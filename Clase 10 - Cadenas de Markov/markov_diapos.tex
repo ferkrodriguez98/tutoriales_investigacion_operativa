@@ -1,0 +1,279 @@
+\documentclass{beamer}
+\usetheme{metropolis}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+% Definición de colores personalizados
+\definecolor{primary}{RGB}{46, 204, 113}
+\definecolor{secondary}{RGB}{52, 152, 219}
+\definecolor{accent}{RGB}{231, 76, 60}
+\definecolor{background}{RGB}{236, 240, 241}
+
+% Configuración del tema
+\setbeamercolor{normal text}{fg=black,bg=background}
+\setbeamercolor{structure}{fg=primary}
+\setbeamercolor{alerted text}{fg=accent}
+
+\title{\Huge\textbf{Cadenas de Markov}}
+\subtitle{\large Investigación Operativa}
+\author{Universidad de San Andrés}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Introducción a las Cadenas de Markov}
+    \begin{itemize}
+        \item<1-> Un proceso estocástico que cumple con la propiedad de Markov
+        \item<2-> La probabilidad de cualquier estado futuro depende únicamente del estado presente
+        \item<3-> No depende de la secuencia de eventos que le precedieron
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Definición Formal}
+    Sea $\{X_n, n \geq 0\}$ un proceso estocástico con espacio de estados $S$.
+    
+    Es una cadena de Markov si para todo $n \geq 0$ y para todos los estados $i_0, i_1, ..., i_n, j \in S$:
+    \[P(X_{n+1} = j | X_n = i_n, X_{n-1} = i_{n-1}, ..., X_0 = i_0) = P(X_{n+1} = j | X_n = i_n)\]
+\end{frame}
+
+\begin{frame}{Matriz de Transición}
+    \begin{itemize}
+        \item La matriz $P = (p_{ij})$ contiene las probabilidades de transición
+        \item $p_{ij} = P(X_{n+1} = j | X_n = i)$
+        \item<+-> Propiedades:
+        \begin{itemize}
+            \item $0 \leq p_{ij} \leq 1$ para todo $i,j \in S$
+            \item $\sum_{j \in S} p_{ij} = 1$ para todo $i \in S$
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejercicio 1: Predicción del Clima - Consigna}
+    \begin{itemize}
+        \item Si hoy está soleado:
+            \begin{itemize}
+                \item 70\% de probabilidad de que mañana esté soleado
+                \item 20\% de probabilidad de que mañana esté nublado
+                \item 10\% de probabilidad de que mañana llueva
+            \end{itemize}
+        \item Si hoy está nublado:
+            \begin{itemize}
+                \item 30\% de probabilidad de que mañana esté soleado
+                \item 40\% de probabilidad de que mañana esté nublado
+                \item 30\% de probabilidad de que mañana llueva
+            \end{itemize}
+        \item Si hoy llueve:
+            \begin{itemize}
+                \item 20\% de probabilidad de que mañana esté soleado
+                \item 40\% de probabilidad de que mañana esté nublado
+                \item 40\% de probabilidad de que mañana llueva
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejercicio 1: Predicción del Clima - Preguntas}
+    \begin{enumerate}[a)]
+        \item Construir la matriz de transición $P$
+        \item ¿Cuál es la probabilidad de que llueva dentro de dos días si hoy está soleado?
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Ejercicio 1: Predicción del Clima - Matriz de Transición}
+    a) Matriz de transición:
+    \begin{center}
+        \[P = \begin{pmatrix}
+        0.7 & 0.2 & 0.1 \\
+        0.3 & 0.4 & 0.3 \\
+        0.2 & 0.4 & 0.4
+        \end{pmatrix}\]
+    \end{center}
+    
+    Donde:
+    \begin{itemize}
+        \item Fila 1: Probabilidades desde estado soleado
+        \item Fila 2: Probabilidades desde estado nublado
+        \item Fila 3: Probabilidades desde estado lluvioso
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejercicio 1: Predicción del Clima - Cálculo de Probabilidad}
+    b) Probabilidad de lluvia en dos días si hoy está soleado:
+    \[
+    \begin{split}
+    P(X_2 = L | X_0 = S) &= (0.7)(0.1) + (0.2)(0.3) + (0.1)(0.4) \\
+    &= 0.07 + 0.06 + 0.04 = 0.17
+    \end{split}
+    \]
+    
+    Interpretación:
+    \begin{itemize}
+        \item 7\%: Soleado $\rightarrow$ Soleado $\rightarrow$ Lluvia
+        \item 6\%: Soleado $\rightarrow$ Nublado $\rightarrow$ Lluvia
+        \item 4\%: Soleado $\rightarrow$ Lluvia $\rightarrow$ Lluvia
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejercicio 2: Puntos en Tenis - Contexto}
+    Final de Roland Garros 2025. Cerúndolo vs Rune con match point.
+    
+    Probabilidades de Cerúndolo:
+    \begin{itemize}
+        \item 50\% de ganar de ace o saque no devuelto
+        \item 30\% de que entre el primer saque y se arme el punto
+        \item 90\% de meter el segundo saque
+        \item 2\% de ganar directo con segundo saque
+        \item 55\% de ganar cualquier peloteo
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejercicio 2: Puntos en Tenis - Preguntas}
+    \begin{enumerate}[a)]
+        \item Identificar estados
+        \item ¿Cuál es la probabilidad de que Cerúndolo gane el punto?
+        \item Si se jugaran infinitos puntos con estas probabilidades, ¿qué porcentaje ganaría cada jugador?
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Ejercicio 2: Estados y Matriz}
+    \begin{columns}
+        \column{0.4\textwidth}
+        Estados identificados:
+        \begin{itemize}
+            \item S: Primer saque
+            \item D: Segundo saque
+            \item P: Peloteo
+            \item W: Ganado
+            \item L: Perdido
+        \end{itemize}
+        
+        \column{0.6\textwidth}
+        \[P = \begin{pmatrix}
+        0 & 0.30 & 0.20 & 0.50 & 0 \\
+        0 & 0 & 0.90 & 0.02 & 0.08 \\
+        0 & 0 & 0 & 0.55 & 0.45 \\
+        0 & 0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & 0 & 1
+        \end{pmatrix}\]
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Ejercicio 2: Resolución}
+    Probabilidad de ganar el punto:
+    \[
+    \begin{split}
+    P(\text{Cerúndolo gana}) &= 0.50 + (0.20 \cdot 0.55) + (0.30 \cdot 0.90 \cdot 0.55) + (0.30 \cdot 0.02) \\
+    &= 0.50 + 0.11 + 0.1485 + 0.006 = 0.7645
+    \end{split}
+    \]
+    
+    A largo plazo:
+    \begin{itemize}
+        \item Cerúndolo: 76.45\% de los puntos
+        \item Rune: 23.55\% de los puntos
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejercicio 3: Máquina de Juguetes - Consigna}
+    \begin{columns}[T]
+        \column{0.6\textwidth}
+        \textbf{Estados posibles:}
+        \begin{itemize}
+            \item F: Funcionando perfectamente (80\%)
+            \item M: Mal funcionamiento (15\%)
+            \item R: Rota (5\%)
+        \end{itemize}
+        
+        \column{0.4\textwidth}
+        \textbf{Producción por hora:}
+        \begin{itemize}
+            \item F: 100 muñecos
+            \item M: 50 muñecos
+            \item R: 0 muñecos
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Ejercicio 3: Intervención del Técnico}
+    \textbf{Intervención del técnico:}
+    \begin{itemize}
+        \item 90\% de probabilidad de reparar
+        \item 10\% de probabilidad de empeorar
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejercicio 3: Preguntas}
+    \begin{enumerate}[a)]
+        \item Construir matriz de transición
+        \item Probabilidad de estar rota después de dos intervenciones, partiendo de F
+        \item Probabilidad de funcionar perfectamente durante tres horas consecutivas
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Ejercicio 3: Resolución - Parte 1}
+    a) Matriz de transición:
+    \[P = \begin{pmatrix}
+    0.80 & 0.15 & 0.05 \\
+    0.90 & 0 & 0.10 \\
+    0.90 & 0 & 0.10
+    \end{pmatrix}\]
+    
+    \begin{itemize}
+        \item Primera fila: Desde F, 80\% sigue en F, 15\% pasa a M, 5\% pasa a R
+        \item Segunda fila: Desde M, técnico arregla (90\%), empeora (10\%)
+        \item Tercera fila: Desde R, técnico arregla (90\%), empeora (10\%)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejercicio 3: Resolución - Parte 2}
+    b) Probabilidad de estar rota después de dos intervenciones:
+    
+    Posibles caminos:
+    \begin{itemize}
+        \item F $\rightarrow$ M $\rightarrow$ M $\rightarrow$ R (prob = 0)
+        \item F $\rightarrow$ R $\rightarrow$ R $\rightarrow$ R (prob = 0.0005)
+        \item F $\rightarrow$ R $\rightarrow$ M $\rightarrow$ R (prob = 0)
+        \item F $\rightarrow$ M $\rightarrow$ R $\rightarrow$ R (prob = 0.0015)
+    \end{itemize}
+    
+    \[
+    \begin{split}
+    P(\text{Rota después de 2}) &= 0 + 0.0005 + 0 + 0.0015 \\
+    &= 0.002
+    \end{split}
+    \]
+\end{frame}
+
+\begin{frame}{Ejercicio 3: Resolución - Parte 3}
+    c) Probabilidad de funcionar tres horas consecutivas:
+    
+    \[
+    \begin{split}
+    P(F \text{ durante 3 horas}) &= 0.80 \cdot 0.80 \cdot 0.80 \\
+    &= 0.512
+    \end{split}
+    \]
+    
+    \begin{itemize}
+        \item Cada hora tiene 80\% de probabilidad de seguir en F
+        \item Las probabilidades son independientes
+        \item Multiplicamos las tres probabilidades
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \begin{center}
+        {\Huge\textbf{¡Gracias!}}
+    \end{center}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,293 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{enumitem}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{center}
+    {\LARGE \textbf{Cadenas de Markov}}\\[0.5em]
+    {Investigación Operativa, Universidad de San Andrés}
+\end{center}
+
+Si encuentran algún error en el documento o hay alguna duda, mandenmé un mail a rodriguezf@udesa.edu.ar y lo revisamos.
+
+\section{Introducción a las Cadenas de Markov}
+
+Una cadena de Markov es un proceso estocástico que cumple con la propiedad de Markov, es decir, la probabilidad de cualquier estado futuro depende únicamente del estado presente y no de la secuencia de eventos que le precedieron.
+
+\subsection{Definición Formal}
+
+Sea $\{X_n, n \geq 0\}$ un proceso estocástico con espacio de estados $S$. Decimos que es una cadena de Markov si para todo $n \geq 0$ y para todos los estados $i_0, i_1, ..., i_n, j \in S$:
+
+\[P(X_{n+1} = j | X_n = i_n, X_{n-1} = i_{n-1}, ..., X_0 = i_0) = P(X_{n+1} = j | X_n = i_n)\]
+
+\subsection{Matriz de Transición}
+
+La matriz de transición $P = (p_{ij})$ contiene las probabilidades de transición de un estado a otro, donde:
+
+\[p_{ij} = P(X_{n+1} = j | X_n = i)\]
+
+Propiedades importantes:
+\begin{itemize}
+    \item $0 \leq p_{ij} \leq 1$ para todo $i,j \in S$
+    \item $\sum_{j \in S} p_{ij} = 1$ para todo $i \in S$
+\end{itemize}
+
+\section{Ejercicios Resueltos}
+
+\subsection{Ejercicio 1: Predicción del Clima}
+
+Un meteorólogo estudia el clima en Buenos Aires y clasifica los días en tres estados posibles: Soleado (S), Nublado (N) y Lluvioso (L). Las probabilidades de transición son:
+
+\begin{itemize}
+    \item Si hoy está soleado:
+        \begin{itemize}
+            \item 70\% de probabilidad de que mañana esté soleado
+            \item 20\% de probabilidad de que esté nublado
+            \item 10\% de probabilidad de que llueva
+        \end{itemize}
+    \item Si hoy está nublado:
+        \begin{itemize}
+            \item 30\% de probabilidad de que mañana esté soleado
+            \item 40\% de probabilidad de que siga nublado
+            \item 30\% de probabilidad de que llueva
+        \end{itemize}
+    \item Si hoy llueve:
+        \begin{itemize}
+            \item 20\% de probabilidad de que mañana esté soleado
+            \item 40\% de probabilidad de que esté nublado
+            \item 40\% de probabilidad de que siga lloviendo
+        \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+    \item[a)] Construir la matriz de transición $P$ que representa este sistema.
+    \item[b)] ¿Cuál es la probabilidad de que llueva dentro de dos días si hoy está soleado?
+\end{itemize}
+
+\textbf{Solución:}
+
+\vspace{0.5em}
+
+a) La matriz de transición $P$ es:
+
+\[P = \begin{pmatrix}
+0.7 & 0.2 & 0.1 \\
+0.3 & 0.4 & 0.3 \\
+0.2 & 0.4 & 0.4
+\end{pmatrix}\]
+
+b) Si hoy está soleado, la probabilidad de que dentro de dos días llueva es:
+
+\[P(X_2 = L | X_0 = S) = \sum_{j \in S} P(X_1 = j | X_0 = S)P(X_2 = L | X_1 = j)\]
+
+Para calcular la probabilidad de que llueva en dos días partiendo de un día soleado, necesitamos considerar todos los caminos posibles:
+
+\begin{itemize}
+    \item Si mañana está soleado (0.7) y luego llueve (0.1)
+    \item Si mañana está nublado (0.2) y luego llueve (0.3)
+    \item Si mañana llueve (0.1) y sigue lloviendo (0.4)
+\end{itemize}
+
+\[
+\begin{aligned}
+P(X_2 = L | X_0 = S) &= (0.7)(0.1) + (0.2)(0.3) + (0.1)(0.4) \\
+&= 0.07 + 0.06 + 0.04 \\
+&= 0.17
+\end{aligned}
+\]
+
+Por lo tanto, hay un 17\% de probabilidad de que llueva dentro de dos días si hoy está soleado.
+
+\subsection{Ejercicio 2: Puntos en Tenis}
+
+Final de Roland Garros 2025. Francisco Cerúndolo está contra Holger Rune con match point. Siendo el analista de tenis de Cerúndolo, se sabe las siguientes probabilidades:
+
+\begin{itemize}
+    \item Hay un 50\% de chances de ganar el punto de un ace o un saque no devuelto
+    \item Tiene 30\% de chances de que la pelota entre con el primer saque y se arme el punto
+    \item Si erra el primer saque, tiene 90\% de chances de meter el segundo
+    \item Hay un 2\% de chances de que gane el punto directamente con el segundo saque
+    \item En cualquier peloteo (sea con primer o segundo saque), tiene 55\% de chances de ganar el punto
+\end{itemize}
+
+Resuelva los siguientes items:
+
+\begin{itemize}
+    \item[a)] Identifique los estados posibles del sistema y construya el diagrama de transición.
+    \item[b)] Calcule la probabilidad de que Cerúndolo gane el punto y se consagre campeón.
+    \item[c)] Si se jugaran infinitos puntos con estas probabilidades, ¿qué porcentaje ganaría cada jugador?
+\end{itemize}
+
+\textbf{Solución:}
+
+\vspace{0.5em}
+
+a) Los estados posibles son:
+\begin{itemize}
+    \item S: Primer saque de Cerúndolo
+    \item D: Segundo saque de Cerúndolo
+    \item P: Punto en juego (peloteo)
+    \item W: Punto ganado por Cerúndolo
+    \item L: Punto perdido por Cerúndolo (ganado por Rune)
+\end{itemize}
+
+\vspace{0.5em}
+
+b) La matriz de transición es:
+
+\[P = \begin{pmatrix}
+0 & 0.30 & 0.20 & 0.50 & 0 \\
+0 & 0 & 0.90 & 0.02 & 0.08 \\
+0 & 0 & 0 & 0.55 & 0.45 \\
+0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 1
+\end{pmatrix}\]
+
+\begin{center}
+Donde las filas y columnas siguen el orden S, D, P, W, L.
+\end{center}
+
+\vspace{0.5em}
+Analicemos cada fila:
+\begin{itemize}
+    \item Primera fila (S): 0.30 de ir a D (errar primer saque), 0.20 de ir a P (peloteo), 0.50 de ir a W (ganar directo)
+    \item Segunda fila (D): 0.90 de ir a P (peloteo), 0.02 de ir a W (ganar directo), 0.08 de ir a L (doble falta)
+    \item Tercera fila (P): 0.55 de ir a W (ganar el punto), 0.45 de ir a L (perder el punto)
+    \item Cuarta y quinta filas (W y L): estados absorbentes (probabilidad 1 de quedarse en el mismo estado)
+\end{itemize}
+
+La probabilidad de que Cerúndolo gane el punto se puede calcular considerando todos los caminos posibles:
+\begin{itemize}
+    \item Ganar directo con el primer saque (0.50)
+    \item Ir a peloteo con primer saque (0.20) y ganar el peloteo (0.55)
+    \item Errar primer saque (0.30), meter segundo (0.90) y ganar el peloteo (0.55)
+    \item Errar primer saque (0.30), ganar directo con el segundo saque (0.02)
+\end{itemize}
+
+Resolvemos entonces la ecuación:
+\[
+\begin{split}
+P(\text{Cerúndolo gana}) &= 0.50 + (0.20 \cdot 0.55) + (0.30 \cdot 0.90 \cdot 0.55) + (0.30 \cdot 0.02) \\
+&= 0.50 + 0.11 + 0.1485 + 0.006 \\
+&= 0.7645
+\end{split}
+\]
+
+Por lo tanto, Cerúndolo tiene aproximadamente un 76.45\% de probabilidad de ganar el punto.
+
+\vspace{0.5em}
+
+c) A largo plazo, considerando que cada punto es independiente y las probabilidades se mantienen constantes:
+\begin{itemize}
+    \item Cerúndolo ganaría aproximadamente el 76.45\% de los puntos
+    \item Rune ganaría aproximadamente el 23.55\% de los puntos
+\end{itemize}
+
+\subsection{Ejercicio 3: Máquina de Juguetes}
+
+En una fábrica de juguetes, hay una máquina que produce muñecos de peluche. La máquina puede estar en tres estados:
+
+\begin{itemize}
+    \item F: Funcionando perfectamente (0.80)
+    \item M: Mal funcionamiento (0.15)
+    \item R: Rota (0.05)
+\end{itemize}
+
+Cuando la máquina está funcionando perfectamente, produce 100 muñecos por hora. En mal funcionamiento, produce 50 muñecos por hora. Cuando está rota, no produce nada.
+
+\vspace{0.5em}
+
+El técnico de mantenimiento puede:
+\begin{itemize}
+    \item Reparar la máquina (0.90)
+    \item Empeorar la situación (0.10)
+\end{itemize}
+
+Resuelva los siguientes items:
+
+\begin{itemize}
+    \item[a)] Construya la matriz de transición considerando los estados de la máquina y las acciones del técnico.
+    \item[b)] Si la máquina comienza funcionando perfectamente, ¿cuál es la probabilidad de que esté rota después de dos intervenciones del técnico?
+    \item[c)] ¿Cuál es la probabilidad de que la máquina funcione perfectamente durante tres horas consecutivas?
+\end{itemize}
+
+\textbf{Ayuda:}
+\begin{itemize}
+    \item La máquina puede cambiar de estado por sí sola o por la intervención del técnico
+    \item El técnico solo interviene cuando la máquina no está funcionando perfectamente
+    \item Las probabilidades son independientes del tiempo
+\end{itemize}
+
+\textbf{Resolución:}
+
+\vspace{0.5em}
+
+a) La matriz de transición es:
+
+\[P = \begin{pmatrix}
+0.80 & 0.15 & 0.05 \\
+0.90 & 0 & 0.10 \\
+0.90 & 0 & 0.10
+\end{pmatrix}\]
+
+\begin{center}
+    Donde las filas y columnas siguen el orden F, M, R.
+\end{center}
+
+Explicación de los valores:
+\begin{itemize}
+    \item Primera fila: Desde F, la máquina tiene 80\% de probabilidad de seguir en F, 15\% de pasar a M y 5\% de pasar a R
+    \item Segunda fila: Desde M, el técnico tiene 90\% de probabilidad de arreglarla (F), 0\% de dejarla igual (M) y 10\% de empeorarla (R)
+    \item Tercera fila: Desde R, el técnico tiene 90\% de probabilidad de arreglarla (F), 0\% de dejarla en M y 10\% de dejarla igual (R)
+\end{itemize}
+
+b) Para calcular la probabilidad de que esté rota después de dos intervenciones, partiendo de F, analizamos todas las posibles combinaciones válidas:
+
+\vspace{0.5em}
+Posibles caminos, sin considerar que la arregla porque si no sería infinito:
+\begin{itemize}
+    \item F $\rightarrow$ M $\rightarrow$ M $\rightarrow$ R
+    \item F $\rightarrow$ R $\rightarrow$ R $\rightarrow$ R  
+    \item F $\rightarrow$ R $\rightarrow$ M $\rightarrow$ R
+    \item F $\rightarrow$ M $\rightarrow$ R $\rightarrow$ R
+\end{itemize}
+
+Calculando cada probabilidad:
+\[
+\begin{aligned}[c]
+P(F \rightarrow M \rightarrow M \rightarrow R) &= 0.15 \cdot 0 \cdot 0.10 = 0 \\
+P(F \rightarrow R \rightarrow R \rightarrow R) &= 0.05 \cdot 0.10 \cdot 0.10 = 0.0005 \\
+P(F \rightarrow R \rightarrow M \rightarrow R) &= 0.05 \cdot 0 \cdot 0.10 = 0 \\
+P(F \rightarrow M \rightarrow R \rightarrow R) &= 0.15 \cdot 0.10 \cdot 0.10 = 0.0015
+\end{aligned}
+\]
+
+Sumando todas las probabilidades:
+\[
+\begin{split}
+P(\text{Rota después de 2 intervenciones}) &= 0 + 0.0005 + 0 + 0.0015 \\
+&= 0.002
+\end{split}
+\]
+
+\vspace{0.5em}
+
+c) Para que funcione perfectamente durante tres horas consecutivas:
+\[
+\begin{split}
+P(\text{F durante 3 horas}) &= 0.80 \cdot 0.80 \cdot 0.80 \\
+&= 0.512
+\end{split}
+\]
+
+\end{document}

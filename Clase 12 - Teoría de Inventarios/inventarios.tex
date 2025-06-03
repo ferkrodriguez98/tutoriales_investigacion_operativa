@@ -1,0 +1,197 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{enumerate}
+\usepackage{tikz}
+\usepackage{tcolorbox}
+\usepackage{xcolor}
+
+\definecolor{primary}{RGB}{46, 204, 113}
+\definecolor{secondary}{RGB}{52, 152, 219}
+\definecolor{accent}{RGB}{231, 76, 60}
+
+\sloppy
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+% Título y materia
+\begin{center}
+    {\LARGE \textbf{Teoría de Inventarios}}\\[0.5em]
+    {Investigación Operativa, Universidad de San Andrés}
+  \end{center}
+
+Si encuentran algún error en el documento o hay alguna duda, mandenmé un mail a rodriguezf@udesa.edu.ar y lo revisamos.
+
+\section{Introducción a la Gestión de Inventarios}
+La gestión de inventarios es una parte fundamental de la administración de operaciones. Un sistema de inventario eficiente permite:
+\begin{itemize}
+    \item Satisfacer la demanda de manera oportuna
+    \item Minimizar costos operativos
+    \item Optimizar el uso de recursos
+    \item Mantener un balance entre servicio al cliente y costos
+\end{itemize}
+
+\section{Modelo EOQ (Economic Order Quantity)}
+\subsection{Variables del Modelo}
+Las variables principales que intervienen en el modelo EOQ son:
+\begin{itemize}
+    \item \textbf{D} = Demanda
+    \item \textbf{Q} = Cantidad a pedir
+    \item \textbf{h} = Costo de mantener inventario
+    \item \textbf{K} = Costo de pedir
+    \item \textbf{CT} = Costo total
+    \item \textbf{L} = Lead time (tiempo hasta tener el stock)
+\end{itemize}
+
+\subsection{Fórmulas Fundamentales}
+\begin{align*}
+Q^* &= \sqrt{\frac{2KD}{h}} \quad \text{(Cantidad Óptima de Pedido)} \\
+CT &= \frac{hQ}{2} + \frac{KD}{Q} \quad \text{(Costo Total)} \\
+N^* &= \frac{D}{Q^*} \quad \text{(Número óptimo de pedidos por año)} \\
+T^* &= \frac{Q^*}{D} \quad \text{(Tiempo entre pedidos)}
+\end{align*}
+
+\section{EOQ con Faltantes Permitidos}
+En algunos casos, puede ser económicamente viable permitir faltantes en el inventario. Esto ocurre cuando el costo de mantener inventario es significativamente alto comparado con el costo de no satisfacer la demanda inmediatamente. Uno podría jugar con el costo de mantener inventario y el costo de no satisfacer la demanda inmediatamente para encontrar el punto óptimo, pagando multas por no entregar el producto a tiempo si son más baratas que el costo de almacenar.
+
+\subsection{Variables Adicionales}
+\begin{itemize}
+    \item \textbf{p} = Costo por unidad por unidad de tiempo de demanda insatisfecha
+    \item \textbf{S} = Nivel máximo de inventario
+\end{itemize}
+
+\subsection{Fórmulas con Faltantes}
+\begin{align*}
+Q^* &= \sqrt{\frac{2DK}{h}}\sqrt{\frac{p+h}{p}} \quad \text{(Cantidad óptima de compra)} \\
+S^* &= \sqrt{\frac{2DK}{h}}\sqrt{\frac{p}{p+h}} \quad \text{(Inventario máximo)} \\
+T^* &= \frac{Q^*}{D} \quad \text{(Tiempo de ciclo)} \\
+T_S^* &= \frac{S^*}{D} \quad \text{(Tiempo con inventario positivo)}
+\end{align*}
+
+\section{Ejemplos Resueltos}
+\subsection{Ejemplo 1: EOQ Básico}
+Una empresa que se dedica a la comercialización de raquetas de tenis presenta los siguientes datos operativos: una demanda anual de 1200 unidades, un costo fijo de \$500 por cada orden realizada, y un costo de almacenamiento de \$100 por cada unidad mantenida en inventario durante un año.
+
+\begin{enumerate}[a]
+    \item ¿Cuál es la cantidad óptima de raquetas a pedir?
+    \item ¿Cuál es el costo total anual?
+    \item ¿Cuál es el número de pedidos por año?
+    \item ¿Cuál es el tiempo entre pedidos?
+\end{enumerate}
+
+\subsubsection{Resolución}
+\begin{enumerate}[a.]
+    \item Cantidad óptima de pedido (Q*):
+    \[ Q^* = \sqrt{\frac{2(500)(1200)}{100}} = \sqrt{12000} \approx 110 \text{ unidades} \]
+    
+    \item Costo total anual:
+    \[ CT = \frac{100(110)}{2} + \frac{500(1200)}{110} = 5500 + 5454.55 = \$10,954.55 \]
+    
+    \item Número de pedidos por año:
+    \[ N^* = \frac{1200}{110} \approx 11 \text{ pedidos} \]
+    
+    \item Tiempo entre pedidos:
+    \[ T^* = \frac{110}{1200} \times 12 \approx 1.1 \text{ meses} \]
+\end{enumerate}
+
+\subsection{Ejemplo 2: EOQ con Faltantes}
+Una empresa que vende computadoras Thinkpad presenta los siguientes datos operativos: una demanda anual de 12,000 unidades, un costo de ordenar de \$500 por pedido, un costo de mantener inventario de \$10 por unidad por mes, y un costo por faltante de \$900 por unidad.
+
+\begin{enumerate}[a]
+    \item ¿Cuál es la cantidad óptima a pedir?
+    \item ¿Cuál es el nivel máximo de inventario?
+    \item ¿Cuál es la cantidad máxima de faltantes permitidos?
+    \item ¿Cuál es el tiempo entre pedidos?
+\end{enumerate}
+
+\subsubsection{Resolución}
+\begin{enumerate}[a.]
+    \item Cantidad óptima a pedir (Q*):
+    \[ Q^* = \sqrt{\frac{2DK}{h} \cdot \frac{h + p}{p}} = \sqrt{100{,}000 \cdot \frac{1{,}020}{900}} = 336.54 \text{ unidades} \]
+    
+    \item Nivel máximo de inventario (S*):
+    \[ S^* = Q^* \cdot \frac{p}{p + h} = 336.54 \cdot \frac{900}{1{,}020} = 296.03 \text{ unidades} \]
+    
+    \item Cantidad máxima de faltantes permitidos:
+    \[ \text{Faltantes máximos} = Q^* - S^* = 336.54 - 296.03 = 40.51 \text{ unidades} \]
+    
+    \item Tiempo entre pedidos (T*):
+    \[ T^* = \frac{Q^*}{D} = \frac{336.54}{12{,}000} = 0.0280 \text{ años} \approx 10.22 \text{ días} \]
+\end{enumerate}
+
+\section{Punto de Reorden}
+El punto de reorden (R) es el nivel de inventario en el cual se debe realizar un nuevo pedido para evitar faltantes, considerando el tiempo de entrega (lead time).
+
+\subsection{Fórmula del Punto de Reorden}
+\[ R = D \cdot L \]
+donde:
+\begin{itemize}
+    \item D = Demanda diaria
+    \item L = Lead time en días
+\end{itemize}
+
+\subsection{Ejemplo de Punto de Reorden}
+
+Para el caso de las computadoras Thinkpad, considerando un lead time de 5 días y una demanda anual de 12,000 unidades, ¿cuál es el punto de reorden?
+
+\subsubsection{Resolución}
+\begin{itemize}
+    \item Lead time: 5 días
+    \item Días laborables: 250 días
+    \item Demanda diaria = 12000/250 = 48 unidades
+\end{itemize}
+
+\begin{align*}
+R &= D \cdot L \\
+  &= 48 \cdot 5 \\
+  &= 240 \text{ unidades}
+\end{align*}
+
+\section{EOQ con Descuentos por Cantidad}
+\subsection{Metodología de Resolución}
+Para resolver problemas con descuentos por cantidad:
+\begin{enumerate}
+    \item Calcular Q* para cada precio
+    \item Verificar si Q* está en el rango válido del descuento
+    \item Si Q* no está en el rango, evaluar los extremos del rango
+    \item Comparar los costos totales de todas las opciones válidas
+\end{enumerate}
+
+\subsection{Ejemplo de Descuentos}
+La estructura de descuentos establece que el precio unitario es de \$100 para pedidos entre 0 y 999 unidades, \$95 para pedidos entre 1000 y 4999 unidades, y \$90 para pedidos de 5000 o más unidades. Para este análisis, se consideran los siguientes datos: una demanda anual de 5000 unidades, un costo fijo de \$200 por cada orden realizada, y un costo de mantener inventario equivalente al 20\% del valor del producto.
+
+\subsubsection{Resolución por Tramos}
+Para cada tramo, el costo de mantener (h) es 20\% del precio unitario:
+\begin{enumerate}
+    \item \textbf{Tramo 1 (0-999):}
+        \begin{itemize}
+            \item h = \$20 (20\% de \$100)
+            \item Q* = 316.23 unidades (válido)
+            \item CT = \$506,324.56
+        \end{itemize}
+    
+    \item \textbf{Tramo 2 (1000-4999):}
+        \begin{itemize}
+            \item h = \$19 (20\% de \$95)
+            \item Q* = 1000 unidades (válido)
+            \item CT = \$485,500.00
+        \end{itemize}
+    
+    \item \textbf{Tramo 3 (5000+):}
+        \begin{itemize}
+            \item h = \$18 (20\% de \$90)
+            \item Q* = 5000 unidades (válido)
+            \item CT = \$495,200.00
+        \end{itemize}
+\end{enumerate}
+
+La política óptima es ordenar 1000 unidades por pedido, con un costo total anual de \$485,500.00.
+
+\end{document}
