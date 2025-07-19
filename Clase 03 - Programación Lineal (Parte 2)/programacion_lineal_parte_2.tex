@@ -1,0 +1,640 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{forest}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{siunitx}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\usetikzlibrary{arrows.meta}
+\tikzset{
+    vertex/.style={circle, draw, minimum size=20pt, inner sep=0pt},
+    edge/.style={-{Latex[length=3mm]}, thick},
+    cost/.style={midway, fill=white}
+}
+
+\sloppy
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE \textbf{Programación Lineal - Parte 2}}\\[0.5em]
+  {Investigación Operativa, Universidad de San Andrés}
+\end{center}
+
+Si encuentran algún error en el documento o hay alguna duda, mandenmé un mail a rodriguezf@udesa.edu.ar y lo revisamos.
+
+\section*{Problemas de Redes}
+
+Hasta ahora veníamos viendo problemas desestructurados, es decir, problemas que no tienen una estructura predefinida. En esos casos la formulación del programa lineal puede salir del enunciado rápidamente o con un poco de creatividad. Los problemas de redes son un tipo especial de programación lineal donde las variables de decisión representan flujos entre nodos conectados por arcos. Estos problemas al poder graficarlos nos ayuda mucho a poder visualizar el problema y resolverlo.
+
+\section{Problema de Transporte}
+
+El problema de transporte es uno de los problemas de redes más comunes. Consiste en determinar cómo transportar unidades desde varios orígenes hasta varios destinos minimizando el costo total, obviamente teniendo restricciones en el camino.
+
+\subsection{Ejemplo de Transporte}
+
+Una empresa tiene 3 fabricas y 4 centros de distribucion. Las fabricas pueden producir las siguientes cantidades: Fabrica 1 puede producir 100 unidades, Fabrica 2 puede producir 150 unidades y Fabrica 3 puede producir 200 unidades. Los centros de distribucion requieren: Centro 1 necesita 120 unidades, Centro 2 necesita 80 unidades, Centro 3 necesita 150 unidades y Centro 4 necesita 100 unidades. \\
+
+El costo de transporte por unidad se muestra en la siguiente matriz:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|cccc}
+        \toprule
+        & CD1 & CD2 & CD3 & CD4 \\
+        \midrule
+        F1 & 10 & 8 & 6 & 5 \\
+        F2 & 7 & 9 & 8 & 6 \\
+        F3 & 8 & 7 & 5 & 9 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsubsection{Gráfico}
+
+A la izquierda de cada nodo de fábrica ponemos la capacidad de producción de la fábrica. A la derecha de cada nodo de centro de distribución ponemos la demanda de ese centro de distribución. Trazamos todas las lineas que conectan los nodos de fábricas con los nodos de centros de distribución y encima de ellas ponemos el costo de transporte por unidad. Si hubiera una fábrica que no tiene distribución a un centro, esa línea no se traza.
+
+\begin{center}
+\begin{tikzpicture}[node distance=4cm]
+    % Nodos de origen (fábricas)
+    \node[vertex] (F1) at (0,6) {F1};
+    \node[vertex] (F2) at (0,3) {F2};
+    \node[vertex] (F3) at (0,0) {F3};
+    
+    % Nodos de destino (centros de distribución)
+    \node[vertex] (CD1) at (8,6) {CD1};
+    \node[vertex] (CD2) at (8,4) {CD2};
+    \node[vertex] (CD3) at (8,2) {CD3};
+    \node[vertex] (CD4) at (8,0) {CD4};
+    
+    % Capacidades de las fábricas
+    \node[left] at (F1.west) {100};
+    \node[left] at (F2.west) {150};
+    \node[left] at (F3.west) {200};
+    
+    % Demandas de los centros
+    \node[right] at (CD1.east) {120};
+    \node[right] at (CD2.east) {80};
+    \node[right] at (CD3.east) {150};
+    \node[right] at (CD4.east) {100};
+    
+    % Arcos con costos (solo algunos para no saturar el gráfico)
+    \draw[edge] (F1) -- (CD1) node[pos=0.25,above] {10};
+    \draw[edge] (F1) -- (CD2) node[pos=0.25,above] {8};
+    \draw[edge] (F1) -- (CD3) node[pos=0.25,above] {6};
+    \draw[edge] (F1) -- (CD4) node[pos=0.25,above] {5};
+    \draw[edge] (F2) -- (CD1) node[pos=0.25,above] {7};
+    \draw[edge] (F2) -- (CD2) node[pos=0.25,above] {9};
+    \draw[edge] (F2) -- (CD3) node[pos=0.25,above] {8};
+    \draw[edge] (F2) -- (CD4) node[pos=0.25,above] {6};
+    \draw[edge] (F3) -- (CD1) node[pos=0.25,above] {8};
+    \draw[edge] (F3) -- (CD2) node[pos=0.25,above] {7};
+    \draw[edge] (F3) -- (CD3) node[pos=0.25,above] {5};
+    \draw[edge] (F3) -- (CD4) node[pos=0.25,above] {9};
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Formulación}
+
+Para las variables de decisión en este tipo de problemas tenemos dos formas de anotarlo. Una sería la forma más mátematica:
+\begin{itemize}
+    \item $x_{ij}$: cantidad transportada desde la fábrica $i$ al centro $j$
+\end{itemize}
+
+O bien la forma más práctica:
+\begin{itemize}
+    \item $x_{i}$: cantidad transportada por cada camino $i$
+\end{itemize}
+
+Con la función objetivo nos pasaría lo mismo. Una es la forma más mátematica:
+\begin{align*}
+\text{Minimizar: } Z = \sum_{i=1}^3 \sum_{j=1}^4 c_{ij}x_{ij}
+\end{align*}
+
+O bien la forma más práctica:
+\begin{align*}
+\text{Minimizar: } Z = \sum_{i=1}^{12} x_{i}
+\end{align*}
+
+Con las restricciones, nuevamente, es lo mismo. Si fueramos por la forma más matemática, en donde $i$ es cada fábrica y $j$ es cada centro de distribución, tendríamos:
+
+\begin{align*}
+\sum_{j=1}^4 x_{1j} &= 100 && \text{(capacidad F1)} \\
+\sum_{j=1}^4 x_{2j} &= 150 && \text{(capacidad F2)} \\
+\sum_{j=1}^4 x_{3j} &= 200 && \text{(capacidad F3)} \\
+\sum_{i=1}^3 x_{i1} &= 120 && \text{(demanda CD1)} \\
+\sum_{i=1}^3 x_{i2} &= 80 && \text{(demanda CD2)} \\
+\sum_{i=1}^3 x_{i3} &= 150 && \text{(demanda CD3)} \\
+\sum_{i=1}^3 x_{i4} &= 100 && \text{(demanda CD4)} \\
+x_{ij} &\geq 0 && \forall i,j
+\end{align*}
+
+Notar que en cada caso de los anteriores, una de las variables queda fija. Por el contrario, si fueramos con que $i$ es cada camino y nada más, las restricciones nos quedan de la siguiente manera:
+
+\begin{align*}
+\sum_{i=1}^{4} x_{i} &= 100 && \text{(capacidad F1)} \\
+\sum_{i=5}^{8} x_{i} &= 150 && \text{(capacidad F2)} \\
+\end{align*}
+
+\begin{align*}
+\sum_{i=9}^{12} x_{i} &= 200 && \text{(capacidad F3)} \\
+x_1 + x_5 + x_9 &= 120 && \text{(demanda CD1)} \\
+x_2 + x_6 + x_{10} &= 80 && \text{(demanda CD2)} \\
+x_3 + x_7 + x_{11} &= 150 && \text{(demanda CD3)} \\
+x_4 + x_8 + x_{12} &= 100 && \text{(demanda CD4)} \\
+x_{i} &\geq 0 && \forall i
+\end{align*}
+
+Ambas formas son válidas y pueden usar la que quieran y se sientan más cómodos.
+
+\subsubsection{Implementación}
+
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+# Crear el problema
+P = picos.Problem()
+
+# Definir variables
+x = picos.RealVariable('x', 12)
+
+# Definir costos
+c = np.array([10, 8, 6, 5, 7, 9, 8, 6, 8, 7, 5, 9])
+
+# Definir funcion objetivo
+P.set_objective('min', picos.sum([c[i] * x[i] for i in range(12)]))
+
+# Restricciones de capacidad
+P.add_constraint(sum(x[0:4]) == 100)  # F1
+P.add_constraint(sum(x[4:8]) == 150)  # F2
+P.add_constraint(sum(x[8:12]) == 200) # F3
+
+# Restricciones de demanda
+P.add_constraint(x[0] + x[4] + x[8] == 120)    # CD1
+P.add_constraint(x[1] + x[5] + x[9] == 80)     # CD2
+P.add_constraint(x[2] + x[6] + x[10] == 150)   # CD3
+P.add_constraint(x[3] + x[7] + x[11] == 100)   # CD4
+
+# Restricciones de no negatividad
+P.add_constraint(x >= 0)
+
+# Resolver
+P.solve(solver='glpk')
+
+# Mostrar resultados
+print("Solucion optima:")
+for i in range(12):
+    print(f"x_{i+1}: {x[i].value:.2f}")
+print(f"Costo total: ${P.value:.2f}")
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+Solucion optima:
+x_1: 0.00
+x_2: 30.00
+x_3: 0.00
+x_4: 70.00
+x_5: 120.00
+x_6: 0.00
+x_7: 0.00
+x_8: 30.00
+x_9: 0.00
+x_10: 50.00
+x_11: 150.00
+x_12: 0.00
+Costo total: $2710.00
+\end{lstlisting}
+
+\section{Problema de Transporte Desbalanceado}
+
+En la práctica, es común encontrar situaciones donde la oferta total no coincide con la demanda total. En estos casos, tenemos un problema desbalanceado que requiere la introducción de variables de holgura (slack).
+
+\subsection{Ejemplo con Demanda Insatisfecha}
+
+Consideremos el ejemplo anterior pero con una demanda total mayor que la oferta. En este caso, debemos introducir una ``fábrica ficticia'' con un costo de penalización por demanda insatisfecha.
+
+\begin{center}
+\begin{tikzpicture}[node distance=4cm]
+    % Nodos de origen (fábricas)
+    \node[vertex] (F1) at (0,6) {F1};
+    \node[vertex] (F2) at (0,3) {F2};
+    \node[vertex] (F3) at (0,0) {F3};
+    \node[vertex,dashed] (FF) at (3,8) {FF};
+    
+    % Nodos de destino
+    \node[vertex] (CD1) at (8,6) {CD1};
+    \node[vertex] (CD2) at (8,4) {CD2};
+    \node[vertex] (CD3) at (8,2) {CD3};
+    \node[vertex] (CD4) at (8,0) {CD4};
+    
+    % Capacidades y demandas
+    \node[left] at (F1.west) {100};
+    \node[left] at (F2.west) {150};
+    \node[left] at (F3.west) {200};
+    \node[left] at (FF.west) {$\infty$};
+    
+    \node[right] at (CD1.east) {120};
+    \node[right] at (CD2.east) {80};
+    \node[right] at (CD3.east) {150};
+    \node[right] at (CD4.east) {150};
+    
+    % Arcos con costos
+    \draw[edge] (F1) -- (CD1) node[pos=0.25,above] {10};
+    \draw[edge] (F1) -- (CD2) node[pos=0.25,above] {8};
+    \draw[edge] (F1) -- (CD3) node[pos=0.25,above] {6};
+    \draw[edge] (F1) -- (CD4) node[pos=0.25,above] {5};
+    \draw[edge] (F2) -- (CD1) node[pos=0.25,above] {7};
+    \draw[edge] (F2) -- (CD2) node[pos=0.25,above] {9};
+    \draw[edge] (F2) -- (CD3) node[pos=0.25,above] {8};
+    \draw[edge] (F2) -- (CD4) node[pos=0.25,above] {6};
+    \draw[edge] (F3) -- (CD1) node[pos=0.25,above] {8};
+    \draw[edge] (F3) -- (CD2) node[pos=0.25,above] {7};
+    \draw[edge] (F3) -- (CD3) node[pos=0.25,above] {5};
+    \draw[edge] (F3) -- (CD4) node[pos=0.25,above] {9};
+    \draw[edge,dashed] (FF) -- (CD1) node[cost] {M};
+    \draw[edge,dashed] (FF) -- (CD2) node[cost] {M};
+    \draw[edge,dashed] (FF) -- (CD3) node[cost] {M};
+    \draw[edge,dashed] (FF) -- (CD4) node[cost] {M};
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{¿Y qué cambia esto?}
+
+Al agregar la fábrica ficticia podemos llegar a suplir la demanda de los centros de distribución. El tema es que por cada unidad que se transporta desde la fábrica ficticia, se tiene un costo de penalización. Esto se agrega a la función objetivo de la siguiente manera:
+
+\begin{align*}
+\text{Minimizar: } Z = \sum_{i=1}^3 \sum_{j=1}^4 c_{ij}x_{ij} + M \sum_{i=1}^3 x_{i}
+\end{align*}
+
+Donde $M$ es un número muy grande que representa el costo de penalización por demanda insatisfecha.
+
+\section{Problema de Transshipment}
+
+El problema de transshipment es una extensión del problema de transporte donde se permite que los nodos intermedios actúen como puntos de transferencia.
+
+\subsection{Sunco Oil Co.}
+
+Sunco Oil Co. es una empresa petrolera que tiene dos pozos W1 y W2. La empresa provee de petróleo a la ciudad Nueva York y Los Ángeles. El Pozo W1 puede producir hasta 150.000 barriles de petróleo por día mientras que el W2 puede producir hasta 200.000 barriles de petróleo al día. NY tiene una demanda de 140.000 b/día mientras que LA tiene una demanda de 160.000 b/día. Además de enviar camiones directos a NY y LA Sunco Oil tiene la opción de enviarlo a dos puertos: Mobile y Galveston, donde después llegarán por barco a destino. \\
+
+\begin{center}
+\begin{tabular}{cccccccc}
+\toprule
+ & & \multicolumn{6}{c}{\textbf{Hasta}} \\
+ & & W1 & W2 & M & G & NY & LA \\
+\midrule
+\textbf{Pozo} & W1 & X & -- & 10 & 12 & 45 & 28 \\
+ & W2 & -- & X & 5 & 12 & 26 & 25 \\
+\midrule
+\textbf{Puerto} & M & -- & -- & X & 6 & 16 & 17 \\
+ & G & -- & -- & -- & X & 14 & 16 \\
+\midrule
+\textbf{Ciudad} & NY & -- & -- & -- & -- & X & 15 \\
+ & LA & -- & -- & -- & -- & -- & X \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+¿Cómo debe ser el tránsito del petróleo para minimizar los costos y cubrir la demanda de NY y LA?
+
+\subsubsection{Gráfico}
+
+Hay que ser muy prolijos con el gráfico y no mezclarnos costos de distintos caminos.
+
+\begin{center}
+\begin{tikzpicture}[node distance=3cm]
+    % Nodos de pozos
+    \node[vertex] (W1) at (0,5) {W1};
+    \node[vertex] (W2) at (0,0) {W2};
+    
+    % Nodos de puertos
+    \node[vertex] (M) at (4,4) {M};
+    \node[vertex] (G) at (4,1) {G};
+    
+    % Nodos de ciudades
+    \node[vertex] (NY) at (8,5) {NY};
+    \node[vertex] (LA) at (8,0) {LA};
+    
+    % Capacidades de los pozos
+    \node[left] at (W1.west) {150};
+    \node[left] at (W2.west) {200};
+    
+    % Demandas de las ciudades
+    \node[right] at (NY.east) {140};
+    \node[right] at (LA.east) {160};
+    
+    % Arcos desde pozos a puertos
+    \draw[edge] (W1) -- (M) node[pos=0.5, above] {10};
+    \draw[edge] (W1) -- (G) node[pos=0.3, below] {12};
+    \draw[edge] (W2) -- (M) node[pos=0.2, above] {5};
+    \draw[edge] (W2) -- (G) node[pos=0.5, above] {12};
+    
+    % Arcos desde pozos a ciudades
+    \draw[edge] (W1) -- (NY) node[pos=0.5, above] {45};
+    \draw[edge] (W1) -- (LA) node[pos=0.3, above] {28};
+    \draw[edge] (W2) -- (NY) node[pos=0.3, above] {26};
+    \draw[edge] (W2) -- (LA) node[pos=0.5, below] {25};
+    
+    % Arcos desde puertos a ciudades
+    \draw[edge] (M) -- (NY) node[pos=0.5, above] {16};
+    \draw[edge] (M) -- (LA) node[pos=0.5, right] {17};
+    \draw[edge] (M) -- (G) node[pos=0.2, right] {6};
+    \draw[edge] (G) -- (NY) node[pos=0.5, above] {14};
+    \draw[edge] (G) -- (LA) node[pos=0.5, below] {16};
+
+    \draw[edge] (NY) -- (LA) node[pos=0.5, right] {15};
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Formulación}
+
+Como siempre, podemos tener $x_i$ siendo cada camino, pero también lo podemos hacer más prolijo. Para las variables de decision:
+\begin{itemize}
+    \item $x_{W1M}$: cantidad de petroleo transportada desde el pozo W1 al puerto M
+    \item $x_{W1G}$: cantidad de petroleo transportada desde el pozo W1 al puerto G
+    \item $x_{W2M}$: cantidad de petroleo transportada desde el pozo W2 al puerto M
+    \item $x_{W2G}$: cantidad de petroleo transportada desde el pozo W2 al puerto G
+    \item $x_{W1NY}$: cantidad de petroleo transportada desde el pozo W1 a NY
+    \item $x_{W1LA}$: cantidad de petroleo transportada desde el pozo W1 a LA
+    \item $x_{W2NY}$: cantidad de petroleo transportada desde el pozo W2 a NY
+    \item $x_{W2LA}$: cantidad de petroleo transportada desde el pozo W2 a LA
+    \item $x_{MNY}$: cantidad de petroleo transportada desde el puerto M a NY
+    \item $x_{MLA}$: cantidad de petroleo transportada desde el puerto M a LA
+    \item $x_{MG}$: cantidad de petroleo transportada desde el puerto M al puerto G
+    \item $x_{GNY}$: cantidad de petroleo transportada desde el puerto G a NY
+    \item $x_{GLA}$: cantidad de petroleo transportada desde el puerto G a LA
+    \item $x_{NYLA}$: cantidad de petroleo transportada desde NY a LA
+\end{itemize}
+
+\vspace{1em}
+
+Funcion objetivo:
+\begin{align*}
+\text{Minimizar: } Z = \sum_{i=1}^{14} c_ix_i
+\end{align*}
+
+donde $c_i$ son los costos de cada camino y $x_i$ son las variables de decision para cada camino. \\
+
+O bien de forma explícita:
+
+\begin{align*}
+\text{Minimizar: } Z = 10x_{W1M} + 12x_{W1G} + 5x_{W2M} + 12x_{W2G} + 45x_{W1NY} + 28x_{W1LA} + \\ 26x_{W2NY} + 25x_{W2LA} + 16x_{MNY} + 17x_{MLA} + 6x_{MG} + 14x_{GNY} + 16x_{GLA} + 15x_{NYLA}
+\end{align*}
+
+Para las restricciones tenemos dos tipos, las de oferta y demanda, que son las siguientes:
+\begin{align*}
+x_{W1M} + x_{W1G} + x_{W1NY} + x_{W1LA} &\leq 150 && \text{(capacidad W1)} \\
+x_{W2M} + x_{W2G} + x_{W2NY} + x_{W2LA} &\leq 200 && \text{(capacidad W2)} \\
+x_{W1NY} + x_{W2NY} + x_{MNY} + x_{GNY} + x_{LA,NY} &= 140 && \text{(demanda NY)} \\
+x_{W1LA} + x_{W2LA} + x_{MLA} + x_{GLA} + x_{NY,LA} &= 160 && \text{(demanda LA)} \\
+x_{ij} &\geq 0 && \forall i,j
+\end{align*}
+
+Por otra parte, tenemos las restricciones de \textbf{balance} para asegurarnos de todo lo que llega a $M$ y a $G$ efectivamente se vaya:
+\begin{align*}
+x_{W1M} + x_{W2M} &= x_{MNY} + x_{MLA} + x_{MG} && \text{(balance M)} \\
+x_{W1G} + x_{W2G} + x_{MG} &= x_{GNY} + x_{GLA} && \text{(balance G)} \\
+\end{align*}
+
+\subsubsection{Implementación}
+
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+# Crear el problema
+P = picos.Problem()
+
+# Definir variables de decision
+x = picos.RealVariable('x', 14)  # 14 caminos posibles
+
+# Definir costos
+c = np.array([10, 12, 5, 12, 45, 28, 26, 25, 16, 17, 6, 14, 16, 15])
+c = picos.Constant('c', c)
+
+# Definir funcion objetivo
+P.set_objective('min', c | x)
+
+# Restricciones de oferta
+P.add_constraint(x[0] + x[1] + x[4] + x[5] <= 150)  # W1
+P.add_constraint(x[2] + x[3] + x[6] + x[7] <= 200)  # W2
+
+# Restricciones de demanda
+P.add_constraint(x[4] + x[6] + x[8] + x[11] + x[13] == 140)  # NY
+P.add_constraint(x[5] + x[7] + x[9] + x[12] + x[13] == 160)  # LA
+
+# Restricciones de balance
+P.add_constraint(x[0] + x[2] == x[8] + x[9] + x[10])  # M
+P.add_constraint(x[1] + x[3] + x[10] == x[11] + x[12])  # G
+
+# Restricciones de no negatividad
+P.add_constraint(x >= 0)
+
+# Resolver
+P.solve(solver='glpk')
+
+print("Valores optimos de las variables:")
+print(x)
+print("\nCosto total minimo:", P.value)
+\end{lstlisting}
+
+\subsection{Salida de la consola}
+
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+Valores optimos de las variables:
+[ 0.00e+00]
+[ 0.00e+00]
+[ 2.00e+01]
+[ 0.00e+00]
+[ 0.00e+00]
+[ 0.00e+00]
+[ 0.00e+00]
+[ 0.00e+00]
+[ 0.00e+00]
+[ 2.00e+01]
+[ 0.00e+00]
+[ 0.00e+00]
+[ 0.00e+00]
+[ 1.40e+02]
+
+Costo total minimo: 2540.0
+\end{lstlisting}
+
+
+\section{Problema de Flujo Máximo}
+
+El problema de flujo máximo busca determinar el máximo flujo posible desde un nodo fuente hasta un nodo sumidero, respetando las capacidades de los arcos. Es como una red de cañerías, donde cada arco tiene una capacidad máxima y el flujo que pasa por cada arco es el que se transporta.
+
+\subsection{Sunco Oil Co. (Continuación)}
+
+Sunco Oil quiere transportar la máxima cantidad de petróleo posible (por hora) mediante tubos desde el nodo So (source) hasta Si (sink). El petróleo debe si o si pasar a traves de ciertas estaciones de la empresa: 1, 2 y 3. Los distintos arcos en el diagrama representan los tubos, los cuales tienen distintos diametros. El número máximo de barriles de petróleo que pueden ser bombeados a traves de cada arco se muestra en la siguiente Tabla. Cada número se lo denomina capacidad del tubo o del arco. Determinar cuanto es el máximo número de barriles de petróleo por hora que se pueden enviar de So a Si. \\
+
+Los costos (capacidades) de los arcos se encuentran en la siguiente tabla:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+\textbf{Arco} & \textbf{Capacidad} \\
+\midrule
+so-1 & 2 \\
+so-2 & 3 \\
+1-2 & 3 \\
+1-3 & 4 \\
+3-si & 1 \\
+2-si & 2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Gráfico}
+
+Para armar el gráfico de flujo máximo simplemente creamos cada nodo y luego trazamos los arcos con sus respectivas capacidades prestando atención a no equivocarnos. \\
+
+\begin{center}
+\begin{tikzpicture}[node distance=2.5cm]
+    % Nodos
+    \node[vertex, fill=red!30] (so) at (0,0) {so};
+    \node[vertex, fill=gray!60] (1) at (2.5,0) {1};
+    \node[vertex, fill=gray!60] (2) at (5,0) {2};
+    \node[vertex, fill=gray!60] (3) at (3.75,2) {3};
+    \node[vertex, fill=blue!30] (si) at (7.5,0) {si};
+
+    % Arcos con capacidades
+    \draw[edge] (so) -- (1) node[pos=0.5, above] {2};
+    \draw[edge] (1) -- (2) node[pos=0.5, above] {3};
+    \draw[edge] (2) -- (si) node[pos=0.5, above] {2};
+    \draw[edge] (1) -- (3) node[pos=0.5, above] {4};
+    \draw[edge] (3) -- (si) node[pos=0.5, above] {1};
+    \draw[edge] (so) .. controls +(1.5,-1.5) and +(-1.5,-1.5) .. (2) node[pos=0.5, below] {3};
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{Formulación}
+
+Las variables de decisión van a ser cada uno de los caminos, y cuánto pasa por ahí:
+\begin{itemize}
+    \item $x_{i}$: flujo en el arco $i$
+\end{itemize}
+
+La función objetivo es simplemente maximizar lo que sale de $so$ (o lo que llega a $si$):
+\begin{align*}
+\text{Maximizar: } Z = x_1 + x_2
+\end{align*}
+
+Las restricciones es donde está lo importante en los problemas de flujo máximo. Tenemos que asegurarnos de que lo que entra a cada nodo sea igual a lo que sale. Por ejemplo, en el nodo 1, lo que entra es $x_1 + x_2$ y lo que sale es $x_3 + x_4$. Por lo tanto, tenemos que:
+\begin{align*}
+x_1 + x_2 &= x_5 + x_6 && \text{(salida igual a llegada)} \\
+x_1 + x_2 &= x_3 + x_4 && \text{(conservacion nodo 1)} \\
+x_2 + x_4 &= x_6 && \text{(conservacion nodo 2)} \\
+x_3 &= x_5 && \text{(conservacion nodo 3)} \\
+x_1 &\leq 2 && \text{(capacidad so-1)} \\
+x_2 &\leq 3 && \text{(capacidad so-2)} \\
+x_3 &\leq 3 && \text{(capacidad 1-2)} \\
+x_4 &\leq 4 && \text{(capacidad 1-3)} \\
+x_5 &\leq 1 && \text{(capacidad 3-si)} \\
+x_6 &\leq 2 && \text{(capacidad 2-si)} \\
+x_i &\geq 0 && \forall i
+\end{align*}
+
+\section{Implementación con PICOS}
+
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+# Crear el problema
+P = picos.Problem()
+
+# Definir variables
+x = picos.RealVariable('x', 6)
+
+# Definir funcion objetivo
+P.set_objective('max', x[0] + x[1])
+
+# Restricciones de conservacion de flujo
+P.add_constraint(x[0] + x[1] == x[4] + x[5])  # salida igual a llegada
+P.add_constraint(x[0] + x[1] == x[2] + x[3])  # conservacion nodo 1
+P.add_constraint(x[1] + x[3] == x[5])         # conservacion nodo 2
+P.add_constraint(x[2] == x[4])                # conservacion nodo 3
+
+# Restricciones de capacidad
+P.add_constraint(x[0] <= 2)  # capacidad so-1
+P.add_constraint(x[1] <= 3)  # capacidad so-2
+P.add_constraint(x[2] <= 3)  # capacidad 1-2
+P.add_constraint(x[3] <= 4)  # capacidad 1-3
+P.add_constraint(x[4] <= 1)  # capacidad 3-si
+P.add_constraint(x[5] <= 2)  # capacidad 2-si
+
+# Restricciones de no negatividad
+P.add_constraint(x >= 0)
+
+# Resolver
+P.solve(solver='glpk')
+
+# Mostrar resultados
+print("Solucion optima:")
+for i in range(6):
+    print(f"x_{i+1}: {x[i].value:.2f}")
+print(f"Flujo maximo: {P.value:.2f}")
+
+\end{lstlisting}
+
+\subsection{Salida de la consola}
+
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+Solucion optima:
+x_1: 2.00
+x_2: 0.00
+x_3: 1.00
+x_4: 1.00
+x_5: 1.00
+x_6: 1.00
+Flujo maximo: 2.00
+\end{lstlisting}
+
+
+\end{document} 

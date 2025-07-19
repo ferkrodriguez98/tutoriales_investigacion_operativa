@@ -146,7 +146,7 @@ a) Los estados posibles son:
 b) La matriz de transición es:
 
 \[P = \begin{pmatrix}
-0 & 0.30 & 0.20 & 0.50 & 0 \\
+0 & 0.20 & 0.30 & 0.50 & 0 \\
 0 & 0 & 0.90 & 0.02 & 0.08 \\
 0 & 0 & 0 & 0.55 & 0.45 \\
 0 & 0 & 0 & 1 & 0 \\
@@ -160,7 +160,7 @@ Donde las filas y columnas siguen el orden S, D, P, W, L.
 \vspace{0.5em}
 Analicemos cada fila:
 \begin{itemize}
-    \item Primera fila (S): 0.30 de ir a D (errar primer saque), 0.20 de ir a P (peloteo), 0.50 de ir a W (ganar directo)
+    \item Primera fila (S): 0.20 de ir a D (errar primer saque), 0.30 de ir a P (peloteo), 0.50 de ir a W (ganar directo)
     \item Segunda fila (D): 0.90 de ir a P (peloteo), 0.02 de ir a W (ganar directo), 0.08 de ir a L (doble falta)
     \item Tercera fila (P): 0.55 de ir a W (ganar el punto), 0.45 de ir a L (perder el punto)
     \item Cuarta y quinta filas (W y L): estados absorbentes (probabilidad 1 de quedarse en el mismo estado)
@@ -169,28 +169,28 @@ Analicemos cada fila:
 La probabilidad de que Cerúndolo gane el punto se puede calcular considerando todos los caminos posibles:
 \begin{itemize}
     \item Ganar directo con el primer saque (0.50)
-    \item Ir a peloteo con primer saque (0.20) y ganar el peloteo (0.55)
-    \item Errar primer saque (0.30), meter segundo (0.90) y ganar el peloteo (0.55)
-    \item Errar primer saque (0.30), ganar directo con el segundo saque (0.02)
+    \item Ir a peloteo con primer saque (0.30) y ganar el peloteo (0.55)
+    \item Errar primer saque (0.20), meter segundo (0.90) y ganar el peloteo (0.55)
+    \item Errar primer saque (0.20), ganar directo con el segundo saque (0.02)
 \end{itemize}
 
 Resolvemos entonces la ecuación:
 \[
 \begin{split}
-P(\text{Cerúndolo gana}) &= 0.50 + (0.20 \cdot 0.55) + (0.30 \cdot 0.90 \cdot 0.55) + (0.30 \cdot 0.02) \\
-&= 0.50 + 0.11 + 0.1485 + 0.006 \\
-&= 0.7645
+P(\text{Cerúndolo gana}) &= 0.50 + (0.30 \cdot 0.55) + (0.20 \cdot 0.90 \cdot 0.55) + (0.20 \cdot 0.02) \\
+&= 0.50 + 0.165 + 0.099 + 0.004 \\
+&= 0.768
 \end{split}
 \]
 
-Por lo tanto, Cerúndolo tiene aproximadamente un 76.45\% de probabilidad de ganar el punto.
+Por lo tanto, Cerúndolo tiene aproximadamente un 76.8\% de probabilidad de ganar el punto.
 
 \vspace{0.5em}
 
 c) A largo plazo, considerando que cada punto es independiente y las probabilidades se mantienen constantes:
 \begin{itemize}
-    \item Cerúndolo ganaría aproximadamente el 76.45\% de los puntos
-    \item Rune ganaría aproximadamente el 23.55\% de los puntos
+    \item Cerúndolo ganaría aproximadamente el 76.8\% de los puntos
+    \item Rune ganaría aproximadamente el 23.2\% de los puntos
 \end{itemize}
 
 \subsection{Ejercicio 3: Máquina de Juguetes}

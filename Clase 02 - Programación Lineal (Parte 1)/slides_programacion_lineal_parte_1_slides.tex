@@ -1,0 +1,499 @@
+\documentclass{beamer}
+\usetheme{metropolis}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{booktabs}
+\usepackage{fontawesome5}
+
+% Definición de colores personalizados
+\definecolor{primary}{RGB}{46, 204, 113}
+\definecolor{secondary}{RGB}{52, 152, 219}
+\definecolor{accent}{RGB}{231, 76, 60}
+\definecolor{background}{RGB}{236, 240, 241}
+\definecolor{gradient1}{RGB}{255, 107, 107}
+\definecolor{gradient2}{RGB}{255, 159, 67}
+
+% Configuración del tema
+\setbeamercolor{normal text}{fg=black,bg=background}
+\setbeamercolor{structure}{fg=primary}
+\setbeamercolor{alerted text}{fg=accent}
+
+\definecolor{lightgray}{rgb}{0.95,0.95,0.95}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{darkblue}{rgb}{0,0,0.5}
+
+\lstset{
+  backgroundcolor=\color{lightgray},
+  basicstyle=\tiny\ttfamily,
+  keywordstyle=\color{darkblue}\bfseries,
+  commentstyle=\color{darkgreen},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  frame=single,
+  tabsize=2,
+  language=Python,
+  breaklines=true,
+  breakatwhitespace=true
+}
+
+\title{\Huge\textbf{Programación Lineal - Pt 1}}
+\author{Investigación Operativa}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south west,inner sep=30pt] at (current page.south west) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{¿Qué es la Programación Lineal?}
+    \textbf{Definición:}
+    \begin{itemize}
+        \item Técnica de optimización matemática
+        \item Busca la mejor solución a problemas con función objetivo y restricciones lineales
+        \item Herramienta fundamental para toma de decisiones
+        \item Optimización de recursos limitados
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Aplicaciones de la Programación Lineal}
+    \textbf{Aplicaciones:}
+    \begin{itemize}
+        \item[{\makebox[1em][c]{\textcolor{black}{\faIndustry}}}] Producción y manufactura
+        \item[{\makebox[1em][c]{\textcolor{black}{\faTruck}}}] Logística y transporte
+        \item[{\makebox[1em][c]{\textcolor{black}{\faMoneyBill}}}] Finanzas y inversiones
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Problema de PL General - Componentes}
+    \textbf{Elementos del modelo:}
+    \begin{itemize}
+        \item<1-> \textbf{Variables de decisión} ($x_j$): Nivel de cada actividad
+        \item<2-> \textbf{Función objetivo} ($Z$): Medida de performance a optimizar
+        \item<3-> \textbf{Parámetros:}
+        \begin{itemize}
+            \item $c_j$: Aumento de $Z$ por unidad de $x_j$
+            \item $b_i$: Cantidad del recurso $i$ disponible
+            \item $a_{ij}$: Cantidad del recurso $i$ que consume cada unidad de actividad $j$
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Problema de PL General - Formulación}
+    \textbf{Forma estándar:}
+    \begin{align*}
+        &\textbf{Min } Z \\
+        &\text{Dado} \\
+        &\qquad Z = c x^t \\
+        &\qquad a x^t \leq b \\
+        &\qquad x \geq 0
+    \end{align*}
+    
+    Donde:
+    \begin{itemize}
+        \item $x = (x_1, x_2, \ldots, x_n)$ - vector de variables
+        \item $c = (c_1, c_2, \ldots, c_n)$ - vector de coeficientes
+        \item $b = (b_1, b_2, \ldots, b_m)$ - vector de recursos
+        \item $a$ - matriz de consumo de recursos por unidad de actividad
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejemplo 1: Panes y Tortas}
+    \textbf{Situación:}
+    Jorge tiene una panadería que produce panes y tortas.
+    
+    \vspace{1em}
+    \textbf{Recursos por unidad:}
+    \begin{itemize}
+        \item \textbf{Pan:} 1 kg harina, 0.2 kg levadura
+        \item \textbf{Torta:} 0.5 kg harina, 0.1 kg levadura, 0.2 kg azúcar
+    \end{itemize}
+    
+    \vspace{1em}
+    \textbf{Disponibilidad diaria:}
+    \begin{itemize}
+        \item 50 kg de harina
+        \item 15 kg de levadura  
+        \item 10 kg de azúcar
+    \end{itemize}
+    
+    \vspace{1em}
+    \textbf{Ganancias:} Pan \$2.5, Torta \$1.8
+\end{frame}
+
+\begin{frame}{Ejemplo 1: Formulación}
+    \onslide<1->{
+    \textbf{Variables de decisión:}
+    \begin{itemize}
+        \item $x_1$: Cantidad de panes a producir
+        \item $x_2$: Cantidad de tortas a producir
+    \end{itemize}
+    }
+    
+    \vspace{1em}
+    \onslide<2->{
+    \textbf{Función objetivo:}
+    \begin{align*}
+        \text{Maximizar: } Z = 2.5x_1 + 1.8x_2
+    \end{align*}
+    }
+    
+    \onslide<3->{
+    \textbf{Restricciones:}
+    \begin{align*}
+        x_1 + 0.5x_2 &\leq 50 \quad \text{(harina)} \\
+        0.2x_1 + 0.1x_2 &\leq 15 \quad \text{(levadura)} \\
+        0.2x_2 &\leq 10 \quad \text{(azúcar)} \\
+        20 \leq x_1 &\leq 50, \quad 15 \leq x_2 \leq 20
+    \end{align*}
+    }
+\end{frame}
+
+\begin{frame}{Ejemplo 2: Wyndor Glass Co.}
+    \textbf{Productos:}
+    \begin{itemize}
+        \item \textbf{Producto 1:} Ventana 2m con marco de aluminio
+        \item \textbf{Producto 2:} Ventana colgante 3m con marco de madera
+    \end{itemize}
+    
+    \vspace{1em}
+    \textbf{Recursos de producción:}
+    \begin{table}[H]
+        \centering
+        \tiny
+        \begin{tabular}{l|cc|c}
+            \textbf{Planta} & \textbf{Producto 1} & \textbf{Producto 2} & \textbf{Tiempo disponible} \\
+            \midrule
+            1 & 1 & 0 & 4 \\
+            2 & 0 & 2 & 12 \\
+            3 & 3 & 2 & 18 \\
+        \end{tabular}
+    \end{table}
+    
+    \vspace{1em}
+    \textbf{Ganancias:} Producto 1: \$3000, Producto 2: \$5000
+\end{frame}
+
+\begin{frame}{Wyndor Glass Co. - Formulación}
+    \onslide<1->{
+    \textbf{Variables de decisión:}
+    \begin{itemize}
+        \item $x_1$: Lotes por semana del Producto 1
+        \item $x_2$: Lotes por semana del Producto 2
+    \end{itemize}
+    }
+    \vspace{1em}
+    \onslide<2->{
+    \textbf{Función objetivo:}
+    \begin{align*}
+        \text{Maximizar: } Z = 3000x_1 + 5000x_2
+    \end{align*}
+    }
+    
+    \onslide<3->{
+    \textbf{Restricciones:}
+    \begin{align*}
+        x_1 &\leq 4 \quad \text{(Planta 1)} \\
+        2x_2 &\leq 12 \quad \text{(Planta 2)} \\
+        3x_1 + 2x_2 &\leq 18 \quad \text{(Planta 3)} \\
+        x_1, x_2 &\geq 0
+    \end{align*}
+    }
+\end{frame}
+
+\begin{frame}{Método Simplex - Concepto}
+    \textbf{¿Que es el Metodo Simplex?}
+    \begin{itemize}
+        \item Es un algoritmo iterativo para resolver problemas de programacion lineal
+        \item Se basa en que la solucion optima esta en un vertice de la region factible
+        \item Se mueve de vertice en vertice mejorando la funcion objetivo
+        \item Se detiene cuando no hay vertices adyacentes mejores
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Método Simplex - Pasos del algoritmo}
+    \textbf{Pasos del algoritmo:}
+    \begin{itemize}
+        \item<1->[{\makebox[1em][c]{\textcolor{black}{\faSearch}}}] Encuentra un vertice inicial factible
+        \item<2->[{\makebox[1em][c]{\textcolor{black}{\faMap}}}] Evalua vertices adyacentes
+        \item<3->[{\makebox[1em][c]{\textcolor{black}{\faArrowRight}}}] Se mueve al mejor vertice adyacente
+        \item<4->[{\makebox[1em][c]{\textcolor{black}{\faRandom}}}] Repite hasta encontrar el optimo
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Método Simplex - Paso 1: Restricciones de No Negatividad}
+    \begin{center}
+    \begin{tikzpicture}
+    \begin{axis}[
+        xlabel=$x_1$,
+        ylabel=$x_2$,
+        xmin=-1, xmax=7,
+        ymin=-1, ymax=7,
+        grid=both,
+        grid style={line width=.1pt, draw=gray!10},
+        major grid style={line width=.2pt,draw=gray!50},
+        axis lines=middle,
+        samples=100,
+        domain=-1:7,
+        legend pos=outer north east
+    ]
+    \addplot[color=red, thick] coordinates {(0,-1) (0,7)};
+    \addlegendentry{$x_1 \geq 0$}
+    \addplot[color=blue, thick] coordinates {(-1,0) (7,0)};
+    \addlegendentry{$x_2 \geq 0$}
+    \fill[gray!50,opacity=0.3] (0,0) -- (0,7) -- (7,7) -- (7,0) -- cycle;
+    \end{axis}
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Método Simplex - Paso 2: Agregamos $x_1 \leq 4$}
+    \begin{center}
+    \begin{tikzpicture}
+    \begin{axis}[
+        xlabel=$x_1$,
+        ylabel=$x_2$,
+        xmin=-1, xmax=7,
+        ymin=-1, ymax=7,
+        grid=both,
+        grid style={line width=.1pt, draw=gray!10},
+        major grid style={line width=.2pt,draw=gray!50},
+        axis lines=middle,
+        samples=100,
+        domain=-1:7,
+        legend pos=outer north east
+    ]
+    \addplot[color=red, thick] coordinates {(0,-1) (0,7)};
+    \addlegendentry{$x_1 \geq 0$}
+    \addplot[color=blue, thick] coordinates {(-1,0) (7,0)};
+    \addlegendentry{$x_2 \geq 0$}
+    \addplot[color=green, thick] coordinates {(4,-1) (4,7)};
+    \addlegendentry{$x_1 \leq 4$}
+    \fill[gray!50,opacity=0.3] (0,0) -- (0,7) -- (4,7) -- (4,0) -- cycle;
+    \end{axis}
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Método Simplex - Paso 3: Agregamos $2x_2 \leq 12$}
+    \begin{center}
+    \begin{tikzpicture}
+    \begin{axis}[
+        xlabel=$x_1$,
+        ylabel=$x_2$,
+        xmin=-1, xmax=7,
+        ymin=-1, ymax=7,
+        grid=both,
+        grid style={line width=.1pt, draw=gray!10},
+        major grid style={line width=.2pt,draw=gray!50},
+        axis lines=middle,
+        samples=100,
+        domain=-1:7,
+        legend pos=outer north east
+    ]
+    \addplot[color=red, thick] coordinates {(0,-1) (0,7)};
+    \addlegendentry{$x_1 \geq 0$}
+    \addplot[color=blue, thick] coordinates {(-1,0) (7,0)};
+    \addlegendentry{$x_2 \geq 0$}
+    \addplot[color=green, thick] coordinates {(4,-1) (4,7)};
+    \addlegendentry{$x_1 \leq 4$}
+    \addplot[color=purple, thick] coordinates {(-1,6) (7,6)};
+    \addlegendentry{$2x_2 \leq 12$}
+    \fill[gray!50,opacity=0.3] (0,0) -- (0,6) -- (4,6) -- (4,0) -- cycle;
+    \end{axis}
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Método Simplex - Paso 4: Agregamos $3x_1 + 2x_2 \leq 18$}
+    \begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel=$x_1$,
+    ylabel=$x_2$,
+    xmin=-1, xmax=7,
+    ymin=-1, ymax=7,
+    grid=both,
+    grid style={line width=.1pt, draw=gray!10},
+    major grid style={line width=.2pt,draw=gray!50},
+    axis lines=middle,
+    samples=100,
+    domain=-1:7,
+    legend pos=outer north east
+]
+\addplot[color=red, thick] coordinates {(0,-1) (0,7)};
+\addlegendentry{$x_1 \geq 0$}
+\addplot[color=blue, thick] coordinates {(-1,0) (7,0)};
+\addlegendentry{$x_2 \geq 0$}
+\addplot[color=green, thick] coordinates {(4,-1) (4,7)};
+\addlegendentry{$x_1 \leq 4$}
+\addplot[color=purple, thick] coordinates {(-1,6) (7,6)};
+\addlegendentry{$2x_2 \leq 12$}
+\addplot[color=orange, thick, domain=-1:7] { (18 - 3*x)/2 };
+\addlegendentry{$3x_1 + 2x_2 \leq 18$}
+\fill[gray!50,opacity=0.3] (0,0) -- (0,6) -- (2,6) -- (4,3) -- (4,0) -- cycle;
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}{Wyndor Glass Co. - Solución Óptima}
+    \textbf{Evaluación en vértices:}
+    \begin{itemize}
+        \item<1-> $(0,0)$: $Z = 0$
+        \item<2-> $(0,6)$: $Z = 30000$
+        \item<3-> $(2,6)$: $Z = 36000$ \textcolor{accent}{\textbf{← ÓPTIMO}}
+        \item<4-> $(4,3)$: $Z = 27000$
+        \item<5-> $(4,0)$: $Z = 12000$
+    \end{itemize}
+    
+    \vspace{1em}
+    \onslide<6->{
+    \textbf{Solución óptima:}
+    \begin{itemize}
+        \item Producir 2 lotes del Producto 1
+        \item Producir 6 lotes del Producto 2
+        \item Ganancia máxima: \$36000
+    \end{itemize}
+    }
+\end{frame}
+
+\begin{frame}{Implementación con PICOS}
+    \textbf{¿Qué es PICOS?}
+    \begin{itemize}
+        \item Interfaz de Python para solucionadores de optimización
+        \item Simplifica la formulación de problemas de PL
+        \item Se conecta con solucionadores como GLPK, CPLEX, Gurobi
+    \end{itemize}
+    
+    \vspace{1em}
+    \onslide<2->{
+    \textbf{Ventajas:}
+    \begin{itemize}
+        \item Sintaxis clara y legible
+        \item Manejo automático de matrices
+        \item Múltiples solucionadores disponibles
+        \item Integración con NumPy
+    \end{itemize}
+    }
+\end{frame}
+
+\begin{frame}[fragile]{PICOS - Ejemplo Wyndor}
+    \begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+# Crear problema
+P = picos.Problem()
+
+# Definir variables
+x = picos.RealVariable('x', 2)
+
+# Funcion objetivo
+P.set_objective('max', 3000*x[0] + 5000*x[1])
+
+# Restricciones
+P.add_constraint(x[0] <= 4)
+P.add_constraint(2*x[1] <= 12)
+P.add_constraint(3*x[0] + 2*x[1] <= 18)
+
+# Resolver
+P.solve(solver='glpk')
+print(x)  # [2.0, 6.0]
+print(P.value)  # 36000.0
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{PICOS - Forma Matricial}
+    \begin{lstlisting}[language=Python]
+P = picos.Problem()
+x = picos.RealVariable('x', 2)
+
+# Definir matrices
+A = np.array([[1,0], [0,2], [3,2]])
+c = np.array([3000,5000])
+b = np.array([4,12,18])
+
+# Convertir a constantes PICOS
+c = picos.Constant('c', c)
+A = picos.Constant('A', A)
+b = picos.Constant('b', b)
+
+# Funcion objetivo y restricciones
+P.set_objective('max', c|x)
+P.add_constraint(A*x <= b)
+
+P.solve(solver='glpk')
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Casos Especiales en PL}
+    \textbf{Tipos de soluciones:}
+    \begin{itemize}
+        \item<1-> \textbf{Solución única:} El óptimo está en un único vértice
+        \item<2-> \textbf{Múltiples soluciones:} El óptimo está en una arista completa
+        \item<3-> \textbf{Problema no acotado:} La función objetivo puede crecer infinitamente
+        \item<4-> \textbf{Problema infactible:} No existe solución que satisfaga todas las restricciones
+    \end{itemize}
+    
+    \vspace{1em}
+    \onslide<5->{
+    \textbf{¿Cómo identificarlos?}
+    \begin{itemize}
+        \item El solucionador nos lo indica
+        \item Análisis gráfico (en 2D)
+        \item Verificación de las restricciones
+    \end{itemize}
+    }
+\end{frame}
+
+\begin{frame}{Próximos Pasos}
+    \textbf{En la siguiente clase veremos:}
+    \begin{itemize}
+        \item Problemas de Redes
+        \item Problema de Transporte (balanceado y desbalanceado)
+        \item Problema de Transshipment
+        \item Problema de Flujo Máximo
+    \end{itemize}
+    
+    \vspace{1em}
+    \textbf{Para practicar:}
+    \begin{itemize}
+        \item Resolver los ejercicios de lámparas y dieta óptima
+        \item Resolver los ejercicios de la guía
+        \item Experimentar con PICOS
+        \item Identificar problemas de PL en situaciones reales
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Terminamos}
+    \begin{center}
+        \Large{\textbf{¿Dudas?\\¿Consultas?}}
+    \end{center}
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south,inner sep=30pt] at (current page.south) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\end{document}

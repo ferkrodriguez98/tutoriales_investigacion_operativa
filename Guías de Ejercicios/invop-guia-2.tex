@@ -1,0 +1,199 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}               % Cargar xcolor antes de babel y ulem
+\usepackage[spanish]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage[normalem]{ulem}       % Evita que ulem modifique \emph y otros
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{pstricks}
+\usepackage{pst-node} % Para \circlenode y conexiones
+\usepackage{asymptote}
+\usetikzlibrary{arrows, positioning}
+
+\begin{document}
+
+\begin{center}
+    \underline{\textbf{\large Guía de Ejercicios 2}} \\[5pt]
+    \underline{\textbf{\large Programación Lineal}}
+\end{center}
+
+\section*{Desestructurado}
+
+\begin{enumerate}
+    \item Una empresa tiene sólo tres empleados (Doug, Linda y Bob) que hacen dos tipos de ventanas a mano: con marco de madera y con marco de aluminio. La ganancia es de \$180 por cada ventana con marco de madera y de \$90 por cada una con marco de aluminio. Doug hace marcos de madera y puede terminar 6 al día. Linda hace 4 marcos de aluminio por día. Bob forma y corta el vidrio y puede hacer 48 pies cuadrados de vidrio por día. Cada ventana con marco de madera emplea 6 pies cuadrados de vidrio y cada una de aluminio, 8 pies cuadrados.  
+    ¿Cuántas ventanas de cada tipo debe producir al día para maximizar la ganancia total?  
+
+    \textbf{NOTA:} siendo este un TP de Programación Lineal, en este caso no es necesario que las variables de decisión sean enteras (es decir, pueden ser variables de decisión reales), a pesar de que en la realidad no tiene sentido fabricar una cantidad fraccional de ventanas.
+\end{enumerate}
+
+\section*{Transporte}
+
+\begin{enumerate}
+    \setcounter{enumi}{1} % Continuamos numeración (se inicia en 2)
+    \item En un problema de transporte con 5 nodos de origen y 6 de destino, el costo de transporte y los requisitos de la demanda y oferta están resumidos en la siguiente tabla.  
+    Determinar si el problema es factible (o sea, si la oferta puede suplir a la demanda), y de ser así determinar la distribución de transporte óptima.  
+    Para facilitar la resolución recomendamos dibujar el gráfico de transporte con las 5 fuentes y los 6 destinos.  
+    En la tabla \(M = 1000\) (o sea, un número muy grande).  
+
+    \textbf{NOTA:} utilizar una matriz de decisión, en lugar de un vector de decisión, puede hacer más sencillo el código de Python resultante.
+
+    \begin{table}[h]
+        \centering
+        \renewcommand{\arraystretch}{1.3} % Espaciado vertical
+        \begin{tabular}{c|cccccc|c}
+            \hline
+            & \multicolumn{6}{c|}{\textbf{Destination}} & \textbf{Supply} \\
+            \hline
+            & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} &  \\
+            \hline
+            \textbf{Source} & & & & & & & \\
+            1 & 13 & 10 & 22 & 29 & 18 & 0 & 5 \\
+            2 & 14 & 13 & 16 & 21 & $M$ & 0 & 6 \\
+            3 & 3 & 0 & $M$ & 11 & 6 & 0 & 7 \\
+            4 & 18 & 9 & 19 & 23 & 11 & 0 & 4 \\
+            5 & 30 & 24 & 34 & 36 & 28 & 0 & 3 \\
+            \hline
+            \textbf{Demand} & 3 & 5 & 4 & 5 & 6 & 2 & \\
+            \hline
+        \end{tabular}
+    \end{table}
+    
+    \item Una empresa constructora debe llevar cemento a tres sitios de construcción. Tiene dos proveedores de cemento, uno al Norte y otro al Sur, que le venden cemento a distintos valores por tonelada, y además el costo de transporte de cada uno de estos proveedores a los sitios de construcción es distinto. Puede comprar hasta 18 toneladas a una cantera ubicada al Norte de la ciudad y 14 toneladas a una del Sur.  
+    Necesita 10, 5 y 10 toneladas en las respectivas construcciones 1, 2 y 3.  
+    Los costos de compra y transporte se resumen en la siguiente tabla.  
+
+    Formular el problema como uno de transporte, y encontrar la estrategia de compra y transporte óptima, que minimice el costo total (costo de transporte + costo de compra).
+
+    \begin{table}[h]
+        \centering
+        \renewcommand{\arraystretch}{1.3} 
+        \setlength{\tabcolsep}{10pt}
+        \begin{tabular}{c|>{\centering}p{1.5cm} >{\centering}p{1.5cm} >{\centering}p{1.5cm}|c}
+            \toprule
+            & \multicolumn{3}{c|}{\textbf{Hauling Cost per Ton at Site}} & \textbf{Price per Ton} \\
+            \cmidrule(lr){2-4} 
+            \textbf{Pit} & \textbf{1} & \textbf{2} & \textbf{3} & \\
+            \midrule
+            North & \$100 & \$190 & \$160 & \$300 \\
+            South & 180 & 110 & 140 & 420 \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    
+    \item Una empresa ha decidido producir tres nuevos productos. Tiene cinco plantas de producción con capacidad ociosa, donde quiere producir estos nuevos productos.  
+    El costo unitario de producción del producto 1 es \$31, \$29, \$32, \$28 y \$20 en las plantas 1, 2, 3, 4 y 5 respectivamente.  
+    El costo unitario de producción del producto 2 es \$45, \$41, \$46, \$42 y \$43 en las plantas 1, 2, 3, 4 y 5 respectivamente.  
+    El costo unitario de producción del producto 3 es \$38, \$35, \$40 en las plantas 1, 2 y 3 respectivamente, pero no es posible producir este producto en las plantas 4 y 5 por falta de entrenamiento del personal.  
+
+    El estudio de mercado indica que se tendrán que producir 600, 1000 y 800 unidades por día de los productos 1, 2 y 3 respectivamente.  
+    Las plantas tienen una capacidad de producción de hasta 400, 600, 400, 600 y 1000 unidades por día, independientemente de qué producto sea.
+
+    \begin{enumerate}
+        \item ¿Cuál debe ser la estrategia de producción si se quiere cumplir con los pedidos de producción, pero minimizando el costo total de producción?
+        \item Supongamos que la demanda proyectada fuera de 1000, 1500 y 900 por día de los productos 1, 2 y 3 respectivamente, y que la pérdida por demanda insatisfecha es de \$150, \$200 y \$300 por unidad de los productos 1, 2 y 3 respectivamente.  
+        ¿Cuál es la estrategia de producción óptima?  
+        ¿Queda algún producto con demanda insatisfecha?  
+        De ser así, ¿cuál(es) y cuánta es la demanda insatisfecha?
+    \end{enumerate}
+\end{enumerate}
+
+\section*{Transhipment}
+
+\begin{enumerate}
+    \setcounter{enumi}{4} % Se continúa la numeración (item 5 en adelante)
+    \item Una empresa produce un producto, y debe producir suficiente para satisfacer los contratos de compra-venta firmados para los próximos tres meses.  
+    Las capacidades de producción, costos de producción y costos de almacenaje varían mes a mes.  
+    Debido a esto puede ser beneficioso sobreproducir en ciertos meses, almacenar unidades y venderlas en futuros meses.  
+    La planta puede producir una cierta cantidad durante horas regulares, o de ser necesario puede producir otro tanto en horas extra, a un costo mayor.  
+
+    \textbf{Objetivo:} determinar el plan de producción óptimo.
+
+    \begin{table}[h]
+        \centering
+        \resizebox{\textwidth}{!}{%
+        \renewcommand{\arraystretch}{1.3}%
+        \setlength{\tabcolsep}{8pt} 
+        \begin{tabular}{c|cc|cc|c|c}
+            \toprule
+            \textbf{Mes} & \multicolumn{2}{c|}{\textbf{Capacidad de Producción (unidades/mes)}} & \multicolumn{2}{c|}{\textbf{Costo de Producción (\$/unidad)}} & \textbf{Costo de Almacenaje (\$/unidad)} & \textbf{Ventas Comprometidas (unidades)} \\
+            \cmidrule(lr){2-3} \cmidrule(lr){4-5}
+            & Horas Regulares & Horas Extra & Horas Regulares & Horas Extra & & \\
+            \midrule
+            1 & 10 & 3 & 31 & 38 & 3 & 8 \\
+            2 & 8 & 2 & 32 & 38 & 3 & 10 \\
+            3 & 10 & 3 & 36 & 44 & 3 & 16 \\
+            \bottomrule
+        \end{tabular}%
+        }
+    \end{table}
+
+    \item Una empresa produce un producto en dos plantas y lo vende en tres locales de venta. Luego de producirlos, los productos son enviados a uno de sus dos warehouses hasta que sean requeridos por los locales de venta.  
+
+    Se usan camiones para transportar los productos de sus dos plantas de producción a los warehouses, y de allí a uno de sus tres locales de venta.  
+    La siguiente tabla muestra la capacidad de producción de cada una de sus plantas, los costos de transporte a cada uno de los warehouses, y la cantidad máxima que se puede transportar a cada uno de los warehouses.
+
+    \textbf{Objetivo:} Plantear el problema como un problema de transhipment y encontrar el cronograma de transporte óptimo.
+
+    \begin{table}[h]
+        \centering
+        \resizebox{\textwidth}{!}{%
+        \renewcommand{\arraystretch}{1.3}%
+        \begin{tabular}{c|c|cc|cc}
+            \hline
+            & \textbf{Capacidad de Producción} & \multicolumn{2}{c|}{\textbf{Costo unitario de transporte}} & \multicolumn{2}{c}{\textbf{Capacidad de transporte}} \\
+            \hline
+            & & \textbf{Warehouse 1} & \textbf{Warehouse 2} & \textbf{Warehouse 1} & \textbf{Warehouse 2} \\
+            \hline
+            \textbf{Planta 1} & 200 & 425 & 560 & 125 & 150 \\
+            \textbf{Planta 2} & 300 & 510 & 600 & 175 & 200 \\
+            \hline
+        \end{tabular}%
+        }
+    \end{table}
+
+    \item Considere la siguiente red de distribución de productos, en donde \(A\) es el nodo origen y \(F\) el nodo de demanda, mientras que las capacidades de cada ruta son los números que se muestran junto a los arcos dirigidos.
+
+    \begin{enumerate}
+        \item ¿Cuál es la máxima cantidad de productos que se pueden transportar del Nodo \(A\) al Nodo \(F\) a través de esta red de distribución?
+        \item La empresa quiere entender cómo cambia la capacidad de transporte de la red si se incrementa la capacidad de transporte del vínculo \(B-D\).  
+        Realizar un barrido paramétrico del parámetro 
+        \[
+        u_{BD} = [0,1,2,3,4,5,6,7,8,9,10,11]
+        \]
+        y graficar cómo cambia la capacidad de transporte de la red versus este parámetro.
+    \end{enumerate}
+
+    \begin{center}
+        \begin{asy}
+            size(10cm); // Tamaño de la figura
+            
+            pair A=(0,1), B=(2,2), C=(2,0), D=(4,2), E=(4,0), F=(6,2);
+            
+            // Dibujamos círculos para cada nodo y les ponemos etiqueta
+            draw(Circle(A,0.2)); label("A", A, S);
+            draw(Circle(B,0.2)); label("B", B, N);
+            draw(Circle(C,0.2)); label("C", C, S);
+            draw(Circle(D,0.2)); label("D", D, N);
+            draw(Circle(E,0.2)); label("E", E, S);
+            draw(Circle(F,0.2)); label("F", F, E);
+            
+            // Flechas con sus etiquetas
+            draw(A--B, Arrow()); label("$9$", A--B, N);
+            draw(A--C, Arrow()); label("$7$", A--C, S);
+            draw(B--C, Arrow()); label("$2$", B--C, W);
+            draw(B--D, Arrow()); label("$7$", B--D, N);
+            draw(C--B, Arrow()); label("$4$", C--B, N);
+            draw(C--E, Arrow()); label("$6$", C--E, S);
+            draw(D--F, Arrow()); label("$6$", D--F, N);
+            draw(D--E, Arrow()); label("$3$", D--E, E);
+            draw(E--F, Arrow()); label("$9$", E--F, S);
+        \end{asy}
+    \end{center}
+        
+\end{enumerate}
+
+\end{document}
