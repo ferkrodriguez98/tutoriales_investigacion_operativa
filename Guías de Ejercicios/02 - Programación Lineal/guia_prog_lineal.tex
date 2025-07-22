@@ -1,0 +1,1263 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{forest}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{siunitx}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\sloppy
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{center}
+    {\LARGE \textbf{Guía de Ejercicios \\Programación Lineal}}\\[0.5em]
+    {Investigación Operativa, Universidad de San Andrés}
+\end{center}
+
+Si encuentran algún error en el documento o hay alguna duda, mandenmé un mail a rodriguezf@udesa.edu.ar y lo revisamos.
+
+\section{Ejercicios}
+
+\subsection{Ejercicio 1}
+
+Una empresa fabrica dos productos A y B. El producto A requiere 2 horas de mano de obra y 3 kg de materia prima, mientras que el producto B requiere 3 horas de mano de obra y 2 kg de materia prima. La empresa dispone de 100 horas de mano de obra y 80 kg de materia prima por semana. El beneficio por unidad es de \$40 para A y \$30 para B. Determine la cantidad óptima a producir de cada producto para maximizar el beneficio.
+
+\subsection{Ejercicio 2}
+
+Una dietista debe preparar una mezcla nutritiva que contenga al menos 12 unidades de vitamina A y 15 unidades de vitamina B. Dispone de dos tipos de alimentos: el alimento 1 contiene 2 unidades de vitamina A y 3 de B por kg, y cuesta \$4 por kg; el alimento 2 contiene 3 unidades de vitamina A y 1 de B por kg, y cuesta \$3 por kg. ¿Qué cantidad debe usar de cada alimento para minimizar el costo?
+
+\subsection{Ejercicio 3}
+
+Una fábrica produce sillas y mesas. Cada silla requiere 2 unidades de madera y 1 unidad de trabajo, mientras que cada mesa requiere 3 unidades de madera y 2 unidades de trabajo. La fábrica dispone de 60 unidades de madera y 40 unidades de trabajo. La ganancia por silla es de \$20 y por mesa es de \$30. ¿Cuántas sillas y mesas debe producir para maximizar la ganancia?
+
+\subsection{Ejercicio 4}
+
+Una empresa de transporte tiene dos camiones. El camión 1 puede transportar 10 toneladas y recorre 40 km/h, mientras que el camión 2 puede transportar 15 toneladas y recorre 30 km/h. Se necesita transportar al menos 50 toneladas de mercancía y se dispone de 8 horas. El costo por hora del camión 1 es \$100 y del camión 2 es \$120. ¿Cuántos viajes debe hacer cada camión para minimizar el costo?
+
+\subsection{Ejercicio 5}
+
+Una empresa produce dos tipos de juguetes: coches y trenes. Cada coche requiere 4 horas en el departamento A y 2 horas en el B, mientras que cada tren requiere 2 horas en A y 5 horas en B. Se dispone de 100 horas en A y 80 horas en B. El beneficio es de \$8 por coche y \$7 por tren. ¿Cuántos juguetes de cada tipo debe producir?
+
+\subsection{Ejercicio 6}
+
+Una empresa produce tres tipos de productos: A, B y C. La siguiente tabla muestra los recursos necesarios por unidad y la disponibilidad total:
+
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+Recurso & Producto A & Producto B & Producto C & Disponible \\
+\midrule
+Mano de obra (h) & 4 & 3 & 5 & 400 \\
+Material (kg) & 2 & 4 & 3 & 300 \\
+Tiempo máquina (h) & 3 & 2 & 4 & 350 \\
+\midrule
+Beneficio (\$/u) & 100 & 80 & 120 & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+¿Cuántas unidades de cada producto debe fabricar para maximizar el beneficio?
+
+\subsection{Ejercicio 7}
+
+Una empresa de inversiones tiene \$100,000 para invertir en tres opciones diferentes. La opción A tiene un rendimiento del 8\% anual pero requiere una inversión mínima de \$20,000. La opción B tiene un rendimiento del 12\% anual con un máximo de inversión de \$50,000. La opción C tiene un rendimiento del 10\% anual. Por política de la empresa, la inversión en C debe ser al menos el 30\% de la inversión total. ¿Cómo debe distribuir el dinero para maximizar el rendimiento?
+
+\subsection{Ejercicio 8}
+
+Una fábrica de muebles produce mesas, sillas y estantes. Cada producto requiere madera, tiempo de carpintería y tiempo de acabado según la siguiente tabla:
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+Recurso & Mesa & Silla & Estante \\
+\midrule
+Madera (m²) & 3 & 1 & 2 \\
+Carpintería (h) & 4 & 2 & 3 \\
+Acabado (h) & 2 & 1 & 2 \\
+\midrule
+Beneficio (\$) & 200 & 80 & 150 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Se dispone de 300 m² de madera, 400 horas de carpintería y 200 horas de acabado. El mercado exige que se produzcan al menos 30 sillas y que la cantidad de estantes sea al menos la mitad de la cantidad de mesas. ¿Cuántas unidades de cada producto debe fabricar?
+
+\subsection{Ejercicio 9}
+
+Una empresa de transporte debe planificar el envío de mercancías entre tres almacenes y cuatro tiendas. Las demandas de las tiendas son 300, 200, 400 y 100 unidades respectivamente. Los almacenes tienen capacidades de 400, 300 y 300 unidades. Los costos de transporte (en \$ por unidad) se muestran en la siguiente tabla:
+
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+& Tienda 1 & Tienda 2 & Tienda 3 & Tienda 4 \\
+\midrule
+Almacén 1 & 10 & 8 & 6 & 9 \\
+Almacén 2 & 7 & 11 & 8 & 5 \\
+Almacén 3 & 6 & 9 & 7 & 12 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+¿Cómo debe realizarse el transporte para minimizar los costos?
+
+\subsection{Ejercicio 10}
+
+Una refinería procesa tres tipos de petróleo crudo (A, B y C) para producir gasolina regular y premium. La siguiente tabla muestra los barriles de cada tipo de gasolina que se obtienen por barril de crudo procesado:
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+& Crudo A & Crudo B & Crudo C \\
+\midrule
+Gasolina Regular & 0.5 & 0.4 & 0.3 \\
+Gasolina Premium & 0.3 & 0.4 & 0.5 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+El costo por barril de los crudos A, B y C es \$60, \$70 y \$80 respectivamente. La demanda mínima es de 10,000 barriles de gasolina regular y 8,000 de premium. La refinería tiene una capacidad de procesamiento de 30,000 barriles de crudo. ¿Cuántos barriles de cada tipo de crudo debe procesar para minimizar el costo?
+
+\subsection{Ejercicio 11}
+
+Una empresa tiene sólo tres empleados (Doug, Linda y Bob) que hacen dos tipos de ventanas a mano: con marco de madera y con marco de aluminio. La ganancia es de \$180 por cada ventana con marco de madera y de \$90 por cada una con marco de aluminio. Doug hace marcos de madera y puede terminar 6 al día. Linda hace 4 marcos de aluminio por día. Bob forma y corta el vidrio y puede hacer 48 pies cuadrados de vidrio por día. Cada ventana con marco de madera emplea 6 pies cuadrados de vidrio y cada una de aluminio, 8 pies cuadrados. ¿Cuántas ventanas de cada tipo debe producir al día para maximizar la ganancia total?
+
+\textbf{NOTA:} siendo este una guía de ejercicios de Programación Lineal, en este caso no es necesario que las variables de decisión sean enteras (es decir, pueden ser variables de decisión reales), a pesar de que en la realidad no tiene sentido fabricar una cantidad fraccional de ventanas.
+
+\subsection{Ejercicio 12}
+
+En un problema de transporte con 5 nodos de origen y 6 de destino, el costo de transporte y los requisitos de la demanda y oferta están resumidos en la siguiente tabla. Determinar si el problema es factible (o sea, si la oferta puede suplir a la demanda), y de ser así determinar la distribución de transporte óptima. Para facilitar la resolución recomendamos dibujar el gráfico de transporte con las 5 fuentes y los 6 destinos. En la tabla \(M = 1000\) (o sea, un número muy grande).
+
+\textbf{NOTA:} utilizar una matriz de decisión, en lugar de un vector de decisión, puede hacer más sencillo el código de Python resultante.
+
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+\hline
+& \multicolumn{6}{c|}{\textbf{Destino}} & \textbf{Oferta} \\
+\hline
+& \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} &  \\
+\hline
+\textbf{Origen} & & & & & & & \\
+1 & 13 & 10 & 22 & 29 & 18 & 0 & 5 \\
+2 & 14 & 13 & 16 & 21 & $M$ & 0 & 6 \\
+3 & 3 & 0 & $M$ & 11 & 6 & 0 & 7 \\
+4 & 18 & 9 & 19 & 23 & 11 & 0 & 4 \\
+5 & 30 & 24 & 34 & 36 & 28 & 0 & 3 \\
+\hline
+\textbf{Demanda} & 3 & 5 & 4 & 5 & 6 & 2 & \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Ejercicio 13}
+
+Una empresa constructora debe llevar cemento a tres sitios de construcción. Tiene dos proveedores de cemento, uno al Norte y otro al Sur, que le venden cemento a distintos valores por tonelada, y además el costo de transporte de cada uno de estos proveedores a los sitios de construcción es distinto. Puede comprar hasta 18 toneladas a una cantera ubicada al Norte de la ciudad y 14 toneladas a una del Sur. Necesita 10, 5 y 10 toneladas en las respectivas construcciones 1, 2 y 3. Los costos de compra y transporte se resumen en la siguiente tabla.
+
+Formular el problema como uno de transporte, y encontrar la estrategia de compra y transporte óptima, que minimice el costo total (costo de transporte + costo de compra).
+
+\begin{center}
+\begin{tabular}{c|ccc|c}
+\toprule
+& \multicolumn{3}{c|}{\textbf{Costo de Transporte por Tonelada en Sitio}} & \textbf{Precio por Tonelada} \\
+\cmidrule(lr){2-4} 
+\textbf{Cantera} & \textbf{1} & \textbf{2} & \textbf{3} & \\
+\midrule
+Norte & \$100 & \$190 & \$160 & \$300 \\
+Sur & 180 & 110 & 140 & 420 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Ejercicio 14}
+
+Una empresa ha decidido producir tres nuevos productos. Tiene cinco plantas de producción con capacidad ociosa, donde quiere producir estos nuevos productos. El costo unitario de producción del producto 1 es \$31, \$29, \$32, \$28 y \$20 en las plantas 1, 2, 3, 4 y 5 respectivamente. El costo unitario de producción del producto 2 es \$45, \$41, \$46, \$42 y \$43 en las plantas 1, 2, 3, 4 y 5 respectivamente. El costo unitario de producción del producto 3 es \$38, \$35, \$40 en las plantas 1, 2 y 3 respectivamente, pero no es posible producir este producto en las plantas 4 y 5 por falta de entrenamiento del personal.
+
+El estudio de mercado indica que se tendrán que producir 600, 1000 y 800 unidades por día de los productos 1, 2 y 3 respectivamente. Las plantas tienen una capacidad de producción de hasta 400, 600, 400, 600 y 1000 unidades por día, independientemente de qué producto sea.
+
+\begin{enumerate}
+\item ¿Cuál debe ser la estrategia de producción si se quiere cumplir con los pedidos de producción, pero minimizando el costo total de producción?
+\item Supongamos que la demanda proyectada fuera de 1000, 1500 y 900 por día de los productos 1, 2 y 3 respectivamente, y que la pérdida por demanda insatisfecha es de \$150, \$200 y \$300 por unidad de los productos 1, 2 y 3 respectivamente. ¿Cuál es la estrategia de producción óptima? ¿Queda algún producto con demanda insatisfecha? De ser así, ¿cuál(es) y cuánta es la demanda insatisfecha?
+\end{enumerate}
+
+\subsection{Ejercicio 15}
+
+Una empresa produce un producto, y debe producir suficiente para satisfacer los contratos de compra-venta firmados para los próximos tres meses. Las capacidades de producción, costos de producción y costos de almacenaje varían mes a mes. Debido a esto puede ser beneficioso sobreproducir en ciertos meses, almacenar unidades y venderlas en futuros meses. La planta puede producir una cierta cantidad durante horas regulares, o de ser necesario puede producir otro tanto en horas extra, a un costo mayor.
+
+\textbf{Objetivo:} determinar el plan de producción óptimo.
+
+\begin{center}
+\begin{tabular}{c|cc|cc|c|c}
+\toprule
+\textbf{Mes} & \multicolumn{2}{c|}{\textbf{Capacidad de Producción (unidades/mes)}} & \multicolumn{2}{c|}{\textbf{Costo de Producción (\$/unidad)}} & \textbf{Costo de Almacenaje (\$/unidad)} & \textbf{Ventas Comprometidas (unidades)} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+& Horas Regulares & Horas Extra & Horas Regulares & Horas Extra & & \\
+\midrule
+1 & 10 & 3 & 31 & 38 & 3 & 8 \\
+2 & 8 & 2 & 32 & 38 & 3 & 10 \\
+3 & 10 & 3 & 36 & 44 & 3 & 16 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Ejercicio 16}
+
+Una empresa produce un producto en dos plantas y lo vende en tres locales de venta. Luego de producirlos, los productos son enviados a uno de sus dos warehouses hasta que sean requeridos por los locales de venta.
+
+Se usan camiones para transportar los productos de sus dos plantas de producción a los warehouses, y de allí a uno de sus tres locales de venta. La siguiente tabla muestra la capacidad de producción de cada una de sus plantas, los costos de transporte a cada uno de los warehouses, y la cantidad máxima que se puede transportar a cada uno de los warehouses.
+
+\textbf{Objetivo:} Plantear el problema como un problema de transbordo y encontrar el cronograma de transporte óptimo.
+
+\begin{center}
+\begin{tabular}{c|c|cc|cc}
+\hline
+& \textbf{Capacidad de Producción} & \multicolumn{2}{c|}{\textbf{Costo unitario de transporte}} & \multicolumn{2}{c}{\textbf{Capacidad de transporte}} \\
+\hline
+& & \textbf{Warehouse 1} & \textbf{Warehouse 2} & \textbf{Warehouse 1} & \textbf{Warehouse 2} \\
+\hline
+\textbf{Planta 1} & 200 & 425 & 560 & 125 & 150 \\
+\textbf{Planta 2} & 300 & 510 & 600 & 175 & 200 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Ejercicio 17}
+
+Considere la siguiente red de distribución de productos, en donde \(A\) es el nodo origen y \(F\) el nodo de demanda, mientras que las capacidades de cada ruta son los números que se muestran junto a los arcos dirigidos.
+
+\begin{enumerate}
+\item ¿Cuál es la máxima cantidad de productos que se pueden transportar del Nodo \(A\) al Nodo \(F\) a través de esta red de distribución?
+\item La empresa quiere entender cómo cambia la capacidad de transporte de la red si se incrementa la capacidad de transporte del vínculo \(B-D\). Realizar un barrido paramétrico del parámetro 
+\[
+u_{BD} = [0,1,2,3,4,5,6,7,8,9,10,11]
+\]
+y graficar cómo cambia la capacidad de transporte de la red versus este parámetro.
+\end{enumerate}
+
+\newpage
+
+\section{Anexo: Soluciones}
+
+\subsection{Ejercicio 1}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_1$ = cantidad de A, $x_2$ = cantidad de B
+\item Función objetivo: Max $Z = 40x_1 + 30x_2$
+\item Restricciones:
+  \begin{align*}
+  2x_1 + 3x_2 &\leq 100 \text{ (mano de obra)} \\
+  3x_1 + 2x_2 &\leq 80 \text{ (materia prima)} \\
+  x_1, x_2 &\geq 0
+  \end{align*}
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+P = picos.Problem()
+
+x = picos.RealVariable('x', 2)
+
+# Matriz de restricciones
+A = np.array([
+    [2, 3],  # mano de obra
+    [3, 2]   # materia prima
+])
+b = np.array([100, 80])
+c = np.array([40, 30])
+
+A = picos.Constant('A', A)
+b = picos.Constant('b', b)
+c = picos.Constant('c', c)
+
+P.set_objective('max', c | x)
+P.add_constraint(A * x <= b)
+P.add_constraint(x >= 0)
+
+P.solve(solver='glpk')
+print(f"x1 = {x[0].value}, x2 = {x[1].value}")
+print(f"Z = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+x1 = 8.0, x2 = 28.0
+Z = 1160.0
+\end{lstlisting}
+
+\subsection{Ejercicio 2}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_1$ = kg de alimento 1, $x_2$ = kg de alimento 2
+\item Función objetivo: Min $Z = 4x_1 + 3x_2$
+\item Restricciones:
+  \begin{align*}
+  2x_1 + 3x_2 &\geq 12 \text{ (vitamina A)} \\
+  3x_1 + x_2 &\geq 15 \text{ (vitamina B)} \\
+  x_1, x_2 &\geq 0
+  \end{align*}
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+P = picos.Problem()
+
+x = picos.RealVariable('x', 2)
+
+# Matriz de restricciones
+A = np.array([
+    [2, 3],  # vitamina A
+    [3, 1]   # vitamina B
+])
+b = np.array([12, 15])
+c = np.array([4, 3])
+
+A = picos.Constant('A', A)
+b = picos.Constant('b', b)
+c = picos.Constant('c', c)
+
+P.set_objective('min', c | x)
+P.add_constraint(A * x >= b)
+P.add_constraint(x >= 0)
+
+P.solve(solver='glpk')
+print(f"x1 = {x[0].value:.2f}, x2 = {x[1].value:.2f}")
+print(f"Z = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+x1 = 4.71, x2 = 0.86
+Z = 21.43
+\end{lstlisting}
+
+\subsection{Ejercicio 3}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_1$ = cantidad de sillas, $x_2$ = cantidad de mesas
+\item Función objetivo: Max $Z = 20x_1 + 30x_2$
+\item Restricciones:
+  \begin{align*}
+  2x_1 + 3x_2 &\leq 60 \text{ (madera)} \\
+  x_1 + 2x_2 &\leq 40 \text{ (trabajo)} \\
+  x_1, x_2 &\geq 0
+  \end{align*}
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+P = picos.Problem()
+
+x = picos.RealVariable('x', 2)
+
+# Matriz de restricciones
+A = np.array([
+    [2, 3],  # madera
+    [1, 2]   # trabajo
+])
+b = np.array([60, 40])
+c = np.array([20, 30])
+
+A = picos.Constant('A', A)
+b = picos.Constant('b', b)
+c = picos.Constant('c', c)
+
+P.set_objective('max', c | x)
+P.add_constraint(A * x <= b)
+P.add_constraint(x >= 0)
+
+P.solve(solver='glpk')
+print(f"x1 = {x[0].value}, x2 = {x[1].value}")
+print(f"Z = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+x1 = 0.0, x2 = 20.0
+Z = 600.0
+\end{lstlisting}
+
+\subsection{Ejercicio 4}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_1$ = viajes camión 1, $x_2$ = viajes camión 2
+\item Función objetivo: Min $Z = 100x_1 + 120x_2$
+\item Restricciones:
+  \begin{align*}
+  10x_1 + 15x_2 &\geq 50 \text{ (toneladas)} \\
+  x_1 + x_2 &\leq 8 \text{ (horas)} \\
+  x_1, x_2 &\geq 0
+  \end{align*}
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+P = picos.Problem()
+
+x = picos.RealVariable('x', 2)
+
+# Restricciones
+P.add_constraint(10*x[0] + 15*x[1] >= 50)  # toneladas
+P.add_constraint(x[0] + x[1] <= 8)         # horas
+P.add_constraint(x >= 0)
+
+# Funcion objetivo
+P.set_objective('min', 100*x[0] + 120*x[1])
+
+P.solve(solver='glpk')
+print(f"x1 = {x[0].value}, x2 = {x[1].value}")
+print(f"Z = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+x1 = 0.0, x2 = 3.33
+Z = 400.0
+\end{lstlisting}
+
+\subsection{Ejercicio 5}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_1$ = cantidad de coches, $x_2$ = cantidad de trenes
+\item Función objetivo: Max $Z = 8x_1 + 7x_2$
+\item Restricciones:
+  \begin{align*}
+  4x_1 + 2x_2 &\leq 100 \text{ (dept. A)} \\
+  2x_1 + 5x_2 &\leq 80 \text{ (dept. B)} \\
+  x_1, x_2 &\geq 0
+  \end{align*}
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+P = picos.Problem()
+
+x = picos.RealVariable('x', 2)
+
+# Matriz de restricciones
+A = np.array([
+    [4, 2],  # departamento A
+    [2, 5]   # departamento B
+])
+b = np.array([100, 80])
+c = np.array([8, 7])
+
+A = picos.Constant('A', A)
+b = picos.Constant('b', b)
+c = picos.Constant('c', c)
+
+P.set_objective('max', c | x)
+P.add_constraint(A * x <= b)
+P.add_constraint(x >= 0)
+
+P.solve(solver='glpk')
+print(f"x1 = {x[0].value}, x2 = {x[1].value}")
+print(f"Z = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+x1 = 21.25, x2 = 7.50
+Z = 222.50
+\end{lstlisting}
+
+\subsection{Ejercicio 6}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_1$, $x_2$, $x_3$ = cantidad de productos A, B y C
+\item Función objetivo: Max $Z = 100x_1 + 80x_2 + 120x_3$
+\item Restricciones:
+  \begin{align*}
+  4x_1 + 3x_2 + 5x_3 &\leq 400 \text{ (mano de obra)} \\
+  2x_1 + 4x_2 + 3x_3 &\leq 300 \text{ (material)} \\
+  3x_1 + 2x_2 + 4x_3 &\leq 350 \text{ (tiempo máquina)} \\
+  x_1, x_2, x_3 &\geq 0
+  \end{align*}
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+P = picos.Problem()
+
+x = picos.RealVariable('x', 3)
+
+# Matriz de restricciones
+A = np.array([
+    [4, 3, 5],  # mano de obra
+    [2, 4, 3],  # material
+    [3, 2, 4]   # tiempo maquina
+])
+b = np.array([400, 300, 350])
+c = np.array([100, 80, 120])
+
+A = picos.Constant('A', A)
+b = picos.Constant('b', b)
+c = picos.Constant('c', c)
+
+P.set_objective('max', c | x)
+P.add_constraint(A * x <= b)
+P.add_constraint(x >= 0)
+
+P.solve(solver='glpk')
+print(f"x1 = {x[0].value}, x2 = {x[1].value}, x3 = {x[2].value}")
+print(f"Z = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+x1 = 70.0, x2 = 40.0, x3 = 0.0
+Z = 10200.0
+\end{lstlisting}
+
+\subsection{Ejercicio 7}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_1$, $x_2$, $x_3$ = inversión en A, B y C
+\item Función objetivo: Max $Z = 0.08x_1 + 0.12x_2 + 0.10x_3$
+\item Restricciones:
+  \begin{align*}
+  x_1 + x_2 + x_3 &= 100000 \text{ (total inversión)} \\
+  x_1 &\geq 20000 \text{ (mínimo A)} \\
+  x_2 &\leq 50000 \text{ (máximo B)} \\
+  x_3 &\geq 0.3(x_1 + x_2 + x_3) \text{ (mínimo C)} \\
+  x_1, x_2, x_3 &\geq 0
+  \end{align*}
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+P = picos.Problem()
+
+x = picos.RealVariable('x', 3)
+
+# Restricciones
+P.add_constraint(x[0] + x[1] + x[2] == 100000)  # total inversion
+P.add_constraint(x[0] >= 20000)                  # minimo A
+P.add_constraint(x[1] <= 50000)                  # maximo B
+P.add_constraint(x[2] >= 0.3*(x[0] + x[1] + x[2]))  # minimo C
+P.add_constraint(x >= 0)
+
+# Funcion objetivo
+P.set_objective('max', 0.08*x[0] + 0.12*x[1] + 0.10*x[2])
+
+P.solve(solver='glpk')
+print(f"x1 = {x[0].value}, x2 = {x[1].value}, x3 = {x[2].value}")
+print(f"Z = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+x1 = 20000.0, x2 = 50000.0, x3 = 30000.0
+Z = 10600.0
+\end{lstlisting}
+
+\subsection{Ejercicio 8}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_1$, $x_2$, $x_3$ = cantidad de mesas, sillas y estantes
+\item Función objetivo: Max $Z = 200x_1 + 80x_2 + 150x_3$
+\item Restricciones:
+  \begin{align*}
+  3x_1 + x_2 + 2x_3 &\leq 300 \text{ (madera)} \\
+  4x_1 + 2x_2 + 3x_3 &\leq 400 \text{ (carpintería)} \\
+  2x_1 + x_2 + 2x_3 &\leq 200 \text{ (acabado)} \\
+  x_2 &\geq 30 \text{ (demanda mínima sillas)} \\
+  x_3 &\geq 0.5x_1 \text{ (relación estantes-mesas)} \\
+  x_1, x_2, x_3 &\geq 0
+  \end{align*}
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+P = picos.Problem()
+
+x = picos.RealVariable('x', 3)
+
+# Matriz de restricciones recursos
+A = np.array([
+    [3, 1, 2],  # madera
+    [4, 2, 3],  # carpinteria
+    [2, 1, 2]   # acabado
+])
+b = np.array([300, 400, 200])
+
+A = picos.Constant('A', A)
+b = picos.Constant('b', b)
+
+P.add_constraint(A * x <= b)
+P.add_constraint(x[1] >= 30)  # demanda minima sillas
+P.add_constraint(x[2] >= 0.5*x[0])  # relacion estantes-mesas
+P.add_constraint(x >= 0)
+
+# Funcion objetivo
+P.set_objective('max', 200*x[0] + 80*x[1] + 150*x[2])
+
+P.solve(solver='glpk')
+print(f"x1 = {x[0].value}, x2 = {x[1].value}, x3 = {x[2].value}")
+print(f"Z = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+x1 = 56.67, x2 = 30.0, x3 = 28.33
+Z = 17983.33
+\end{lstlisting}
+
+\subsection{Ejercicio 9}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_{ij}$ = unidades enviadas del almacén $i$ a la tienda $j$
+\item Función objetivo: Min $Z = \sum_{i=1}^3 \sum_{j=1}^4 c_{ij}x_{ij}$
+\item Restricciones:
+  \begin{align*}
+  \sum_{j=1}^4 x_{1j} &\leq 400 \text{ (capacidad almacén 1)} \\
+  \sum_{j=1}^4 x_{2j} &\leq 300 \text{ (capacidad almacén 2)} \\
+  \sum_{j=1}^4 x_{3j} &\leq 300 \text{ (capacidad almacén 3)} \\
+  \sum_{i=1}^3 x_{i1} &= 300 \text{ (demanda tienda 1)} \\
+  \sum_{i=1}^3 x_{i2} &= 200 \text{ (demanda tienda 2)} \\
+  \sum_{i=1}^3 x_{i3} &= 400 \text{ (demanda tienda 3)} \\
+  \sum_{i=1}^3 x_{i4} &= 100 \text{ (demanda tienda 4)} \\
+  x_{ij} &\geq 0 \text{ para todo } i,j
+  \end{align*}
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+P = picos.Problem()
+
+# Matriz de costos
+C = np.array([
+    [10, 8, 6, 9],
+    [7, 11, 8, 5],
+    [6, 9, 7, 12]
+])
+
+# Variables
+x = picos.RealVariable('x', (3,4))
+
+# Restricciones de capacidad de almacenes
+for i in range(3):
+    P.add_constraint(picos.sum(x[i,j] for j in range(4)) <= [400,300,300][i])
+
+# Restricciones de demanda de tiendas
+for j in range(4):
+    P.add_constraint(picos.sum(x[i,j] for i in range(3)) == [300,200,400,100][j])
+
+# No negatividad
+P.add_constraint(x >= 0)
+
+# Funcion objetivo
+P.set_objective('min', picos.sum(C[i,j]*x[i,j] for i in range(3) for j in range(4)))
+
+P.solve(solver='glpk')
+
+print("Solucion optima:")
+for i in range(3):
+    for j in range(4):
+        if x[i,j].value > 0.1:  # Evitar mostrar valores muy cercanos a cero
+            print(f"x[{i+1},{j+1}] = {x[i,j].value}")
+print(f"Costo total = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+Solucion optima:
+x[1,2] = 200.00
+x[1,3] = 200.00
+x[2,1] = 200.00
+x[2,4] = 100.00
+x[3,1] = 100.00
+x[3,3] = 200.00
+Costo total = 6700.00
+\end{lstlisting}
+
+\subsection{Ejercicio 10}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_1$, $x_2$, $x_3$ = barriles de crudo A, B y C
+\item Función objetivo: Min $Z = 60x_1 + 70x_2 + 80x_3$
+\item Restricciones:
+  \begin{align*}
+  0.5x_1 + 0.4x_2 + 0.3x_3 &\geq 10000 \text{ (gasolina regular)} \\
+  0.3x_1 + 0.4x_2 + 0.5x_3 &\geq 8000 \text{ (gasolina premium)} \\
+  x_1 + x_2 + x_3 &\leq 30000 \text{ (capacidad)} \\
+  x_1, x_2, x_3 &\geq 0
+  \end{align*}
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+P = picos.Problem()
+
+x = picos.RealVariable('x', 3)
+
+# Matriz de restricciones
+A = np.array([
+    [0.5, 0.4, 0.3],  # gasolina regular
+    [0.3, 0.4, 0.5]   # gasolina premium
+])
+b = np.array([10000, 8000])
+c = np.array([60, 70, 80])
+
+A = picos.Constant('A', A)
+b = picos.Constant('b', b)
+c = picos.Constant('c', c)
+
+P.add_constraint(A * x >= b)
+P.add_constraint(picos.sum(x) <= 30000)  # capacidad
+P.add_constraint(x >= 0)
+
+P.set_objective('min', c | x)
+
+P.solve(solver='glpk')
+print(f"x1 = {x[0].value}, x2 = {x[1].value}, x3 = {x[2].value}")
+print(f"Z = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+x1 = 16250.0, x2 = 0.0, x3 = 6250.0
+Z = 1475000.0
+\end{lstlisting}
+
+\subsection{Ejercicio 11}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_1$ = ventanas de madera, $x_2$ = ventanas de aluminio
+\item Función objetivo: Max $Z = 180x_1 + 90x_2$
+\item Restricciones:
+  \begin{align*}
+  x_1 &\leq 6 \text{ (capacidad Doug)} \\
+  x_2 &\leq 4 \text{ (capacidad Linda)} \\
+  6x_1 + 8x_2 &\leq 48 \text{ (capacidad Bob)} \\
+  x_1, x_2 &\geq 0
+  \end{align*}
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+
+P = picos.Problem()
+
+x = picos.RealVariable('x', 2)
+
+# Restricciones
+P.add_constraint(x[0] <= 6)  # capacidad Doug
+P.add_constraint(x[1] <= 4)  # capacidad Linda
+P.add_constraint(6*x[0] + 8*x[1] <= 48)  # capacidad Bob
+P.add_constraint(x >= 0)
+
+# Funcion objetivo
+P.set_objective('max', 180*x[0] + 90*x[1])
+
+P.solve(solver='glpk')
+print(f"x1 = {x[0].value}, x2 = {x[1].value}")
+print(f"Z = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+x1 = 6.0, x2 = 1.5
+Z = 1215.0
+\end{lstlisting}
+
+\subsection{Ejercicio 12}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_{ij}$ = unidades enviadas del origen $i$ al destino $j$
+\item Función objetivo: Min $Z = \sum_{i=1}^5 \sum_{j=1}^6 c_{ij}x_{ij}$
+\item Restricciones de oferta y demanda
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+P = picos.Problem()
+
+# Matriz de costos (M = 1000)
+C = np.array([
+    [13, 10, 22, 29, 18, 0],
+    [14, 13, 16, 21, 1000, 0],
+    [3, 0, 1000, 11, 6, 0],
+    [18, 9, 19, 23, 11, 0],
+    [30, 24, 34, 36, 28, 0]
+])
+
+# Ofertas y demandas
+oferta = [5, 6, 7, 4, 3]
+demanda = [3, 5, 4, 5, 6, 2]
+
+# Variables
+x = picos.RealVariable('x', (5,6))
+
+# Restricciones de oferta
+for i in range(5):
+    P.add_constraint(picos.sum(x[i,j] for j in range(6)) <= oferta[i])
+
+# Restricciones de demanda
+for j in range(6):
+    P.add_constraint(picos.sum(x[i,j] for i in range(5)) == demanda[j])
+
+# No negatividad
+P.add_constraint(x >= 0)
+
+# Funcion objetivo
+P.set_objective('min', picos.sum(C[i,j]*x[i,j] for i in range(5) for j in range(6)))
+
+P.solve(solver='glpk')
+
+print("Solucion optima:")
+for i in range(5):
+    for j in range(6):
+        if x[i,j].value > 0.1:
+            print(f"x[{i+1},{j+1}] = {x[i,j].value}")
+print(f"Costo total = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+Solucion optima:
+x[1,1] = 3.0
+x[1,2] = 2.0
+x[2,3] = 4.0
+x[2,4] = 2.0
+x[3,2] = 3.0
+x[3,4] = 3.0
+x[3,5] = 1.0
+x[4,5] = 4.0
+x[5,5] = 1.0
+x[5,6] = 2.0
+Costo total = 276.0
+\end{lstlisting}
+
+\subsection{Ejercicio 13}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_{ij}$ = toneladas compradas en cantera $i$ y enviadas a sitio $j$
+\item Función objetivo: Min $Z = \sum_{i=1}^2 \sum_{j=1}^3 (c_{ij} + p_i)x_{ij}$
+\item Restricciones de capacidad y demanda
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+P = picos.Problem()
+
+# Costos de transporte + precio por tonelada
+C = np.array([
+    [100+300, 190+300, 160+300],  # Norte
+    [180+420, 110+420, 140+420]   # Sur
+])
+
+# Capacidades y demandas
+capacidad = [18, 14]
+demanda = [10, 5, 10]
+
+# Variables
+x = picos.RealVariable('x', (2,3))
+
+# Restricciones de capacidad
+for i in range(2):
+    P.add_constraint(picos.sum(x[i,j] for j in range(3)) <= capacidad[i])
+
+# Restricciones de demanda
+for j in range(3):
+    P.add_constraint(picos.sum(x[i,j] for i in range(2)) == demanda[j])
+
+# No negatividad
+P.add_constraint(x >= 0)
+
+# Funcion objetivo
+P.set_objective('min', picos.sum(C[i,j]*x[i,j] for i in range(2) for j in range(3)))
+
+P.solve(solver='glpk')
+
+print("Solucion optima:")
+for i in range(2):
+    for j in range(3):
+        if x[i,j].value > 0.1:
+            print(f"x[{i+1},{j+1}] = {x[i,j].value}")
+print(f"Costo total = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+Solucion optima:
+x[1,1] = 10.0
+x[1,3] = 8.0
+x[2,2] = 5.0
+x[2,3] = 2.0
+Costo total = 11450.0
+\end{lstlisting}
+
+\subsection{Ejercicio 14}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_{ij}$ = unidades del producto $i$ producidas en planta $j$
+\item Función objetivo: Min $Z = \sum_{i=1}^3 \sum_{j=1}^5 c_{ij}x_{ij}$
+\item Restricciones de capacidad y demanda
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+P = picos.Problem()
+
+# Costos de produccion
+C = np.array([
+    [31, 29, 32, 28, 20],  # Producto 1
+    [45, 41, 46, 42, 43],  # Producto 2
+    [38, 35, 40, 1000, 1000]  # Producto 3 (no se puede en plantas 4,5)
+])
+
+# Capacidades y demandas
+capacidad = [400, 600, 400, 600, 1000]
+demanda = [600, 1000, 800]
+
+# Variables
+x = picos.RealVariable('x', (3,5))
+
+# Restricciones de capacidad
+for j in range(5):
+    P.add_constraint(picos.sum(x[i,j] for i in range(3)) <= capacidad[j])
+
+# Restricciones de demanda
+for i in range(3):
+    P.add_constraint(picos.sum(x[i,j] for j in range(5)) == demanda[i])
+
+# No negatividad
+P.add_constraint(x >= 0)
+
+# Funcion objetivo
+P.set_objective('min', picos.sum(C[i,j]*x[i,j] for i in range(3) for j in range(5)))
+
+P.solve(solver='glpk')
+
+print("Solucion optima:")
+for i in range(3):
+    for j in range(5):
+        if x[i,j].value > 0.1:
+            print(f"x[{i+1},{j+1}] = {x[i,j].value}")
+print(f"Costo total = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+Solucion optima:
+x[1,5] = 600.0
+x[2,4] = 600.0
+x[2,5] = 400.0
+x[3,1] = 200.0
+x[3,2] = 600.0
+Costo total = 83000.0
+\end{lstlisting}
+
+\subsection{Ejercicio 15}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $p_{it}$ = produccion regular del mes $i$, $e_{it}$ = produccion extra del mes $i$, $s_{it}$ = inventario al final del mes $i$
+\item Función objetivo: Min $Z = \sum_{i=1}^3 (31p_{i1} + 38e_{i1} + 32p_{i2} + 38e_{i2} + 36p_{i3} + 44e_{i3} + 3s_{i1} + 3s_{i2})$
+\item Restricciones de balance de inventario y capacidad
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+P = picos.Problem()
+
+# Variables: produccion regular, extra e inventario por mes
+p = picos.RealVariable('p', 3)  # produccion regular
+e = picos.RealVariable('e', 3)  # produccion extra
+s = picos.RealVariable('s', 3)  # inventario
+
+# Capacidades y costos
+cap_reg = [10, 8, 10]
+cap_extra = [3, 2, 3]
+costo_reg = [31, 32, 36]
+costo_extra = [38, 38, 44]
+costo_inv = 3
+ventas = [8, 10, 16]
+
+# Restricciones de capacidad
+for i in range(3):
+    P.add_constraint(p[i] <= cap_reg[i])
+    P.add_constraint(e[i] <= cap_extra[i])
+
+# Restricciones de balance de inventario
+P.add_constraint(p[0] + e[0] - s[0] == ventas[0])  # mes 1
+P.add_constraint(s[0] + p[1] + e[1] - s[1] == ventas[1])  # mes 2
+P.add_constraint(s[1] + p[2] + e[2] - s[2] == ventas[2])  # mes 3
+
+# No negatividad
+P.add_constraint(p >= 0)
+P.add_constraint(e >= 0)
+P.add_constraint(s >= 0)
+
+# Funcion objetivo
+P.set_objective('min', picos.sum(costo_reg[i]*p[i] + costo_extra[i]*e[i] for i in range(3)) + 
+                costo_inv*(picos.sum(s[i] for i in range(2))))
+
+P.solve(solver='glpk')
+print(f"Produccion regular: {[p[i].value for i in range(3)]}")
+print(f"Produccion extra: {[e[i].value for i in range(3)]}")
+print(f"Inventario: {[s[i].value for i in range(3)]}")
+print(f"Costo total = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+Produccion regular: [10.0, 8.0, 10.0]
+Produccion extra: [1.0, 2.0, 3.0]
+Inventario: [3.0, 3.0, 0.0]
+Costo total = 1190.0
+\end{lstlisting}
+
+\subsection{Ejercicio 16}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $x_{ij}$ = unidades enviadas de planta $i$ a warehouse $j$, $y_{jk}$ = unidades enviadas de warehouse $j$ a local $k$
+\item Función objetivo: Min $Z = \sum_{i=1}^2 \sum_{j=1}^2 c_{ij}x_{ij} + \sum_{j=1}^2 \sum_{k=1}^3 d_{jk}y_{jk}$
+\item Restricciones de balance y capacidad
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+P = picos.Problem()
+
+# Costos de transporte planta-warehouse y warehouse-local
+c_planta_warehouse = np.array([
+    [425, 560],  # Planta 1
+    [510, 600]   # Planta 2
+])
+
+c_warehouse_local = np.array([
+    [100, 150, 200],  # Warehouse 1
+    [120, 180, 160]   # Warehouse 2
+])
+
+# Capacidades
+cap_planta = [200, 300]
+cap_warehouse = [125, 150, 175, 200]  # [w1_planta1, w1_planta2, w2_planta1, w2_planta2]
+demanda = [100, 150, 200]  # locales
+
+# Variables
+x = picos.RealVariable('x', (2,2))  # planta a warehouse
+y = picos.RealVariable('y', (2,3))  # warehouse a local
+
+# Restricciones de capacidad de plantas
+for i in range(2):
+    P.add_constraint(picos.sum(x[i,j] for j in range(2)) <= cap_planta[i])
+
+# Restricciones de capacidad de warehouses
+P.add_constraint(x[0,0] <= 125)  # planta 1 a warehouse 1
+P.add_constraint(x[1,0] <= 175)  # planta 2 a warehouse 1
+P.add_constraint(x[0,1] <= 150)  # planta 1 a warehouse 2
+P.add_constraint(x[1,1] <= 200)  # planta 2 a warehouse 2
+
+# Restricciones de balance en warehouses
+for j in range(2):
+    P.add_constraint(picos.sum(x[i,j] for i in range(2)) == picos.sum(y[j,k] for k in range(3)))
+
+# Restricciones de demanda
+for k in range(3):
+    P.add_constraint(picos.sum(y[j,k] for j in range(2)) == demanda[k])
+
+# No negatividad
+P.add_constraint(x >= 0)
+P.add_constraint(y >= 0)
+
+# Funcion objetivo
+P.set_objective('min', picos.sum(c_planta_warehouse[i,j]*x[i,j] for i in range(2) for j in range(2)) +
+                picos.sum(c_warehouse_local[j,k]*y[j,k] for j in range(2) for k in range(3)))
+
+P.solve(solver='glpk')
+
+print("Solucion optima:")
+print("Planta a Warehouse:")
+for i in range(2):
+    for j in range(2):
+        if x[i,j].value > 0.1:
+            print(f"x[{i+1},{j+1}] = {x[i,j].value}")
+print("Warehouse a Local:")
+for j in range(2):
+    for k in range(3):
+        if y[j,k].value > 0.1:
+            print(f"y[{j+1},{k+1}] = {y[j,k].value}")
+print(f"Costo total = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+Solucion optima:
+Planta a Warehouse:
+x[1,1] = 125.0
+x[1,2] = 75.0
+x[2,1] = 175.0
+x[2,2] = 75.0
+Warehouse a Local:
+y[1,1] = 100.0
+y[1,2] = 150.0
+y[1,3] = 50.0
+y[2,3] = 150.0
+Costo total = 295875.0
+\end{lstlisting}
+
+\subsection{Ejercicio 17}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Variables: $f_{ij}$ = flujo en el arco $(i,j)$
+\item Función objetivo: Max $Z = \sum_{j} f_{Aj}$ (flujo total desde A)
+\item Restricciones de conservación de flujo y capacidad
+\end{itemize}
+
+\textbf{Código de resolución en PICOS:}
+\begin{lstlisting}[language=Python]
+P = picos.Problem()
+
+# Capacidades de los arcos
+capacidades = {
+    ('A','B'): 9, ('A','C'): 7, ('B','C'): 2, ('B','D'): 7,
+    ('C','B'): 4, ('C','E'): 6, ('D','F'): 6, ('D','E'): 3, ('E','F'): 9
+}
+
+# Variables de flujo
+f = {}
+for arco in capacidades:
+    f[arco] = picos.RealVariable(f'f_{arco[0]}{arco[1]}')
+
+# Restricciones de capacidad
+for arco, cap in capacidades.items():
+    P.add_constraint(f[arco] <= cap)
+    P.add_constraint(f[arco] >= 0)
+
+# Restricciones de conservacion de flujo
+# Nodo A (origen)
+P.add_constraint(f[('A','B')] + f[('A','C')] == picos.sum(f[('B','C')] + f[('C','B')] + f[('D','E')] + f[('E','F')]))
+
+# Nodo B
+P.add_constraint(f[('A','B')] + f[('C','B')] == f[('B','C')] + f[('B','D')])
+
+# Nodo C
+P.add_constraint(f[('A','C')] + f[('B','C')] == f[('C','B')] + f[('C','E')])
+
+# Nodo D
+P.add_constraint(f[('B','D')] == f[('D','F')] + f[('D','E')])
+
+# Nodo E
+P.add_constraint(f[('C','E')] + f[('D','E')] == f[('E','F')])
+
+# Nodo F (destino)
+P.add_constraint(f[('D','F')] + f[('E','F')] == f[('A','B')] + f[('A','C')])
+
+# Funcion objetivo: maximizar flujo desde A
+P.set_objective('max', f[('A','B')] + f[('A','C')])
+
+P.solve(solver='glpk')
+
+print("Flujo maximo:")
+for arco in capacidades:
+    if f[arco].value > 0.1:
+        print(f"f{arco} = {f[arco].value}")
+print(f"Flujo maximo total = {P.value}")
+\end{lstlisting}
+
+\textbf{Salida de la consola:}
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+Flujo maximo:
+f('A', 'B') = 6.0
+f('A', 'C') = 7.0
+f('B', 'C') = 2.0
+f('B', 'D') = 7.0
+f('C', 'B') = 3.0
+f('C', 'E') = 6.0
+f('D', 'F') = 6.0
+f('D', 'E') = 1.0
+f('E', 'F') = 7.0
+Flujo maximo total = 13.0
+\end{lstlisting}
+
+\end{document}

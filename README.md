@@ -17,8 +17,13 @@ Este repositorio contiene los materiales, notebooks, apuntes y recursos de las c
 - [Clase 11 - Teoría de Filas](Clase%2011%20-%20Teoría%20de%20Filas/): Modelos de colas, análisis de sistemas de espera y optimización.
 - [Clase 12 - Teoría de Inventarios](Clase%2012%20-%20Teoría%20de%20Inventarios/): Modelos de inventario, políticas óptimas y gestión de stocks.
 
+## Guías de Ejercicios
+
+Las guías de ejercicios se encuentran en [esta](/Guías%20de%20Ejercicios/) carpeta.
 
 ## Tabla de clases y temas
+
+Ambas tutoriales (Benégas y Rodríguez del Castillo) de la cátedra Severino son los Jueves 9am.
 
 | # Clase | Fecha   | Temas |
 |:------:|:-------:|:------|

@@ -142,7 +142,7 @@ Las restricciones quedan de la siguiente manera:
     & y_3 + y_4 \le 1 \quad \text{(mutuamente excluyentes)} \\
     & y_3 \le y_1 + y_2 \quad \text{(si se hace la 1 o la 2, se puede hacer la 3 o la 4)} \\
     & y_4 \le y_1 + y_2 \quad \text{(si se hace la 1 o la 2, se puede hacer la 3 o la 4)} \\
-    & y_j \in \{0,1\} \quad \forall j \quad \text{(variables binarias)}
+    & y_j \in \{0,1\} \quad \forall j \quad \text{(variables binarias)} \\
 \end{align*}
 
 \subsubsection{Resolución con PICOS}
@@ -166,7 +166,7 @@ P.add_constraint(y[2] <= y[0] + y[1])  # precedencia
 P.add_constraint(y[3] <= y[0] + y[1])  # precedencia
 
 # Resolver
-P.options.verbosity = 1
+P.options.verbosity = 0
 P.solve(solver='glpk')
 
 print(y)          # valores optimos de las variables
@@ -176,23 +176,17 @@ print(P.value)    # ganancia total optima
 \subsubsection{Salida de la consola}
 
 \begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
-Binary Program
-    maximize: 15*y[0] + 12*y[1] + 16*y[2] + 18*y[3] + 9*y[4] + 11*y[5]
-    over:
-      6 Boolean variables y
-    subject to:
-      38*y[0] + 33*y[1] + 39*y[2] + 45*y[3] + 23*y[4] + 27*y[5] <= 100
-      y[0] + y[1] <= 1
-      y[2] + y[3] <= 1
-      y[2] <= y[0] + y[1]
-      y[3] <= y[0] + y[1]
-
-[1.00e+0 0.00e+0 0.00e+0 0.00e+0 1.00e+0 1.00e+0]
-35.0
+[ 1.00e+00]
+[ 0.00e+00]
+[ 1.00e+00]
+[ 0.00e+00]
+[ 1.00e+00]
+[ 0.00e+00]
+40.0
 \end{lstlisting}
 
 % ---------------------------------------------------------
-\subsection{Asignación de productos a plantas}
+\subsection{Plantas y Productos}
 Una compañía producirá cuatro productos empleando tres plantas con capacidad ociosa. El esfuerzo productivo por unidad es comparable en todas las plantas; por lo tanto, la capacidad disponible se mide en unidades de cualquier producto por día.
 
 \begin{table}[H]
@@ -220,236 +214,125 @@ La dirección debe decidir la asignación con dos criterios:
     \item \textbf{No permitir división}: cada producto se fabrica en una sola planta (modelo de asignación binaria).
 \end{enumerate}
 
-Para el caso (b) definimos $y_{ij} = 1$ si el producto $j$ se produce en la planta $i$ y $0$ en caso contrario. Luego sumamos una restricción $\sum_i y_{ij} = 1$ para cada producto $j$.
-
-% ---------------------------------------------------------
-\subsection{Planificación de producción}
-Una empresa opera con dos turnos: diurno y nocturno. Independientemente de la cantidad producida, el costo de poner en marcha la planta es:
-\begin{itemize}
-    \item Turno diurno: \$8\,000.
-    \item Turno nocturno: \$4\,500.
-\end{itemize}
-
-La demanda para los próximos dos días es de 2000 unidades para el día uno, 3000 unidades para la noche del día uno, 2000 unidades para el día dos y 3000 unidades para la noche del día dos. El costo de almacenaje es de \$1 por unidad por día. Se busca minimizar el costo total cumpliendo demanda. La entrega es inmediata.
-
 \subsubsection{Resolución}
 
-Acá debemos pensar como que tenemos cuatro oportunidades donde producir, dado que la entrega es inmediata. Además, tenemos tres oportunidades de almacenar y cuatro momentos en donde debemos recibir. Lo podemos gráficar de la siguiente manera para que quede más claro:
-
-\begin{center}
-\begin{tikzpicture}[auto, thick, node distance=1.5cm and 2.2cm]
-    % Nodos de demanda
-    \node[draw, circle, fill=purple!40, minimum size=1.2cm] (D1) {D1};
-    \node[draw, circle, fill=purple!40, minimum size=1.2cm, below=of D1] (N1) {N1};
-    \node[draw, circle, fill=purple!40, minimum size=1.2cm, below=of N1] (D2) {D2};
-    \node[draw, circle, fill=purple!40, minimum size=1.2cm, below=of D2] (N2) {N2};
-
-    % Nodos de inventario
-    \node[draw, circle, fill=red!40, minimum size=1.2cm, right=of D1] (I1) {I1};
-    \node[draw, circle, fill=red!40, minimum size=1.2cm, below=of I1] (I2) {I2};
-    \node[draw, circle, fill=red!40, minimum size=1.2cm, below=of I2] (I3) {I3};
-    \node[draw, circle, fill=red!40, minimum size=1.2cm, below=of I3] (I4) {I4};
-
-    % Nodos de produccion
-    \node[draw, circle, fill=teal!60, minimum size=1.2cm, right=of I1] (P1) {P1};
-    \node[draw, circle, fill=teal!60, minimum size=1.2cm, below=of P1] (P2) {P2};
-    \node[draw, circle, fill=teal!60, minimum size=1.2cm, below=of P2] (P3) {P3};
-    \node[draw, circle, fill=teal!60, minimum size=1.2cm, below=of P3] (P4) {P4};
-
-    % Flechas de produccion a inventario
-    \draw[-latex] (D1) -- node[above] {$y^d_1$} (I1);
-    \draw[-latex] (N1) -- node[above] {$y^n_1$} (I2);
-    \draw[-latex] (D2) -- node[above] {$y^d_2$} (I3);
-    \draw[-latex] (N2) -- node[above] {$y^n_2$} (I4);
-
-    % Flechas de inventario a produccion
-    \draw[-latex] (I1) -- (P1);
-    \draw[-latex] (I2) -- (P2);
-    \draw[-latex] (I3) -- (P3);
-    \draw[-latex] (I4) -- (P4);
-
-    % Flechas de inventario a inventario (almacenaje)
-    \draw[-latex] (I1) -- node[right] {$x_{I1 \to I2}$} (I2);
-    \draw[-latex] (I2) -- node[right] {$x_{I2 \to I3}$} (I3);
-    \draw[-latex] (I3) -- node[right] {$x_{I3 \to I4}$} (I4);
-
-    % Demandas
-    \node[right=0.7cm of P1, text=teal!80!black, font=\bfseries\large] (dem1) {2000};
-    \node[right=0.7cm of P2, text=teal!80!black, font=\bfseries\large] (dem2) {3000};
-    \node[right=0.7cm of P3, text=teal!80!black, font=\bfseries\large] (dem3) {2000};
-    \node[right=0.7cm of P4, text=teal!80!black, font=\bfseries\large] (dem4) {3000};
-\end{tikzpicture}
-\end{center}
-
-No olvidemos el costo de iniciar la producción, que es de \$8\,000 para el turno diurno y \$4\,500 para el nocturno, los cuales podemos plantear como dos variables:
+La función objetivo entonces es minimizar el costo total de producción, el cual se compone de la cantidad de producto fabricado por el costo unitario de producción. No tenemos un costo por poner en marcha la fábrica. Siendo $c_{ij}$ el costo unitario de producción del producto $j$ en la planta $i$ y $x_{ij}$ la cantidad de producto $j$ fabricado en la planta $i$, nos queda la siguiente función objetivo:
 
 \begin{align*}
-    c_d = 8000 \quad \text{y} \quad c_n = 4500
+    \text{Min } & Z = \sum_{i=1}^{3} \sum_{j=1}^{4} c_{ij} x_{ij} \\
 \end{align*}
 
-Nos queda entonces la siguiente función objetivo:
+Vamos entonces ahora a pensar las restricciones. En primer lugar tenemos que pensar las restricciones de capacidad de las plantas.
 
 \begin{align*}
-    \text{Min } & Z = c_d\*(y^d_1 + y^d_2) + c_n\*(y^n_1 + y^n_2) + \sum_{i=1}^{4} x_{Ii \to I(i+1)}
+    \sum_{j=1}^{4} x_{ij} \le cap_i \quad \forall i \\
 \end{align*}
 
-Las primeras restricciones que debemos pensar son las de que todo debe ser mayor que 0:
+En segundo lugar, vamos a pensar en las restricciones de demanda.
 
 \begin{align*}
-    &y^d_i, y^n_i \in \{0,1\} \quad \forall i \\
-    &x_{Ii \to I(i+1)} \ge 0 \quad \forall i \\
+    \sum_{i=1}^{3} x_{ij} = demanda_j \quad \forall j \\
 \end{align*}
 
-Además, tenemos que agregar una restricción de activación:
-
-Las restricciones son de conservación de flujo (porque todo lo que entra debe salir) son:
+Por último, vamos a pensar en las restricciones de división. Si no permitimos división, entonces cada producto se fabrica en una sola planta. Si permitimos división, entonces cada producto puede fabricarse en más de una planta. Basta entonces con tener o no esta restricción para controlar eso.
 
 \begin{align*}
-    y^d_1 - X_{I1 \to I2} &= X_{I1 \to P_1} \\
-    y^n_1 + X_{I1 \to I2} - X_{I2 \to I3} &= X_{I2 \to P_2} \\
-    y^d_2 + X_{I2 \to I3} - X_{I3 \to I4} &= X_{I3 \to P_3} \\
-    y^n_2 + X_{I3 \to I4} &= X_{I4 \to P_4} \\
+    \sum_{i=1}^{3} x_{ij} = 1 \quad \forall j \\
 \end{align*}
-
-El parámetro $M$ es un número grande (por ejemplo $10\,000$) que garantiza la validez de la restricción de activación.
-
-% TO DO !
-
-% ---------------------------------------------------------
-\subsection{Planificación eléctrica}
-Una empresa proveedora de energía debe satisfacer en el primer año una demanda de 80 millones de kWh. La demanda crece 20 millones de kWh por año, llegando al año cinco con una demanda de 160 millones de kWh. Se dispone de cuatro tipos de plantas con las características que se muestran a continuación:
-
-\begin{table}[H]
-    \centering
-    \resizebox{\textwidth}{!}{
-    \begin{tabular}{cccc}
-        \toprule
-        Planta & Capacidad (millones kWh) & Costo construcción (\$M) & Costo operativo anual (\$M) \\
-        \midrule
-        1 & 70 & 20 & 1.5 \\
-        2 & 50 & 16 & 0.8 \\
-        3 & 60 & 18 & 1.3 \\
-        4 & 40 & 14 & 0.6 \\
-        \bottomrule
-    \end{tabular}
-    }
-\end{table}
-
-Se debe decidir en qué año construir cada planta (variable binaria) y cuándo operarla (otra variable binaria) para minimizar el costo total descontado.
-
-\subsubsection{Resolución}
-
-La forma de pensarlo es que tenemos las siguientes variables:
-
-\begin{itemize}[label=$\rightarrow$]
-    \item $x_{ij}$: Energía generada por la planta $i$ en el año $j$ (millones kWh). Variable continua $\ge 0$.
-    \item $\alpha_{ij}$: 1 si la planta $i$ está operativa en el año $j$; 0 en caso contrario. Variable binaria.
-    \item $y_i$: 1 si la planta $i$ se construye en algún momento. Variable binaria.
-\end{itemize}
-
-Además, tenemos los siguientes vectores:
-
-\begin{itemize}[label=$\rightarrow$]
-    \item $d = (80,\,100,\,120,\,140,\,160)$: Demanda de energía (millones kWh).
-    \item $cap = (70,\,50,\,60,\,40)$: Capacidad de las plantas (millones kWh).
-    \item $c = (20,\,16,\,18,\,14)$: Costo de construcción de las plantas (millones \$).
-    \item $o = (1.5,\,0.8,\,1.3,\,0.6)$: Costo operativo anual de las plantas (millones \$).
-\end{itemize}
-
-La función objetivo entonces consiste en multiplicar el costo de construcción de cada planta por la variable binaria que indica si se construye o no, y sumarle el costo operativo anual de cada planta por la variable binaria que indica si se opera o no.
-
-\begin{align*}
-    \text{Min } & Z = \sum_{i=0}^{3} c_i\,y_i + \sum_{i=0}^{3}\sum_{j=0}^{4} o_i\,\alpha_{ij} \\
-\end{align*}
-
-Las restricciones son:
-
-\begin{enumerate}[label=(R\arabic*)]
-    \item \textbf{Demanda anual:} para cada año $j$ se debe cubrir la demanda.
-          \[\sum_{i} x_{ij} \;\ge\; d_j \quad \forall\, j\]
-    \item \textbf{Capacidad de planta:}
-          \[x_{ij} \;\le\; \text{cap}_i\,\alpha_{ij} \quad \forall\, i,\,j\]
-    \item \textbf{Operar sólo si se construyó:}
-          \[\alpha_{ij} \;\le\; y_i \quad \forall\, i,\,j\]
-    \item \textbf{Permanencia}: una vez que está operativa, no se puede apagar en años posteriores.
-          \[\alpha_{i,j+1} \;\ge\; \alpha_{ij} \quad \forall\, i,\,j=1,\dots,T-1\]
-\end{enumerate}
 
 \subsubsection{Resolución con PICOS}
 \begin{lstlisting}[language=Python]
 import picos
+import numpy as np
 
-# ---- Datos ----
-demand = picos.Constant('demanda',  [80, 100, 120, 140, 160])
-limits  = picos.Constant('cap',     [70, 50, 60, 40])
-c       = picos.Constant('c',       [20, 16, 18, 14])
-o       = picos.Constant('o',       [1.5, 0.8, 1.3, 0.6])
+costos = np.array([
+    [41, 27, 28, 24],
+    [40, 29, 1e6, 23],  # 1e6 (1000000) es un costo prohibitivo para producto 3 en planta 2
+    [37, 30, 27, 21]
+])
+capacidades = [75, 75, 45]
+demanda = [20, 30, 30, 40]
 
-# ---- Variables ----
-T, P = 5, 4                      # anios, plantas
-x = picos.RealVariable('x',  (P, T), lower=0)
-alfa = picos.BinaryVariable('alfa', (P, T))
-y = picos.BinaryVariable('y', P)
+plantas, productos = 3, 4
 
-p = picos.Problem()
+# ---- a) Permitir division (modelo de transporte) ----
+P = picos.Problem()
+x = picos.RealVariable('x', (plantas, productos), lower=0)
 
-# ---- Restricciones ----
-# (R1) Demanda anual
-for j in range(T):
-    p.add_constraint(picos.sum(x[:, j]) >= demand[j])
+# Objetivo
+P.set_objective('min', picos.sum([
+    costos[i, j] * x[i, j]
+    for i in range(plantas)
+    for j in range(productos)
+]))
 
-# (R2) Capacidad de planta
-for i in range(P):
-    p.add_constraint(picos.sum(x[i, :]) <= 1e4*y[i])
+# Restricciones de capacidad
+for i in range(plantas):
+    P.add_constraint(picos.sum(x[i, :]) <= capacidades[i])
 
-    for j in range(T):
-        p.add_constraint(x[i, j] <= 1e4*alfa[i, j])
-        p.add_constraint(x[i, j] - limits[i] <= 1e4*(1-alfa[i, j]))
+# Restricciones de demanda
+for j in range(productos):
+    P.add_constraint(picos.sum(x[:, j]) == demanda[j])
 
-# (R3) Permanencia
-for i in range(P):
-    for j in range(T-1):
-        p.add_constraint(alfa[i, j+1] >= alfa[i, j])
+P.solve(solver='glpk')
+print('--- Modelo de transporte (division permitida) ---')
+print("Asignacion continua (x):")
+print(np.round(x.value, 2))
+print("Costo total:", round(P.value, 2))
 
-# (R4) Operacion implica construccion
-for i in range(P):
-    for j in range(T):
-        p.add_constraint(alfa[i, j] <= y[i])
+# ---- b) No permitir division (modelo de asignacion binaria) ----
+costos_lista = costos.tolist()  # conversion segura para picos
+demanda_lista = list(demanda)
 
-# ---- Objetivo ----
-p.set_objective('min', c[0]*y[0] + c[1]*y[1] + c[2]*y[2] + c[3]*y[3] +
-                     o[0]*picos.sum(alfa[0, :]) + o[1]*picos.sum(alfa[1, :]) +
-                     o[2]*picos.sum(alfa[2, :]) + o[3]*picos.sum(alfa[3, :]))
+P2 = picos.Problem()
+y = picos.BinaryVariable('y', (plantas, productos))
 
-# ---- Solve ----
-p.options.verbosity = 1
-p.solve(solver='glpk')
+# Objetivo
+P2.set_objective('min', picos.sum([
+    costos_lista[i][j] * demanda_lista[j] * y[i, j]
+    for i in range(plantas)
+    for j in range(productos)
+]))
 
-print(x)           # energia generada
-print(p.value)     # costo total minimo
+# Cada producto se fabrica en una sola planta
+for j in range(productos):
+    P2.add_constraint(picos.sum([y[i, j] for i in range(plantas)]) == 1)
+
+# Restricciones de capacidad
+for i in range(plantas):
+    P2.add_constraint(picos.sum([
+        y[i, j] * demanda_lista[j]
+        for j in range(productos)
+    ]) <= capacidades[i])
+
+P2.solve(solver='glpk')
+print('--- Modelo de asignacion binaria (sin division) ---')
+print("Asignacion binaria (y):")
+asignacion = np.array([[int(round(y[i, j].value)) for j in range(productos)] for i in range(plantas)])
+print(asignacion)
+print("Costo total:", round(P2.value, 2))
+
 \end{lstlisting}
-
-\vspace{0.5em}
-Notar que el 1e4 (el número 1000 en notación científica) es para que no se rompa la convexidad, se puede poner cualquier numero grande. La explicación mas larga es que si no ponemos un numero grande, la restricción $x_{ij} \le \text{cap}_i\,\alpha_{ij}$ puede ser que $x_{ij}$ sea mayor que $\text{cap}_i$.
 
 \subsubsection{Salida de la consola}
 
 \begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
-Mixed Integer Linear Program
-    minimize: 20*y[0] + 16*y[1] + 18*y[2] + 14*y[3] + 1.5*sum(alfa(0,:)) + 0.8*sum(alfa(1,:)) + 1.3*sum(alfa(2,:)) + 0.6*sum(alfa(3,:))...
-
-Optimal solution found.
-
-[[7.00e+01 5.00e+01 7.00e+01 7.00e+01 7.00e+01]
- [1.00e+00 5.00e+00 5.00e+00 5.00e+00 5.00e+00]
- [0.00e+00 0.00e+00 0.00e+00 0.00e+00 0.00e+00]
- [0.00e+00 0.00e+00 0.00e+00 2.00e+01 4.00e+01]]
-
-[1. 1. 0. 1.]
+--- Modelo de transporte (division permitida) ---
+Asignacion continua (x):
+[[ 0. 30. 30.  0.]
+[ 0.  0.  0. 15.]
+[20.  0.  0. 25.]]
+Costo total: 3260.0
+--- Modelo de asignacion binaria (sin division) ---
+Asignacion binaria (y):
+[[0 1 1 0]
+[1 0 0 0]
+[0 0 0 1]]
+Costo total: 3290.0
 \end{lstlisting}
 
 % ---------------------------------------------------------
-\subsection{Localización de estaciones de bomberos}
+\subsection{Estaciones de Bomberos}
 Se pretende ubicar dos estaciones de bomberos en una comunidad dividida en cinco sectores. No se pueden tener más de una estación en un mismo sector. Una estación solo puede atender a su propio sector y a los otros que le sean asignados. La matriz muestra el tiempo medio de respuesta (minutos) si una estación ubicada en el sector $i$ atiende un incendio en el sector $j$.
 
 \begin{table}[H]
@@ -478,25 +361,91 @@ La forma de pensarlo es que tenemos las siguientes variables:
     \item $x_{ij}$: 1 si el sector $j$ es atendido por la estación ubicada en $i$. Variable binaria.
 \end{itemize}
 
-Además, tenemos los siguientes vectores:
+Además, tenemos un vector de frecuencias:
 
 \begin{itemize}[label=$\rightarrow$]
-    \item $d = (2,\,1,\,3,\,1,\,3)$: Frecuencia promedio de incendios por sector.
+    \item $f = (2,\,1,\,3,\,1,\,3)$: Frecuencia promedio de incendios por sector.
 \end{itemize}
 
-La función objetivo es:
+Lo que queremos minimizar es el tiempo de respuesta a cada sector, dados por la matriz de tiempos de respuesta que llamamos $t$. Nos queda entonces que la función objetivo es:
 
 \begin{align*}
-    \text{Min } & Z = \sum_{i=1}^{5} \sum_{j=1}^{5} x_{ij} \cdot d_j \\
+    \text{Min } & Z = \sum_{i=1}^{5} \sum_{j=1}^{5} t_{ij} \cdot x_{ij} \cdot f_j \\
 \end{align*}
 
-Para poner las restricciones debemos pensar en que en primer lugar no se puede tener más de una estación en un mismo sector, y en segundo lugar una estación solo puede atender a su propio sector y a los otros que le sean asignados (es decir, son mutuamente excluyentes).
+Para poner las restricciones debemos pensar en que en primer lugar no se puede tener más de una estación en un mismo sector, y en segundo lugar una estación solo puede atender a su propio sector y a los otros que le sean asignados (es decir, son mutuamente excluyentes). Además, queremos poner exactamente dos estaciones.
 
 \begin{align*}
-    \sum_{i=1}^{5} y_{ij} \le 1 \quad \forall j \\
-    \sum_{j=1}^{5} x_{ij} = 1 \quad \forall i
+    x_{ij} &\le y_i \quad \forall i,j \\
+    \sum_{j=1}^{5} x_{ij} &= 1 \quad \forall i \\
+    \sum_{i=1}^{5} y_i &= 2 \\
 \end{align*}
 
 \subsubsection{Resolución con PICOS}
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+# Matriz de tiempos de respuesta
+tiempos = np.array([
+    [5, 12, 30, 20, 15],
+    [20, 4, 15, 10, 25],
+    [15, 20, 6, 15, 12],
+    [25, 15, 25, 4, 10],
+    [10, 25, 15, 12, 5]
+])
+
+frecuencias = np.array([2, 1, 3, 1, 3])
+sectores = 5
+
+P = picos.Problem()
+
+# Variables binarias
+y = picos.BinaryVariable('y', sectores)  # y[i]: 1 si hay estacion en sector i
+x = picos.BinaryVariable('x', (sectores, sectores))  # x[i,j]: 1 si sector j es atendido por estacion en i
+
+# Objetivo: minimizar tiempo de respuesta ponderado por frecuencia
+P.set_objective('min', picos.sum([
+    tiempos[i, j] * x[i, j] * frecuencias[j]
+    for i in range(sectores)
+    for j in range(sectores)
+]))
+
+# Restriccion: cada sector es atendido por una sola estacion
+for j in range(sectores):
+    P.add_constraint(picos.sum([x[i, j] for i in range(sectores)]) == 1)
+
+# Restriccion: solo puede atender si hay estacion en i
+for i in range(sectores):
+    for j in range(sectores):
+        P.add_constraint(x[i, j] <= y[i])
+
+# Restriccion: exactamente dos estaciones
+P.add_constraint(picos.sum(y) == 2)
+
+P.solve(solver='glpk')
+print('Asignacion (x):')
+print(np.array([[int(round(x[i, j].value)) for j in range(sectores)] for i in range(sectores)]))
+print('Estaciones ubicadas (y):')
+print(np.array([int(round(y[i].value)) for i in range(sectores)]))
+print('Tiempo total ponderado:', round(P.value, 2))
+
+\end{lstlisting}
+
+\subsubsection{Salida de la consola}
+
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+Asignacion (x):
+[[0 0 0 0 0]
+ [0 0 0 0 0]
+ [0 1 1 0 0]
+ [0 0 0 0 0]
+ [1 0 0 1 1]]
+Estaciones ubicadas (y):
+[0 0 1 0 1]
+Tiempo total ponderado: 85.0
+\end{lstlisting}
+
+Es decir, la estación en el sector 3 atiende a los sectores 2 y 3, y la estación en el sector 5 atiende a los sectores 1, 4 y 5.
 
 \end{document}

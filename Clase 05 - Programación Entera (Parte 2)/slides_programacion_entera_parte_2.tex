@@ -1,0 +1,468 @@
+% Slides de Programacion Entera - Parte 2
+\documentclass{beamer}
+\usetheme{metropolis}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{fontawesome5}
+\usepackage{tikz}
+% ------------------------ Paquetes extra de TikZ para posicionamiento y flechas
+\usetikzlibrary{positioning,calc,arrows}
+
+% Definicion de colores personalizados
+\definecolor{primary}{RGB}{46, 204, 113}
+\definecolor{secondary}{RGB}{52, 152, 219}
+\definecolor{accent}{RGB}{231, 76, 60}
+\definecolor{background}{RGB}{236, 240, 241}
+\definecolor{lightgray}{rgb}{0.95,0.95,0.95}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{darkblue}{rgb}{0,0,0.5}
+
+% Configuracion del tema
+\setbeamercolor{normal text}{fg=black,bg=background}
+\setbeamercolor{structure}{fg=primary}
+\setbeamercolor{alerted text}{fg=accent}
+
+\lstset{
+  backgroundcolor=\color{lightgray},
+  basicstyle=\tiny\ttfamily,
+  keywordstyle=\color{darkblue}\bfseries,
+  commentstyle=\color{darkgreen},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  frame=single,
+  tabsize=2,
+  language=Python,
+  breaklines=true,
+  breakatwhitespace=true
+}
+
+\title{\Huge\textbf{Programación Entera - Parte 2}}
+\author{Investigación Operativa}
+\date{}
+
+\begin{document}
+
+% Portada
+\begin{frame}
+    \titlepage
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south west,inner sep=30pt] at (current page.south west) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+% Introduccion
+\begin{frame}{Programación Mixta}
+    \textbf{En la clase anterior:}
+    \begin{itemize}
+        \item Vimos problemas con variables si/no
+        \item Ahora aparecen problemas con variables binarias y continuas juntas
+        \item Ejemplo típico: decidir si se opera una planta y cuanto produce
+    \end{itemize}
+\end{frame}
+
+% Ejemplo 1: Planificacion de produccion
+\begin{frame}{Ejemplo: Planificación de producción}
+    Una empresa opera con dos turnos: diurno y nocturno. El costo de poner en marcha la planta es:
+    \begin{itemize}
+        \item Turno diurno: \$8.000
+        \item Turno nocturno: \$4.500
+    \end{itemize}
+    \vspace{0.5em}
+    Demanda para los próximos dos días:
+    \begin{itemize}
+        \item Dia 1: 2000 unidades (diurno)
+        \item Noche 1: 3000 unidades (nocturno)
+        \item Dia 2: 2000 unidades (diurno)
+        \item Noche 2: 3000 unidades (nocturno)
+    \end{itemize}
+    Costo de almacenaje: \$1 por unidad por día. Se busca minimizar el costo total cumpliendo demanda.
+\end{frame}
+
+% Secuencia de armado del grafico de produccion
+
+% Slide 1: Solo D1, I1, P1 y demanda
+\begin{frame}{Visualización del problema: Turno D1}
+    \begin{center}
+    \scalebox{0.7}{
+    \begin{tikzpicture}[auto, thick, node distance=1.5cm and 2.2cm]
+        % Nodos de demanda
+        \node[draw, circle, fill=purple!40, minimum size=1.2cm] (D1) {D1};
+        % Nodo de inventario
+        \node[draw, circle, fill=red!40, minimum size=1.2cm, right=of D1] (I1) {I1};
+        % Nodo de produccion
+        \node[draw, circle, fill=teal!60, minimum size=1.2cm, right=of I1] (P1) {P1};
+        % Flecha de produccion a inventario
+        \draw[-latex] (D1) -- node[above] {$y^d_1$} (I1);
+        % Flecha de inventario a produccion
+        \draw[-latex] (I1) -- (P1);
+        % Demanda
+        \node[right=0.7cm of P1, text=teal!80!black, font=\bfseries\large] (dem1) {2000};
+    \end{tikzpicture}
+    }
+    \end{center}
+\end{frame}
+
+% Slide 2: Agrego N1, I2, P2 y demanda
+\begin{frame}{Visualización del problema: Turno N1}
+    \begin{center}
+    \scalebox{0.7}{
+    \begin{tikzpicture}[auto, thick, node distance=1.5cm and 2.2cm]
+        % Nodos de demanda
+        \node[draw, circle, fill=purple!40, minimum size=1.2cm] (D1) {D1};
+        \node[draw, circle, fill=purple!40, minimum size=1.2cm, below=of D1] (N1) {N1};
+        % Nodos de inventario
+        \node[draw, circle, fill=red!40, minimum size=1.2cm, right=of D1] (I1) {I1};
+        \node[draw, circle, fill=red!40, minimum size=1.2cm, below=of I1] (I2) {I2};
+        % Nodos de produccion
+        \node[draw, circle, fill=teal!60, minimum size=1.2cm, right=of I1] (P1) {P1};
+        \node[draw, circle, fill=teal!60, minimum size=1.2cm, below=of P1] (P2) {P2};
+        % Flechas
+        \draw[-latex] (D1) -- node[above] {$y^d_1$} (I1);
+        \draw[-latex] (I1) -- (P1);
+        \draw[-latex] (N1) -- node[above] {$y^n_1$} (I2);
+        \draw[-latex] (I2) -- (P2);
+        % Almacenaje
+        \draw[-latex] (I1) -- node[right] {$x_{I1 \to I2}$} (I2);
+        % Demandas
+        \node[right=0.7cm of P1, text=teal!80!black, font=\bfseries\large] (dem1) {2000};
+        \node[right=0.7cm of P2, text=teal!80!black, font=\bfseries\large] (dem2) {3000};
+    \end{tikzpicture}
+    }
+    \end{center}
+\end{frame}
+
+% Slide 3: Agrego D2, I3, P3 y demanda
+\begin{frame}{Visualización del problema: Turno D2}
+    \begin{center}
+    \scalebox{0.7}{
+    \begin{tikzpicture}[auto, thick, node distance=1.5cm and 2.2cm]
+        % Nodos de demanda
+        \node[draw, circle, fill=purple!40, minimum size=1.2cm] (D1) {D1};
+        \node[draw, circle, fill=purple!40, minimum size=1.2cm, below=of D1] (N1) {N1};
+        \node[draw, circle, fill=purple!40, minimum size=1.2cm, below=of N1] (D2) {D2};
+        % Nodos de inventario
+        \node[draw, circle, fill=red!40, minimum size=1.2cm, right=of D1] (I1) {I1};
+        \node[draw, circle, fill=red!40, minimum size=1.2cm, below=of I1] (I2) {I2};
+        \node[draw, circle, fill=red!40, minimum size=1.2cm, below=of I2] (I3) {I3};
+        % Nodos de produccion
+        \node[draw, circle, fill=teal!60, minimum size=1.2cm, right=of I1] (P1) {P1};
+        \node[draw, circle, fill=teal!60, minimum size=1.2cm, below=of P1] (P2) {P2};
+        \node[draw, circle, fill=teal!60, minimum size=1.2cm, below=of P2] (P3) {P3};
+        % Flechas
+        \draw[-latex] (D1) -- node[above] {$y^d_1$} (I1);
+        \draw[-latex] (I1) -- (P1);
+        \draw[-latex] (N1) -- node[above] {$y^n_1$} (I2);
+        \draw[-latex] (I2) -- (P2);
+        \draw[-latex] (D2) -- node[above] {$y^d_2$} (I3);
+        \draw[-latex] (I3) -- (P3);
+        % Almacenaje
+        \draw[-latex] (I1) -- node[right] {$x_{I1 \to I2}$} (I2);
+        \draw[-latex] (I2) -- node[right] {$x_{I2 \to I3}$} (I3);
+        % Demandas
+        \node[right=0.7cm of P1, text=teal!80!black, font=\bfseries\large] (dem1) {2000};
+        \node[right=0.7cm of P2, text=teal!80!black, font=\bfseries\large] (dem2) {3000};
+        \node[right=0.7cm of P3, text=teal!80!black, font=\bfseries\large] (dem3) {2000};
+    \end{tikzpicture}
+    }
+    \end{center}
+\end{frame}
+
+% Slide 4: Agrego N2, I4, P4 y demanda (grafico completo)
+\begin{frame}{Visualización del problema: Turno N2}
+    \begin{center}
+    \scalebox{0.7}{
+    \begin{tikzpicture}[auto, thick, node distance=1.5cm and 2.2cm]
+        % Nodos de demanda
+        \node[draw, circle, fill=purple!40, minimum size=1.2cm] (D1) {D1};
+        \node[draw, circle, fill=purple!40, minimum size=1.2cm, below=of D1] (N1) {N1};
+        \node[draw, circle, fill=purple!40, minimum size=1.2cm, below=of N1] (D2) {D2};
+        \node[draw, circle, fill=purple!40, minimum size=1.2cm, below=of D2] (N2) {N2};
+        % Nodos de inventario
+        \node[draw, circle, fill=red!40, minimum size=1.2cm, right=of D1] (I1) {I1};
+        \node[draw, circle, fill=red!40, minimum size=1.2cm, below=of I1] (I2) {I2};
+        \node[draw, circle, fill=red!40, minimum size=1.2cm, below=of I2] (I3) {I3};
+        \node[draw, circle, fill=red!40, minimum size=1.2cm, below=of I3] (I4) {I4};
+        % Nodos de produccion
+        \node[draw, circle, fill=teal!60, minimum size=1.2cm, right=of I1] (P1) {P1};
+        \node[draw, circle, fill=teal!60, minimum size=1.2cm, below=of P1] (P2) {P2};
+        \node[draw, circle, fill=teal!60, minimum size=1.2cm, below=of P2] (P3) {P3};
+        \node[draw, circle, fill=teal!60, minimum size=1.2cm, below=of P3] (P4) {P4};
+        % Flechas
+        \draw[-latex] (D1) -- node[above] {$y^d_1$} (I1);
+        \draw[-latex] (I1) -- (P1);
+        \draw[-latex] (N1) -- node[above] {$y^n_1$} (I2);
+        \draw[-latex] (I2) -- (P2);
+        \draw[-latex] (D2) -- node[above] {$y^d_2$} (I3);
+        \draw[-latex] (I3) -- (P3);
+        \draw[-latex] (N2) -- node[above] {$y^n_2$} (I4);
+        \draw[-latex] (I4) -- (P4);
+        % Almacenaje
+        \draw[-latex] (I1) -- node[right] {$x_{I1 \to I2}$} (I2);
+        \draw[-latex] (I2) -- node[right] {$x_{I2 \to I3}$} (I3);
+        \draw[-latex] (I3) -- node[right] {$x_{I3 \to I4}$} (I4);
+        % Demandas
+        \node[right=0.7cm of P1, text=teal!80!black, font=\bfseries\large] (dem1) {2000};
+        \node[right=0.7cm of P2, text=teal!80!black, font=\bfseries\large] (dem2) {3000};
+        \node[right=0.7cm of P3, text=teal!80!black, font=\bfseries\large] (dem3) {2000};
+        \node[right=0.7cm of P4, text=teal!80!black, font=\bfseries\large] (dem4) {3000};
+    \end{tikzpicture}
+    }
+    \end{center}
+\end{frame}
+
+\begin{frame}{Variables y función objetivo}
+    \textbf{Variables:}
+    \begin{itemize}
+        \item $y^d_i$: 1 si se produce en el turno diurno $i$, 0 si no
+        \item $y^n_i$: 1 si se produce en el turno nocturno $i$, 0 si no
+        \item $x_{Ii \to I(i+1)}$: cantidad almacenada entre periodos
+    \end{itemize}
+    \vspace{0.5em}
+    \textbf{Función objetivo:}
+    \begin{align*}
+        \text{Min } Z = 8000(y^d_1 + y^d_2) + 4500(y^n_1 + y^n_2) + \sum_{i=1}^{3} x_{Ii \to I(i+1)}
+    \end{align*}
+\end{frame}
+
+\begin{frame}{Restricciones}
+    \begin{itemize}
+        \item $y^d_i, y^n_i \in \{0,1\}$
+        \item $x_{Ii \to I(i+1)} \geq 0$
+        \item Conservación de flujo en cada periodo
+    \end{itemize}
+    \begin{align*}
+        y^d_1 - x_{I1 \to I2} &= x_{I1 \to P_1} \\
+        y^n_1 + x_{I1 \to I2} - x_{I2 \to I3} &= x_{I2 \to P_2} \\
+        y^d_2 + x_{I2 \to I3} - x_{I3 \to I4} &= x_{I3 \to P_3} \\
+        y^n_2 + x_{I3 \to I4} &= x_{I4 \to P_4}
+    \end{align*}
+\end{frame}
+
+% Codigo PICOS - parte 1
+\begin{frame}[fragile]{Modelo en PICOS: Definicion de variables y datos}
+    \begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+# Datos
+costo_diurno = 8000
+costo_nocturno = 4500
+demanda = [2000, 3000, 2000, 3000]  # D1, N1, D2, N2
+costo_almacenaje = 1
+
+# Variables
+P = picos.Problem()
+
+y_d = picos.BinaryVariable('y_d', 2)  # diurno (dia 1 y dia 2)
+y_n = picos.BinaryVariable('y_n', 2)  # nocturno (noche 1 y noche 2)
+x_d = picos.RealVariable('x_d', 2, lower=0)
+x_n = picos.RealVariable('x_n', 2, lower=0)
+s = picos.RealVariable('s', 3, lower=0)
+    \end{lstlisting}
+\end{frame}
+
+% Codigo PICOS - parte 2
+\begin{frame}[fragile]{Modelo en PICOS: Objetivo y restricciones}
+    \begin{lstlisting}[language=Python]
+# Objetivo: costos fijos de produccion + almacenaje
+P.set_objective('min',
+    costo_diurno * picos.sum(y_d) +
+    costo_nocturno * picos.sum(y_n) +
+    costo_almacenaje * picos.sum(s)
+)
+
+tipo_M = 10000
+for i in range(2):
+    P.add_constraint(x_d[i] <= tipo_M * y_d[i])
+    P.add_constraint(x_n[i] <= tipo_M * y_n[i])
+
+# Balance de inventario
+P.add_constraint(x_d[0] - demanda[0] == s[0])
+P.add_constraint(x_n[0] + s[0] - demanda[1] == s[1])
+P.add_constraint(x_d[1] + s[1] - demanda[2] == s[2])
+P.add_constraint(x_n[1] + s[2] - demanda[3] == 0)
+    \end{lstlisting}
+\end{frame}
+
+% Codigo PICOS - parte 3
+\begin{frame}[fragile]{Modelo en PICOS: Resolucion y resultados}
+    \begin{lstlisting}[language=Python]
+P.solve(solver='glpk')
+print('Produccion diurna:', np.round(x_d.value, 2))
+print('Produccion nocturna:', np.round(x_n.value, 2))
+print('Turnos diurnos activados:', [int(round(y_d[i].value)) for i in range(2)])
+print('Turnos nocturnos activados:', [int(round(y_n[i].value)) for i in range(2)])
+print('Inventario final en cada periodo:', np.round(s.value, 2))
+print('Costo total:', round(P.value, 2))
+    \end{lstlisting}
+\end{frame}
+
+% Salida de consola
+\begin{frame}[fragile]{Salida}
+    \begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+Produccion diurna:
+[[2000.]
+[   0.]]
+Produccion nocturna:
+[[5000.]
+[3000.]]
+Turnos diurnos activados:
+[1, 0]
+Turnos nocturnos activados:
+[1, 1]
+Inventario final en cada periodo:
+[[   0.]
+[2000.]
+[   0.]]
+Costo total: 19000.0
+    \end{lstlisting}
+\end{frame}
+
+% Ejemplo 2: Planificacion electrica
+\begin{frame}{Ejemplo: Planificación eléctrica}
+    Una empresa de energía debe satisfacer una demanda creciente durante 5 años. Hay 4 tipos de plantas con distintas capacidades y costos de construcción y operación. Se debe decidir en que año construir cada planta y cuando operarla para minimizar el costo total.
+\end{frame}
+
+\begin{frame}{Datos del problema}
+    \begin{table}[H]
+        \scalebox{0.7}{
+        \centering
+        \begin{tabular}{cccc}
+            \toprule
+            Planta & Capacidad (millones kWh) & Costo construccion (M\$) & Costo operativo anual (M\$) \\
+            \midrule
+            1 & 70 & 20 & 1.5 \\
+            2 & 50 & 16 & 0.8 \\
+            3 & 60 & 18 & 1.3 \\
+            4 & 40 & 14 & 0.6 \\
+            \bottomrule
+        \end{tabular}
+        }
+    \end{table}
+    Demanda: 80, 100, 120, 140, 160 millones kWh por año.
+\end{frame}
+
+\begin{frame}{Variables y modelo}
+    \textbf{Variables:}
+    \begin{itemize}
+        \item $x_{ij}$: energía generada por planta $i$ en año $j$
+        \item $\alpha_{ij}$: 1 si la planta $i$ esta operativa en año $j$, 0 si no
+        \item $y_i$: 1 si la planta $i$ se construye
+    \end{itemize}
+    \vspace{0.5em}
+    \textbf{Función objetivo:}
+    \begin{align*}
+        \text{Min } Z = \sum_{i=1}^{4} c_i y_i + \sum_{i=1}^{4}\sum_{j=1}^{5} o_i \alpha_{ij}
+    \end{align*}
+\end{frame}
+
+\begin{frame}{Restricciones}
+    \begin{enumerate}
+        \item Demanda anual: $\sum_{i} x_{ij} \geq d_j$ para todo $j$
+        \item Capacidad de planta: $x_{ij} \leq cap_i \alpha_{ij}$
+        \item Operar solo si se construyo: $\alpha_{ij} \leq y_i$
+        \item Permanencia: una vez operativa, no se puede apagar: $\alpha_{i,j+1} \geq \alpha_{ij}$
+    \end{enumerate}
+\end{frame}
+
+% Codigo PICOS - parte 1
+\begin{frame}[fragile]{Modelo en PICOS: Definicion de datos y variables}
+    \begin{lstlisting}[language=Python]
+import picos
+
+demand = picos.Constant('demanda',  [80, 100, 120, 140, 160])
+limits  = picos.Constant('cap',     [70, 50, 60, 40])
+c       = picos.Constant('c',       [20, 16, 18, 14])
+o       = picos.Constant('o',       [1.5, 0.8, 1.3, 0.6])
+
+T, P = 5, 4  # anios, plantas
+x = picos.RealVariable('x',  (P, T), lower=0)
+alfa = picos.BinaryVariable('alfa', (P, T))
+y = picos.BinaryVariable('y', P)
+
+p = picos.Problem()
+    \end{lstlisting}
+\end{frame}
+
+% Codigo PICOS - parte 2
+\begin{frame}[fragile]{Modelo en PICOS: Restricciones}
+    \begin{lstlisting}[language=Python]
+# Demanda anual
+for j in range(T):
+    p.add_constraint(picos.sum(x[:, j]) >= demand[j])
+
+# Capacidad de planta
+for i in range(P):
+    p.add_constraint(picos.sum(x[i, :]) <= 1e4*y[i])
+    for j in range(T):
+        p.add_constraint(x[i, j] <= 1e4*alfa[i, j])
+        p.add_constraint(x[i, j] - limits[i] <= 1e4*(1-alfa[i, j]))
+
+# Permanencia
+for i in range(P):
+    for j in range(T-1):
+        p.add_constraint(alfa[i, j+1] >= alfa[i, j])
+
+# Operacion implica construccion
+for i in range(P):
+    for j in range(T):
+        p.add_constraint(alfa[i, j] <= y[i])
+    \end{lstlisting}
+\end{frame}
+
+% Codigo PICOS - parte 3
+\begin{frame}[fragile]{Modelo en PICOS: Objetivo y resolucion}
+    \begin{lstlisting}[language=Python]
+# Objetivo
+p.set_objective('min', c[0]*y[0] + c[1]*y[1] + c[2]*y[2] + c[3]*y[3] +
+                     o[0]*picos.sum(alfa[0, :]) + o[1]*picos.sum(alfa[1, :]) +
+                     o[2]*picos.sum(alfa[2, :]) + o[3]*picos.sum(alfa[3, :]))
+
+# Resolver
+p.options.verbosity = 1
+p.solve(solver='glpk')
+
+print(x)           # energia generada
+print(p.value)     # costo total minimo
+    \end{lstlisting}
+\end{frame}
+
+% Salida de consola
+\begin{frame}[fragile]{Salida esperada}
+    \begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+[ 7.00e+01  5.00e+01  7.00e+01  7.00e+01  7.00e+01]
+[ 1.00e+01  5.00e+01  5.00e+01  5.00e+01  5.00e+01]
+[ 0.00e+00  0.00e+00  0.00e+00  0.00e+00  0.00e+00]
+[ 0.00e+00  0.00e+00  0.00e+00  2.00e+01  4.00e+01]
+62.7
+    \end{lstlisting}
+\end{frame}
+
+% Cierre
+\begin{frame}{Terminamos}
+    \begin{center}
+        \Large{\textbf{¿Dudas?\\¿Consultas?}}
+    \end{center}
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south,inner sep=30pt] at (current page.south) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\end{document}

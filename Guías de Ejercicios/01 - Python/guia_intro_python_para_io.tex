@@ -1,0 +1,400 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{forest}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{siunitx}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\sloppy
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{center}
+    {\LARGE \textbf{Guía de Ejercicios \\Python para I. O.}}\\[0.5em]
+    {Investigación Operativa, Universidad de San Andrés}
+\end{center}
+
+Si encuentran algún error en el documento o hay alguna duda, mandenmé un mail a rodriguezf@udesa.edu.ar y lo revisamos.
+
+\section{Ejercicios}
+
+\subsection{Ejercicio 1}
+Escribir un código que imprima en la consola las siguientes frases o el resultado de las operaciones matemáticas:
+\begin{enumerate}[label=\alph*)]
+    \item “Alo mundo!”
+    \item 2 + 3
+    \item 2 * 3
+    \item $2^3$
+    \item $\frac{2}{3}$
+    \item Resto de la división 2/3
+\end{enumerate}
+    
+\subsection{Ejercicio 2}
+Escribir un código que imprima todos los números pares entre 0 y 31, utilizando \textbf{for} loops.
+    
+\subsection{Ejercicio 3}
+Escribir un código que compute el promedio de la lista de números [1,32,53,14,55,36,27]. Hacerlo de dos maneras distintas:
+\begin{enumerate}[label=\alph*)]
+    \item Mediante for loops
+    \item Usando la función \texttt{np.mean( )}
+\end{enumerate}
+    
+\subsection{Ejercicio 4}
+Escribir una función que tome como input dos números $x_1,x_2$ e imprima a la consola la suma de esos dos números.
+    
+\subsection{Ejercicio 5}
+
+\begin{enumerate}[label=\alph*)]
+    \item Importar la librería numpy con el comando ``\texttt{import numpy as np}''
+    \item Considerar la matriz  
+    \[
+    A = \begin{bmatrix}
+    1 & 2 & 0\\[4pt]
+    3 & 0 & 4\\[4pt]
+    1 & 0 & 3
+    \end{bmatrix}
+    \]
+    \item Transformar en un array de numpy con el comando ``\texttt{A = np.array(A)}''
+    \item Corroborar que los comandos \texttt{A[0][0]} y \texttt{A[0,0]} devuelven el primer elemento en la primera fila, y primera columna.
+    \item Corroborar que el comando \texttt{A[:,1]} devuelve la segunda columna.
+    \item Corroborar que los comandos \texttt{A[1]} y \texttt{A[1,:]} devuelven la segunda fila.
+    \item Corroborar que el comando \texttt{A[:, -1]} devuelve la última columna.
+    \item Corroborar que \texttt{A[0:2]} y \texttt{A[:,0:2]} devuelven las primeras dos filas y las primeras dos columnas respectivamente.
+    \item ¿Qué devuelven los comandos \texttt{A[-1, -1]}, \texttt{A[0:2]}, \texttt{A[0:2, 0]}, \texttt{A[0:2, 0:2]}?
+\end{enumerate}
+
+    
+\subsection{Ejercicio 6}
+\begin{enumerate}[label=\alph*)]
+    \item Escribir un for loop que dadas las dos listas:
+    \[
+    A = [2,\, 10,\, 16,\, 2,\, 4,\, 12,\, 24,\, 100]
+    \]
+    \[
+    B = [5,\, 2,\, 5,\, 2,\, 1,\, 2,\, 1,\, 0.5]
+    \]
+    sume la multiplicación coordenada a coordenada de todos sus elementos, es decir:
+    \[
+    A[0]*B[0] + A[1]*B[1] + A[2]*B[2] + \dots = 2*5 + 10*2 + 16*5 \dots
+    \]
+    \textbf{Nota: }Esta operación es llamada producto interno entre dos vectores o listas.
+    \item Realizar la cuenta a mano y verificar que el resultado es el mismo que en Python.
+    \item Importar la librería numpy y transformar ambas listas en arrays de numpy usando np.array
+    \item Corroborar que ahora el comando ``\texttt{np.dot(A, B)}'' da el mismo resultado que en (a) y (b).
+\end{enumerate}
+    
+\subsection{Ejercicio 7}
+\begin{enumerate}[label=\alph*)]
+    \item Considerar las matrices
+    \[
+    A = \begin{bmatrix}
+    1 & 2 & 0\\[4pt]
+    3 & 0 & 4\\[4pt]
+    1 & 0 & 3
+    \end{bmatrix}, \quad
+    B = \begin{bmatrix}
+    3 & 1 & 1\\[4pt]
+    1 & 2 & 0\\[4pt]
+    2 & 4 & 1
+    \end{bmatrix}
+    \]
+    \item Transformarlas en arrays de numpy
+    \textbf{Definición:} Se define a la multiplicación de matrices $A*B$ como la matriz que en la coordenada $i,j$ (fila $i$, columna $j$) tiene al producto interno de la fila $i$ de $A$ con la columna $j$ de $B$. En este caso la matriz $A*B$ también es de tamaño $3 \times 3$ (son 9 operaciones de producto interno).
+    \item Realizar a mano la multiplicación de las matrices $A$ y $B$ del punto (a).
+    \item Hacer un doble \textbf{for} loop y utilizar lo aprendido en el ejercicio anterior (el 6) para construir la matriz $A*B$ en Python. Corroborar que da lo mismo que a mano.
+    \item Multiplicar las matrices utilizando el comando abreviado de numpy `A@B'. Corroborar que también da lo mismo.
+\end{enumerate}
+    
+\subsection{Ejercicio 8}
+Escribir una función que tome como input dos números $x_1, x_2$, y determine si están en el conjunto factible definido por las siguientes restricciones lineales. El output debe ser un booleano \texttt{True/False}.\\[0.5em]
+    \[
+    \begin{aligned}
+        2x_1 + 3x_2 &\leq 24 \\
+        x_1 &\geq 0 \\
+        x_2 &\geq 0
+        \end{aligned}
+    \]
+
+Usando esta función escribir código que determine si los siguientes puntos están en el conjunto factible.
+\begin{enumerate}[label=\alph*)]
+    \item $(x_1,x_2) = (1,1)$
+    \item $(x_1,x_2) = (12,8)$
+    \item $(x_1,x_2) = (4,8)$
+    \item $(x_1,x_2) = (-1,0)$
+    \item $(x_1,x_2) = (-2,2)$
+\end{enumerate}
+    
+\subsection{Ejercicio 9}
+Para los siguientes problemas de optimización encontrar gráficamente el/los punto(s) óptimo(s) y el valor óptimo. Para hacer esto pueden graficar las funciones objetivo en el rango de interés (o sea, que por lo menos contenga el conjunto factible), y visualmente identificar el punto y valor óptimo. Para los casos donde haya más de un óptimo, reportar todos los puntos óptimos que existan. Para los casos en que no existe el óptimo, explicar por qué este es el caso (o sea, si es porque el conjunto factible es nulo, o porque la función objetivo no está acotada).
+\begin{enumerate}[label=\alph*)]
+    \item \fbox{
+        \begin{minipage}{3cm}
+            \textbf{min} \quad $x^2$
+        \end{minipage}
+    }
+
+    \item \fbox{
+        \begin{minipage}{3cm}
+            \textbf{min} \quad $x^2$ \\[5pt]
+            $x \geq 2$
+        \end{minipage}
+    }
+
+    \item \fbox{
+        \begin{minipage}{3cm}
+            \textbf{max} \quad $x$ \\[5pt]
+            $0 \leq x$
+        \end{minipage}
+    }
+
+    \item \fbox{
+        \begin{minipage}{3.5cm}
+            \textbf{max} \quad $x$ \\[10pt]
+            $0 \leq x$ \\[5pt]
+            $x \leq 10$
+        \end{minipage}
+    }
+
+    \item \fbox{
+        \begin{minipage}{3.5cm}
+            \textbf{max} \quad $x$ \\[10pt]
+            $x \leq 0$ \\[5pt]
+            $2 \leq x$
+        \end{minipage}
+    }
+
+    \item \fbox{
+        \begin{minipage}{3.5cm}
+            \textbf{min} \quad $\cos(x)$ \\[10pt]
+            $0 \leq x$ \\[5pt]
+            $x \leq 1$
+        \end{minipage}
+    }
+
+    \item \fbox{
+        \begin{minipage}{3.5cm}
+            \textbf{min} \quad $\cos(x)$ \\[10pt]
+            $0 \leq x$ \\[5pt]
+            $x \leq 10$
+        \end{minipage}
+    }
+\end{enumerate}
+
+\newpage
+
+\section{Anexo: Soluciones}
+
+% Ejercicio 1
+\subsection{Ejercicio 1}
+\begin{lstlisting}[language=Python]
+print("Alo mundo!")
+print(2 + 3)
+print(2 * 3)
+print(2 ** 3)
+print(2 / 3)
+print(2 % 3)
+\end{lstlisting}
+
+% Ejercicio 2
+\subsection{Ejercicio 2}
+\begin{lstlisting}[language=Python]
+for i in range(0, 32, 2):
+    print(i)
+\end{lstlisting}
+
+% Ejercicio 3
+\subsection{Ejercicio 3}
+\begin{lstlisting}[language=Python]
+# a)
+nums = [1, 32, 53, 14, 55, 36, 27]
+suma = 0
+for n in nums:
+    suma += n
+promedio = suma / len(nums)
+print(promedio)
+
+# b)
+import numpy as np
+nums = [1, 32, 53, 14, 55, 36, 27]
+print(np.mean(nums))
+\end{lstlisting}
+
+% Ejercicio 4
+\subsection{Ejercicio 4}
+\begin{lstlisting}[language=Python]
+def suma(x1, x2):
+    print(x1 + x2)
+\end{lstlisting}
+
+% Ejercicio 5
+\subsection{Ejercicio 5}
+\begin{lstlisting}[language=Python]
+# a)
+import numpy as np
+A = [[1, 2, 0], [3, 0, 4], [1, 0, 3]]
+A = np.array(A)
+
+# d)
+print(A[0][0])
+print(A[0,0])
+
+# e)
+print(A[:,1])
+
+# f)
+print(A[1])
+print(A[1,:])
+
+# g)
+print(A[:,-1])
+
+# h)
+print(A[0:2])
+print(A[:,0:2])
+
+# i)
+print(A[-1,-1])
+print(A[0:2])
+print(A[0:2,0])
+print(A[0:2,0:2])
+\end{lstlisting}
+
+% Ejercicio 6
+\subsection{Ejercicio 6}
+\begin{lstlisting}[language=Python]
+# a)
+A = [2, 10, 16, 2, 4, 12, 24, 100]
+B = [5, 2, 5, 2, 1, 2, 1, 0.5]
+res = 0
+
+for i in range(len(A)):
+    res += A[i] * B[i]
+print(res)
+
+# c)
+import numpy as np
+
+A = np.array([2, 10, 16, 2, 4, 12, 24, 100])
+B = np.array([5, 2, 5, 2, 1, 2, 1, 0.5])
+print(np.dot(A, B))
+\end{lstlisting}
+
+% Ejercicio 7
+\subsection{Ejercicio 7}
+\begin{lstlisting}[language=Python]
+# a)
+import numpy as np
+A = np.array([[1, 2, 0], [3, 0, 4], [1, 0, 3]])
+B = np.array([[3, 1, 1], [1, 2, 0], [2, 4, 1]])
+
+# d)
+C = np.zeros((3,3))
+for i in range(3):
+    for j in range(3):
+        C[i,j] = np.dot(A[i,:], B[:,j])
+print(C)
+
+# e)
+print(A @ B)
+\end{lstlisting}
+
+% Ejercicio 8
+\subsection{Ejercicio 8}
+\begin{lstlisting}[language=Python]
+def factible(x1, x2):
+    return 2*x1 + 3*x2 <= 24 and x1 >= 0 and x2 >= 0
+
+print(factible(1,1))
+print(factible(12,8))
+print(factible(4,8))
+print(factible(-1,0))
+print(factible(-2,2))
+\end{lstlisting}
+
+% Ejercicio 9
+\subsection{Ejercicio 9}
+\begin{lstlisting}[language=Python]
+# a)
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(-5, 5, 200)
+plt.plot(x, x**2)
+plt.show()
+
+# b)
+x = np.linspace(2, 5, 200)
+plt.plot(x, x**2)
+plt.show()
+
+# c)
+x = np.linspace(0, 5, 200)
+plt.plot(x, x)
+plt.show()
+
+# d)
+x = np.linspace(0, 10, 200)
+plt.plot(x, x)
+plt.show()
+
+# e)
+x = np.linspace(2, 0, 200)
+plt.plot(x, x)
+plt.show()
+
+# f)
+x = np.linspace(0, 1, 200)
+plt.plot(x, np.cos(x))
+plt.show()
+
+# g)
+x = np.linspace(0, 10, 200)
+plt.plot(x, np.cos(x))
+plt.show()
+\end{lstlisting}
+
+\end{document}

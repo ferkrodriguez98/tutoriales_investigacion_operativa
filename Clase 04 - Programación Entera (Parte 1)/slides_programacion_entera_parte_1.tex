@@ -1,0 +1,493 @@
+% Slides de Programacion Entera - Parte 1
+\documentclass{beamer}
+\usetheme{metropolis}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{fontawesome5}
+
+% Definicion de colores personalizados
+\definecolor{primary}{RGB}{46, 204, 113}
+\definecolor{secondary}{RGB}{52, 152, 219}
+\definecolor{accent}{RGB}{231, 76, 60}
+\definecolor{background}{RGB}{236, 240, 241}
+\definecolor{lightgray}{rgb}{0.95,0.95,0.95}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{darkblue}{rgb}{0,0,0.5}
+
+% Configuracion del tema
+\setbeamercolor{normal text}{fg=black,bg=background}
+\setbeamercolor{structure}{fg=primary}
+\setbeamercolor{alerted text}{fg=accent}
+
+\lstset{
+  backgroundcolor=\color{lightgray},
+  basicstyle=\tiny\ttfamily,
+  keywordstyle=\color{darkblue}\bfseries,
+  commentstyle=\color{darkgreen},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  frame=single,
+  tabsize=2,
+  language=Python,
+  breaklines=true,
+  breakatwhitespace=true
+}
+
+\title{\Huge\textbf{Programación Entera - Parte 1}}
+\author{Investigación Operativa}
+\date{}
+
+\begin{document}
+
+% Portada
+\begin{frame}
+    \titlepage
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south west,inner sep=30pt] at (current page.south west) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+% Introduccion
+\begin{frame}{¿Qué es la Programación Entera?}
+    \textbf{Definición:}
+    \begin{itemize}
+        \item Buscamos la mejor solucion a problemas donde las variables deben ser enteras
+        \item Hay dos familias: \textbf{pura} (todas enteras) y \textbf{mixta} (algunas enteras, otras continuas)
+        \item No es convexa: requiere ramificación y acotación, cortes y heurísticas
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{¿Cuándo aparece la PE?}
+    \begin{itemize}
+        \item Decisiones si/no (abrir planta, invertir, etc.)
+        \item Ítems indivisibles (personas, máquinas, micros)
+        \item Restricciones lógicas (mutua exclusión, dependencia, al menos/a lo sumo k)
+    \end{itemize}
+\end{frame}
+
+% Modelado con binarias
+\begin{frame}{Modelado con variables binarias}
+    \textbf{Las binarias $y \in \{0,1\}$ permiten:}
+    \begin{itemize}
+        \item Mutua exclusión: $y_1 + y_2 \leq 1$
+        \item Dependencia: $y_B \leq y_A$
+        \item Costos fijos y variables: $F y + c x$
+        \item Activaciones: $x \leq M y$
+    \end{itemize}
+\end{frame}
+
+% Ejemplo 1: Inversion
+\begin{frame}{Ejemplo: Problema de inversión}
+    Se analizan 6 inversiones, cada una con ganancia y capital requerido. Capital total: 100. Algunas son mutuamente excluyentes y otras dependen de otras.
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{c|cccccc}
+            \toprule
+            Inversión & 1 & 2 & 3 & 4 & 5 & 6 \\
+            \midrule
+            Ganancia & 15 & 12 & 16 & 18 & 9 & 11 \\
+            Capital & 38 & 33 & 39 & 45 & 23 & 27 \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+\end{frame}
+
+% Formulación: función objetivo
+\begin{frame}{Modelo de inversión: Función objetivo}
+    \textbf{Variables:} $y_j = 1$ si se selecciona la inversión $j$.
+    \\[0.5em]
+    \textbf{Queremos maximizar la ganancia total:}
+    \begin{align*}
+        \text{Max } Z = 15y_1 + 12y_2 + 16y_3 + 18y_4 + 9y_5 + 11y_6
+    \end{align*}
+\end{frame}
+
+% Formulación: restricción de capital
+\begin{frame}{Modelo de inversión: Restricción de capital}
+    \textbf{No podemos invertir más de lo disponible:}
+    \begin{align*}
+        38y_1 + 33y_2 + 39y_3 + 45y_4 + 23y_5 + 27y_6 \leq 100
+    \end{align*}
+    (El capital total disponible es 100)
+\end{frame}
+
+% Formulación: exclusión
+\begin{frame}{Modelo de inversión: Exclusión}
+    \textbf{Algunas inversiones son mutuamente excluyentes:}
+    \begin{align*}
+        y_1 + y_2 \leq 1 \\
+        y_3 + y_4 \leq 1
+    \end{align*}
+    (No se pueden hacer ambas a la vez)
+\end{frame}
+
+% Formulación: dependencia
+\begin{frame}{Modelo de inversión: Dependencia}
+    \textbf{Dependencia entre inversiones:}
+    \begin{align*}
+        y_3 \leq y_1 + y_2 \\
+        y_4 \leq y_1 + y_2
+    \end{align*}
+    (Solo se puede hacer la 3 o la 4 si se hizo la 1 o la 2)
+\end{frame}
+
+% Formulación: binariedad
+\begin{frame}{Modelo de inversión: Variables binarias}
+    \textbf{Las variables son binarias:}
+    \begin{align*}
+        y_j \in \{0,1\} \quad \forall j
+    \end{align*}
+    (Cada inversión se toma o no)
+\end{frame}
+
+% Codigo PICOS - parte 1
+\begin{frame}[fragile]{Modelo en PICOS: Definicion y restricciones}
+    \begin{lstlisting}[language=Python]
+import picos
+
+P = picos.Problem()
+y = picos.BinaryVariable('y', 6)
+
+P.set_objective('max', 15*y[0] + 12*y[1] + 16*y[2] + 18*y[3] + 9*y[4] + 11*y[5])
+P.add_constraint(38*y[0] + 33*y[1] + 39*y[2] + 45*y[3] + 23*y[4] + 27*y[5] <= 100)
+P.add_constraint(y[0] + y[1] <= 1)
+P.add_constraint(y[2] + y[3] <= 1)
+P.add_constraint(y[2] <= y[0] + y[1])
+P.add_constraint(y[3] <= y[0] + y[1])
+    \end{lstlisting}
+\end{frame}
+
+% Codigo PICOS - parte 2
+\begin{frame}[fragile]{Modelo en PICOS: Resolucion y resultados}
+    \begin{lstlisting}[language=Python]
+P.options.verbosity = 0
+P.solve(solver='glpk')
+print(y)          # valores optimos de las variables
+print(P.value)    # ganancia total optima
+    \end{lstlisting}
+\end{frame}
+
+% Salida de consola
+\begin{frame}[fragile]{Salida}
+    \begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+[ 1.00e+00]
+[ 0.00e+00]
+[ 1.00e+00]
+[ 0.00e+00]
+[ 1.00e+00]
+[ 0.00e+00]
+40.0
+    \end{lstlisting}
+\end{frame}
+
+% Ejemplo 2: Plantas y productos
+\begin{frame}{Ejemplo: Plantas y productos}
+    Cuatro productos, tres plantas, cada una con capacidad y costos distintos. Hay dos variantes: permitir o no permitir división de producción.
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{c|cccc|c}
+            \toprule
+             & \multicolumn{4}{c|}{Costo unitario (\$/u)} & Capacidad \\
+             & 1 & 2 & 3 & 4 & disponible (u/día) \\
+            \midrule
+            Planta 1 & 41 & 27 & 28 & 24 & 75 \\
+            Planta 2 & 40 & 29 & -- & 23 & 75 \\
+            Planta 3 & 37 & 30 & 27 & 21 & 45 \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    Demanda: 20, 30, 30, 40
+\end{frame}
+
+% Formulación: función objetivo
+\begin{frame}{Modelo: Función objetivo}
+    \textbf{Variables:} $x_{ij}$ cantidad de producto $j$ fabricado en planta $i$.
+    \\[0.5em]
+    \textbf{Queremos minimizar el costo total de producción:}
+    \begin{align*}
+        \text{Min } Z = \sum_{i=1}^{3} \sum_{j=1}^{4} c_{ij} x_{ij}
+    \end{align*}
+\end{frame}
+
+% Formulación: restricción de capacidad
+\begin{frame}{Modelo: Restricción de capacidad}
+    \textbf{Cada planta tiene una capacidad máxima:}
+    \begin{align*}
+        \sum_{j=1}^{4} x_{ij} \leq cap_i \quad \forall i
+    \end{align*}
+    (No se puede fabricar más de lo que permite la planta)
+\end{frame}
+
+% Formulación: restricción de demanda
+\begin{frame}{Modelo: Restricción de demanda}
+    \textbf{Se debe cubrir la demanda de cada producto:}
+    \begin{align*}
+        \sum_{i=1}^{3} x_{ij} = demanda_j \quad \forall j
+    \end{align*}
+    (La suma de lo producido en todas las plantas debe igualar la demanda de cada producto)
+\end{frame}
+
+% Formulación: restricción de división/no división
+\begin{frame}{Modelo: División o no división}
+    \textbf{¿Se permite fabricar un producto en más de una planta?}
+    \begin{itemize}
+        \item \textbf{División permitida:} No se agrega ninguna restricción extra (modelo de transporte).
+        \item \textbf{Sin división:} Cada producto se fabrica en una sola planta (modelo de asignación binaria):
+        \begin{align*}
+            \sum_{i=1}^{3} y_{ij} = 1 \quad \forall j
+        \end{align*}
+        donde $y_{ij} = 1$ si el producto $j$ se fabrica en la planta $i$.
+    \end{itemize}
+\end{frame}
+
+% Codigo PICOS transporte
+\begin{frame}[fragile]{PICOS: modelo de transporte}
+    \begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+costos = np.array([
+    [41, 27, 28, 24],
+    [40, 29, 1e6, 23],
+    [37, 30, 27, 21]
+])
+capacidades = [75, 75, 45]
+demanda = [20, 30, 30, 40]
+
+plantas, productos = 3, 4
+P = picos.Problem()
+x = picos.RealVariable('x', (plantas, productos), lower=0)
+
+P.set_objective('min', picos.sum([
+    costos[i, j] * x[i, j]
+    for i in range(plantas)
+    for j in range(productos)
+]))
+for i in range(plantas):
+    P.add_constraint(picos.sum(x[i, :]) <= capacidades[i])
+for j in range(productos):
+    P.add_constraint(picos.sum(x[:, j]) == demanda[j])
+    \end{lstlisting}
+\end{frame}
+
+% Codigo PICOS transporte resultados
+\begin{frame}[fragile]{PICOS: resultados transporte}
+    \begin{lstlisting}[language=Python]
+P.solve(solver='glpk')
+print('Asignacion continua (x):')
+print(np.round(x.value, 2))
+print('Costo total:', round(P.value, 2))
+    \end{lstlisting}
+\end{frame}
+
+% Codigo PICOS asignacion binaria
+\begin{frame}[fragile]{PICOS: modelo de asignacion binaria}
+    \begin{lstlisting}[language=Python]
+costos_lista = costos.tolist()
+demanda_lista = list(demanda)
+
+P2 = picos.Problem()
+y = picos.BinaryVariable('y', (plantas, productos))
+
+P2.set_objective('min', picos.sum([
+    costos_lista[i][j] * demanda_lista[j] * y[i, j]
+    for i in range(plantas)
+    for j in range(productos)
+]))
+for j in range(productos):
+    P2.add_constraint(picos.sum([y[i, j] for i in range(plantas)]) == 1)
+for i in range(plantas):
+    P2.add_constraint(picos.sum([
+        y[i, j] * demanda_lista[j]
+        for j in range(productos)
+    ]) <= capacidades[i])
+    \end{lstlisting}
+\end{frame}
+
+% Codigo PICOS asignacion binaria resultados
+\begin{frame}[fragile]{PICOS: resultados asignacion binaria}
+    \begin{lstlisting}[language=Python]
+P2.solve(solver='glpk')
+print('Asignacion binaria (y):')
+asignacion = np.array([[int(round(y[i, j].value)) for j in range(productos)] for i in range(plantas)])
+print(asignacion)
+print('Costo total:', round(P2.value, 2))
+    \end{lstlisting}
+\end{frame}
+
+% Salida de consola
+\begin{frame}[fragile]{Salida}
+    \begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+--- Modelo de transporte (division permitida) ---
+Asignacion continua (x):
+[[ 0. 30. 30.  0.]
+[ 0.  0.  0. 15.]
+[20.  0.  0. 25.]]
+Costo total: 3260.0
+--- Modelo de asignacion binaria (sin division) ---
+Asignacion binaria (y):
+[[0 1 1 0]
+[1 0 0 0]
+[0 0 0 1]]
+Costo total: 3290.0
+    \end{lstlisting}
+\end{frame}
+
+% Ejemplo 3: Estaciones de bomberos
+\begin{frame}{Ejemplo: Estaciones de bomberos}
+    Ubicar 2 estaciones en 5 sectores. Cada estación atiende a su propio sector y a los que le sean asignados. Queremos minimizar el tiempo de respuesta ponderado por frecuencia de incendios.
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{c|ccccc}
+            \toprule
+            & 1 & 2 & 3 & 4 & 5 \\
+            \midrule
+            1 & 5 & 12 & 30 & 20 & 15 \\
+            2 & 20 & 4 & 15 & 10 & 25 \\
+            3 & 15 & 20 & 6 & 15 & 12 \\
+            4 & 25 & 15 & 25 & 4 & 10 \\
+            5 & 10 & 25 & 15 & 12 & 5 \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+    Frecuencia: 2, 1, 3, 1, 3
+\end{frame}
+
+% Formulación: función objetivo
+\begin{frame}{Modelo de bomberos: Función objetivo}
+    \textbf{Variables:}
+    \begin{itemize}
+        \item $y_i$: 1 si hay estación en el sector $i$
+        \item $x_{ij}$: 1 si el sector $j$ es atendido por la estación ubicada en $i$
+    \end{itemize}
+    \textbf{Queremos minimizar el tiempo de respuesta ponderado:}
+    \begin{align*}
+        \text{Min } Z = \sum_{i=1}^{5} \sum_{j=1}^{5} t_{ij} x_{ij} f_j
+    \end{align*}
+    donde $t_{ij}$ es el tiempo de respuesta del sector $j$ atendido por la estación en $i$ y $f_j$ es la frecuencia de incendios en el sector $j$.
+\end{frame}
+
+% Formulación: restricción de asignación
+\begin{frame}{Modelo de bomberos: Asignación}
+    \textbf{Cada sector debe ser atendido por una sola estación:}
+    \begin{align*}
+        \sum_{i=1}^{5} x_{ij} = 1 \quad \forall j
+    \end{align*}
+    (Cada sector tiene que estar cubierto por alguna estación)
+\end{frame}
+
+% Formulación: restricción de cobertura
+\begin{frame}{Modelo de bomberos: Cobertura}
+    \textbf{Solo se puede asignar un sector a una estación si esa estación existe:}
+    \begin{align*}
+        x_{ij} \leq y_i \quad \forall i, j
+    \end{align*}
+    (No se puede asignar un sector a un lugar donde no hay estación)
+\end{frame}
+
+% Formulación: cantidad de estaciones
+\begin{frame}{Modelo de bomberos: Cantidad de estaciones}
+    \textbf{Queremos instalar exactamente dos estaciones:}
+    \begin{align*}
+        \sum_{i=1}^{5} y_i = 2
+    \end{align*}
+\end{frame}
+
+% Formulación: resumen de variables
+\begin{frame}{Modelo de bomberos: Variables}
+    \textbf{Resumen:}
+    \begin{itemize}
+        \item $y_i \in \{0,1\}$: 1 si hay estación en el sector $i$
+        \item $x_{ij} \in \{0,1\}$: 1 si el sector $j$ es atendido por la estación en $i$
+    \end{itemize}
+\end{frame}
+
+% Codigo PICOS bomberos
+\begin{frame}[fragile]{PICOS: modelo de bomberos}
+    \begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+tiempos = np.array([
+    [5, 12, 30, 20, 15],
+    [20, 4, 15, 10, 25],
+    [15, 20, 6, 15, 12],
+    [25, 15, 25, 4, 10],
+    [10, 25, 15, 12, 5]
+])
+frecuencias = np.array([2, 1, 3, 1, 3])
+sectores = 5
+
+P = picos.Problem()
+y = picos.BinaryVariable('y', sectores)
+x = picos.BinaryVariable('x', (sectores, sectores))
+
+P.set_objective('min', picos.sum([
+    tiempos[i, j] * x[i, j] * frecuencias[j]
+    for i in range(sectores)
+    for j in range(sectores)
+]))
+for j in range(sectores):
+    P.add_constraint(picos.sum([x[i, j] for i in range(sectores)]) == 1)
+for i in range(sectores):
+    for j in range(sectores):
+        P.add_constraint(x[i, j] <= y[i])
+P.add_constraint(picos.sum(y) == 2)
+    \end{lstlisting}
+\end{frame}
+
+% Codigo PICOS bomberos resultados
+\begin{frame}[fragile]{PICOS: resultados bomberos}
+    \begin{lstlisting}[language=Python]
+P.solve(solver='glpk')
+print('Asignacion (x):')
+print(np.array([[int(round(x[i, j].value)) for j in range(sectores)] for i in range(sectores)]))
+print('Estaciones ubicadas (y):')
+print(np.array([int(round(y[i].value)) for i in range(sectores)]))
+print('Tiempo total ponderado:', round(P.value, 2))
+    \end{lstlisting}
+\end{frame}
+
+% Salida de consola
+\begin{frame}[fragile]{Salida}
+    \begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+Asignacion (x):
+[[0 0 0 0 0]
+ [0 0 0 0 0]
+ [0 1 1 0 0]
+ [0 0 0 0 0]
+ [1 0 0 1 1]]
+Estaciones ubicadas (y):
+[0 0 1 0 1]
+Tiempo total ponderado: 85.0
+    \end{lstlisting}
+\end{frame}
+
+% Cierre
+\begin{frame}{Terminamos}
+    \begin{center}
+        \Large{\textbf{¿Dudas?\\¿Consultas?}}
+    \end{center}
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south,inner sep=30pt] at (current page.south) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\end{document}
