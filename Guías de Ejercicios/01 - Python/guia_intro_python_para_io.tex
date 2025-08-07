@@ -167,62 +167,6 @@ Usando esta función escribir código que determine si los siguientes puntos est
     \item $(x_1,x_2) = (-1,0)$
     \item $(x_1,x_2) = (-2,2)$
 \end{enumerate}
-    
-\subsection{Ejercicio 9}
-Para los siguientes problemas de optimización encontrar gráficamente el/los punto(s) óptimo(s) y el valor óptimo. Para hacer esto pueden graficar las funciones objetivo en el rango de interés (o sea, que por lo menos contenga el conjunto factible), y visualmente identificar el punto y valor óptimo. Para los casos donde haya más de un óptimo, reportar todos los puntos óptimos que existan. Para los casos en que no existe el óptimo, explicar por qué este es el caso (o sea, si es porque el conjunto factible es nulo, o porque la función objetivo no está acotada).
-\begin{enumerate}[label=\alph*)]
-    \item \fbox{
-        \begin{minipage}{3cm}
-            \textbf{min} \quad $x^2$
-        \end{minipage}
-    }
-
-    \item \fbox{
-        \begin{minipage}{3cm}
-            \textbf{min} \quad $x^2$ \\[5pt]
-            $x \geq 2$
-        \end{minipage}
-    }
-
-    \item \fbox{
-        \begin{minipage}{3cm}
-            \textbf{max} \quad $x$ \\[5pt]
-            $0 \leq x$
-        \end{minipage}
-    }
-
-    \item \fbox{
-        \begin{minipage}{3.5cm}
-            \textbf{max} \quad $x$ \\[10pt]
-            $0 \leq x$ \\[5pt]
-            $x \leq 10$
-        \end{minipage}
-    }
-
-    \item \fbox{
-        \begin{minipage}{3.5cm}
-            \textbf{max} \quad $x$ \\[10pt]
-            $x \leq 0$ \\[5pt]
-            $2 \leq x$
-        \end{minipage}
-    }
-
-    \item \fbox{
-        \begin{minipage}{3.5cm}
-            \textbf{min} \quad $\cos(x)$ \\[10pt]
-            $0 \leq x$ \\[5pt]
-            $x \leq 1$
-        \end{minipage}
-    }
-
-    \item \fbox{
-        \begin{minipage}{3.5cm}
-            \textbf{min} \quad $\cos(x)$ \\[10pt]
-            $0 \leq x$ \\[5pt]
-            $x \leq 10$
-        \end{minipage}
-    }
-\end{enumerate}
 
 \newpage
 
@@ -353,48 +297,6 @@ print(factible(12,8))
 print(factible(4,8))
 print(factible(-1,0))
 print(factible(-2,2))
-\end{lstlisting}
-
-% Ejercicio 9
-\subsection{Ejercicio 9}
-\begin{lstlisting}[language=Python]
-# a)
-import numpy as np
-import matplotlib.pyplot as plt
-
-x = np.linspace(-5, 5, 200)
-plt.plot(x, x**2)
-plt.show()
-
-# b)
-x = np.linspace(2, 5, 200)
-plt.plot(x, x**2)
-plt.show()
-
-# c)
-x = np.linspace(0, 5, 200)
-plt.plot(x, x)
-plt.show()
-
-# d)
-x = np.linspace(0, 10, 200)
-plt.plot(x, x)
-plt.show()
-
-# e)
-x = np.linspace(2, 0, 200)
-plt.plot(x, x)
-plt.show()
-
-# f)
-x = np.linspace(0, 1, 200)
-plt.plot(x, np.cos(x))
-plt.show()
-
-# g)
-x = np.linspace(0, 10, 200)
-plt.plot(x, np.cos(x))
-plt.show()
 \end{lstlisting}
 
 \end{document}

@@ -1,0 +1,429 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{forest}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{siunitx}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\sloppy
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+% Título y materia
+\begin{center}
+  {\LARGE \textbf{Programación No Lineal}}\\[0.5em]
+  {Investigación Operativa, Universidad de San Andrés}
+\end{center}
+
+Si encuentran algún error en el documento o hay alguna duda, mandenmé un mail a rodriguezf@udesa.edu.ar y lo revisamos.
+
+\section{Introducción a la Programación No Lineal}
+
+Hasta ahora veníamos viendo problemas solo de programación lineal, en donde tanto la función objetivo como las restricciones eran lineales (o dicho de forma más simple, todo son rectas). Por ejemplo, teníamos gráficos de este estilo:
+
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+    xlabel=$x_1$,
+    ylabel=$x_2$,
+    xmin=-1, xmax=7,
+    ymin=-1, ymax=7,
+    grid=both,
+    grid style={line width=.1pt, draw=gray!10},
+    major grid style={line width=.2pt,draw=gray!50},
+    axis lines=middle,
+    samples=100,
+    domain=-1:7,
+    legend pos=outer north east
+]
+\addplot[color=red, thick] coordinates {(0,-1) (0,7)};
+\addlegendentry{$x_1 \geq 0$}
+\addplot[color=blue, thick] coordinates {(-1,0) (7,0)};
+\addlegendentry{$x_2 \geq 0$}
+\addplot[color=green, thick] coordinates {(4,-1) (4,7)};
+\addlegendentry{$x_1 \leq 4$}
+\addplot[color=purple, thick] coordinates {(-1,6) (7,6)};
+\addlegendentry{$2x_2 \leq 12$}
+\addplot[color=orange, thick, domain=-1:7] { (18 - 3*x)/2 };
+\addlegendentry{$3x_1 + 2x_2 \leq 18$}
+\fill[gray!50,opacity=0.3] (0,0) -- (0,6) -- (2,6) -- (4,3) -- (4,0) -- cycle;
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+Ahora vamos a tener al menos una de las dos cosas que no es lineal, que puede ser o bien la función objetivo o bien alguna de las restricciones.
+
+% \begin{center}
+% \begin{minipage}{0.48\textwidth}
+% \centering
+% \begin{tikzpicture}
+%   \begin{axis}[
+%     view={45}{30},
+%     xlabel={$x$}, ylabel={$y$}, zlabel={$f(x, y)$},
+%     domain=-4:4, y domain=-4:4,
+%     samples=30,
+%     samples y=30,
+%     colormap/viridis,
+%     width=6cm,
+%     height=5cm,
+%     grid=major,
+%     enlargelimits=0.15
+%   ]
+%     \addplot3[surf,shader=interp] {x^2 + y^2};
+%   \end{axis}
+% \end{tikzpicture}
+% \end{minipage}%
+% \hfill
+% \begin{minipage}{0.48\textwidth}
+% \centering
+% \begin{tikzpicture}
+%   \begin{axis}[
+%     view={45}{30},
+%     xlabel={$x$}, ylabel={$y$}, zlabel={$z$},
+%     domain=-1.5:1.5, y domain=-1.5:1.5,
+%     samples=30,
+%     samples y=30,
+%     colormap/hot,
+%     width=6cm,
+%     height=5cm,
+%     grid=major,
+%     enlargelimits=0.15
+%   ]
+%     % Superficie plana
+%     \addplot3[surf,shader=interp,opacity=0.7] {x + y};
+%     % Cilindro elíptico gris
+%     \addplot3[
+%       domain=0:360,
+%       y domain=-5:5,
+%       samples=60,
+%       samples y=40,
+%       fill=gray!40,
+%       draw=none,
+%       opacity=0.6
+%     ] (
+%       {cos(x)}, {sin(x)/sqrt(2)}, {y}
+%     );
+%     % Elipse en el plano z=0
+%     \addplot3[thick,black,domain=0:360,samples=100] (
+%       {cos(x)}, {sin(x)/sqrt(2)}, {-5}
+%     );
+%     % Elipse en el plano z=x+y
+%     \addplot3[thick,black,domain=0:360,samples=100] (
+%       {cos(x)}, {sin(x)/sqrt(2)}, {cos(x)+sin(x)/sqrt(2)}
+%     );
+%   \end{axis}
+% \end{tikzpicture}
+% \end{minipage}
+% \end{center}
+
+\section{Convexidad}
+
+La convexidad es un concepto central en optimización. Una función es convexa si la recta que une dos puntos cualesquiera de su gráfica queda por encima o sobre la función. Esto tiene consecuencias muy importantes en problemas de optimización.
+
+\begin{center}
+\begin{minipage}{0.48\textwidth}
+\centering
+\begin{tikzpicture}
+  \begin{axis}[
+    axis lines=middle,
+    width=5.5cm,
+    height=4.5cm,
+    xlabel={$x$}, ylabel={$f(x)$},
+    domain=-1:1,
+    samples=100,
+    legend style={at={(0.5,-0.15)},anchor=north,legend columns=2},
+    xtick={-1,0,1},
+    ytick={0,2,4,6},
+    ymin=0, ymax=5.5,
+    xmin=-1, xmax=1
+  ]
+    \addplot[thick,red]   {exp(2*x)};  % alpha=2
+    \addplot[thick,orange]{exp(x)};    % alpha=1
+    \addplot[thick,blue]  {exp(-x)};   % alpha=-1
+    \addplot[thick,green] {exp(-2*x)}; % alpha=-2
+  \end{axis}
+\end{tikzpicture}
+\\
+\textbf{Funciones Exponenciales}
+
+$\displaystyle f(x) = e^{\alpha x} \quad \forall \alpha \in \mathbb{R}$
+\end{minipage}%
+\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\begin{tikzpicture}
+  \begin{axis}[
+    axis lines=middle,
+    width=5.5cm,
+    height=4.5cm,
+    xlabel={$x$}, ylabel={$f(x)$},
+    domain=0.1:2,
+    samples=100,
+    legend style={at={(0.5,-0.15)},anchor=north,legend columns=2},
+    xtick={0,1,2},
+    ytick={0,2,4,6,8},
+    ymin=0, ymax=8,
+    xmin=0, xmax=2
+  ]
+    \addplot[thick,blue]  {x^2};      % alpha=2
+    \addplot[thick,orange]{x};        % alpha=1
+    \addplot[thick,green] {x^(-1)};   % alpha=-1
+    \addplot[thick,red]   {x^(-2)};   % alpha=-2
+  \end{axis}
+\end{tikzpicture}
+\\
+\textbf{Funciones Potenciales}
+
+$\displaystyle f(x) = x^{\alpha} \qquad x \geq 0 \qquad \alpha \leq 0 \ \vee \ \alpha \geq 1$
+\end{minipage}
+\end{center}
+
+\vspace{1em}
+
+\textbf{Propiedades:}
+\begin{itemize}
+    \item La suma de dos funciones \textbf{convexas} es convexa.
+    \item Un problema de optimización es convexo si y solo si:
+    \begin{enumerate}
+        \item El conjunto factible es convexo
+        \item El objetivo es minimizar una función convexa (o maximizar una cóncava)
+    \end{enumerate}
+    \item Si un problema de optimización es convexo, \textbf{cualquier óptimo local es un óptimo global}. De otra forma, alcanza con encontrar \textit{algún} mínimo local que sabremos que es global.
+\end{itemize}
+
+\section{Ejemplos}
+
+\subsection{Asignación de presupuesto en publicidad digital}
+
+Una empresa desea asignar su presupuesto diario de publicidad entre dos plataformas: \textbf{Google Ads} ($x_1$) e \textbf{Instagram Ads} ($x_2$). El objetivo es maximizar el impacto total de la campaña, medido como una \textbf{función no lineal del gasto} en cada plataforma, debido a efectos de saturación. La empresa dispone de \$10.000 para su inversión, y para que te dejen meter publicidades, se deben invertir al menos \$2.000 en Google Ads y \$1.000 en Instagram Ads.
+
+\vspace{1em}
+
+La función objetivo ya la sabe la empresa y está basada en datos históricos que relacionan el gasto con el impacto:
+
+\begin{center}
+$\displaystyle f(x_1, x_2) = - \left( 100 \cdot \left(1 - e^{-0.05 x_1}\right) + 80 \cdot \left(1 - e^{-0.08 x_2}\right) \right)$
+\end{center}
+
+\textbf{Nota:} La mayoría de los métodos de optimización numérica van a buscar siempre minimizar una función. Cuando querramos maximizar vamos a tener que agregarle un ``-'' al principio.
+
+\vspace{1em}
+
+Las restricciones sí las tenemos que plantear nosotros, y en este caso son:
+\begin{itemize}
+    \item $x_1 + x_2 \leq 10\,000$ (se dispone de \$10.000 para invertir)
+    \item $x_1 \geq 2\,000$ (se debe invertir al menos \$2.000 en Google Ads)
+    \item $x_2 \geq 1\,000$ (se debe invertir al menos \$1.000 en Instagram Ads)
+\end{itemize}
+
+\textbf{¿Es convexo?}
+
+\vspace{1em}
+
+\subsection{Ejemplo 2: Producción óptima de dos productos}
+
+Una empresa fabrica dos productos, \textbf{A} y \textbf{B}, con ganancias unitarias de \$40 y \$30 respectivamente. La empresa desea determinar cuántas unidades de cada producto debe fabricar por día para \textbf{maximizar su ganancia diaria}, enfrentando restricciones no lineales:
+
+\begin{itemize}
+    \item \textbf{Capacidad de máquinas:} $x_1^2 + x_2^2 \leq 2500$
+    \item \textbf{Compatibilidad:} $\dfrac{x_1}{x_2 + 1} \leq 4$
+    \item \textbf{No negatividad:} $x_1 \geq 0$, $x_2 \geq 0$
+\end{itemize}
+
+Función objetivo:
+
+\begin{center}
+$\displaystyle \max f(x_1, x_2) = 40x_1 + 30x_2$
+\end{center}
+
+\textbf{¿Es no lineal? ¿Convexa?}
+
+\vspace{1em}
+
+\begin{center}
+\begin{tikzpicture}
+  \begin{axis}[
+    axis lines=middle,
+    width=7cm,
+    height=7cm,
+    xlabel={$x_1$}, ylabel={$x_2$},
+    grid=both,
+    minor tick num=1,
+    enlargelimits=0.1,
+    domain=-60:60,
+    samples=200
+  ]
+    % Restriccion no lineal (circulo)
+    \addplot[thick,purple,domain=0:360,samples=200] ({50*cos(x)},{50*sin(x)});
+    % Restriccion lineal
+    \addplot[thick,black,domain=-60:60] {4*x - 1};
+  \end{axis}
+\end{tikzpicture}
+\end{center}
+
+\vspace{1em}
+
+\textbf{Resolución en Python:}
+
+\begin{lstlisting}[language=Python]
+# Funcion objetivo (negativa para maximizar)
+def ganancia_negativa(x):
+    x1, x2 = x
+    return -(40 * x1 + 30 * x2)
+
+# Restriccion 1: x1^2 + x2^2 <= 2500
+def restriccion_maquina(x):
+    return 2500 - (x[0]**2 + x[1]**2)
+
+# Restriccion 2: x1 / (x2 + 1) <= 4
+def restriccion_compatibilidad(x):
+    return 4 * (x[1] + 1) - x[0]
+
+# Lista de restricciones
+restricciones = [
+    {'type': 'ineq', 'fun': restriccion_maquina},
+    {'type': 'ineq', 'fun': restriccion_compatibilidad}
+]
+
+# Limites (x1, x2 >= 0)
+bounds = [(0, None), (0, None)]
+
+# Valor inicial factible
+x0 = [1, 1]
+
+# Optimizacion
+from scipy.optimize import minimize
+res = minimize(ganancia_negativa, x0, method='SLSQP', bounds=bounds, constraints=restricciones)
+
+# Mostrar resultado
+if res.success:
+    x1_opt, x2_opt = res.x
+    ganancia_max = -res.fun
+    print(f'Produccion optima de A: {x1_opt:.2f} unidades')
+    print(f'Produccion optima de B: {x2_opt:.2f} unidades')
+    print(f'Ganancia maxima: ${ganancia_max:.2f}')
+else:
+    print('Error:', res.message)
+\end{lstlisting}
+
+\vspace{1em}
+
+\subsection{Ejemplo 3: Múltiples mínimos locales}
+
+En problemas no lineales, puede haber varios mínimos locales. El resultado depende del punto inicial:
+
+\begin{center}
+\begin{tikzpicture}
+  \begin{axis}[
+    width=8cm,
+    height=5cm,
+    xlabel={$x$}, ylabel={$f(x)$},
+    domain=1:5,
+    samples=200,
+    grid=major
+  ]
+    \addplot[thick,blue] {3*sin(deg(2*x)) + cos(deg(3*x))};
+  \end{axis}
+\end{tikzpicture}
+\end{center}
+
+\noindent
+\textit{Depende de donde empiece llego a un mínimo diferente. Para resolver esto usamos seeds (semillas aleatorias).}
+
+\vspace{1em}
+
+\subsection{Ejemplo 4: Optimización en biotecnología}
+
+Una startup de biotecnología busca desarrollar empaques ecológicos usando dos ingredientes clave: \textbf{fibra vegetal} ($x_1$) y \textbf{alga marina} ($x_2$), ambos en kg por lote. El costo total depende de una función periódica y lineal de ambos ingredientes, más un costo fijo:
+
+\begin{center}
+$\displaystyle f(x_1, x_2) = \sin(x_1) \cdot \cos(x_2) + 0.1(x_1 + x_2) + 25$
+\end{center}
+
+\textbf{Restricciones:}
+\begin{itemize}
+    \item $x_1 + x_2 \geq 2$ (mínimo de ingredientes)
+    \item $x_1 + 2x_2 \leq 8$ (capacidad máxima)
+    \item $0 \leq x_1 \leq 6$
+    \item $0 \leq x_2 \leq 6$
+\end{itemize}
+
+\textbf{Resolución en Python:}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+from scipy.optimize import minimize
+
+def costo(x):
+    x1, x2 = x
+    return np.sin(x1) * np.cos(x2) + 0.1 * (x1 + x2) + 25
+
+restricciones = [
+    {'type': 'ineq', 'fun': lambda x: x[0] + x[1] - 2},
+    {'type': 'ineq', 'fun': lambda x: 8 - (x[0] + 2 * x[1])}
+]
+
+bounds = [(0, 6), (0, 6)]
+
+np.random.seed(42)
+resultados = []
+for i in range(10):
+    x0 = np.random.uniform(0, 6, size=2)
+    res = minimize(costo, x0, method='SLSQP', bounds=bounds, constraints=restricciones)
+    if res.success:
+        resultados.append((res.fun, res.x))
+
+resultados.sort()
+mejor_valor, mejor_x = resultados[0]
+print(f'Mejor solucion encontrada: x1 = {mejor_x[0]:.4f}, x2 = {mejor_x[1]:.4f}')
+print(f'Costo minimo estimado: {mejor_valor:.4f}')
+\end{lstlisting}
+
+\section{Referencias}
+Lista de referencias o sugerencias para profundizar.
+
+\end{document}

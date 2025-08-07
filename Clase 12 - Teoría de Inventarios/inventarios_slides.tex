@@ -48,13 +48,18 @@
 \graphicspath{{./images/}}
 
 \title{\Huge\textbf{Inventarios}}
-\author{Investigación Operativa, Universidad de San Andrés}
+\author{Investigación Operativa}
 \date{}
 
 \begin{document}
 
 \begin{frame}
     \titlepage
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south west,inner sep=30pt] at (current page.south west) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
 \end{frame}
 
 \begin{frame}{Objetivos de la Clase Práctica}
@@ -414,6 +419,17 @@ T &= \frac{Q}{D} \\
     \includegraphics[width=\linewidth]{thinkpad_cambio_demanda.png}
     \caption{Inventario en función del tiempo}
 \end{figure}
+\end{frame}
+
+\begin{frame}{Terminamos}
+    \begin{center}
+        \Large{\textbf{¿Dudas?\\¿Consultas?}}
+    \end{center}
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south,inner sep=30pt] at (current page.south) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
 \end{frame}
 
 \end{document}

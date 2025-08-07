@@ -21,14 +21,18 @@
 \setbeamercolor{alerted text}{fg=accent}
 
 \title{\Huge\textbf{Cadenas de Markov}}
-\subtitle{\large Investigación Operativa}
-\author{Universidad de San Andrés}
+\author{Investigación Operativa}
 \date{}
 
 \begin{document}
 
 \begin{frame}
     \titlepage
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south west,inner sep=30pt] at (current page.south west) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
 \end{frame}
 
 \begin{frame}{Introducción a las Cadenas de Markov}
@@ -270,10 +274,16 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}
+% Cierre
+\begin{frame}{Terminamos}
     \begin{center}
-        {\Huge\textbf{¡Gracias!}}
+        \Large{\textbf{¿Dudas?\\¿Consultas?}}
     \end{center}
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south,inner sep=30pt] at (current page.south) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
 \end{frame}
 
 \end{document}

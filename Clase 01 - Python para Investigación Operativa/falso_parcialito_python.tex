@@ -1,0 +1,129 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{forest}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{ulem}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\sloppy
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+% Título y materia
+\begin{center}
+  {\LARGE \textbf{Falso Parcialito}}\\[0.5em]
+  {Investigación Operativa, Universidad de San Andrés}
+\end{center}
+
+\textbf{Nombre:} \dotuline{\hspace{\fill}} \\
+\textbf{¿Cursaste IPC? ¿Cuándo?} \dotuline{\hspace{\fill}}
+
+\section{Ciclos y Condicionales}
+
+Una tienda registra las ventas diarias de la semana. Se pide crear un programa que analice estos datos.
+
+\begin{lstlisting}[language=Python]
+ventas_semana = [1200, 1500, 800, 2000, 1800, 2200, 1600]
+dias = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo']
+\end{lstlisting}
+
+Hacer una función por cada uno de los siguientes puntos:
+\begin{enumerate}[label=\alph*)]
+    \item Calcular el promedio de ventas de la semana.
+    \item Encontrar el día con mayor venta y mostrar su nombre.
+    \item Contar cuántos días tuvieron ventas superiores a 1500.
+    \item Crear una lista con los días que tuvieron ventas menores al promedio.
+\end{enumerate}
+
+\section{Análisis de Código}
+
+Analiza el siguiente código y responde las preguntas:
+\begin{lstlisting}[language=Python]
+def procesar_ventas(productos, ventas_diarias):
+    resultado = {}
+    total_ventas = 0
+    
+    for producto in productos:
+        resultado[producto] = {'cantidad': 0, 'ganancia': 0}
+    
+    for venta in ventas_diarias:
+        if venta['cantidad'] > 0:
+            producto = venta['producto']
+            if producto in resultado:
+                resultado[producto]['cantidad'] += venta['cantidad']
+                resultado[producto]['ganancia'] += venta['precio'] * venta['cantidad']
+                total_ventas += venta['cantidad']
+            else:
+                break
+    
+    return resultado, total_ventas
+
+productos = ['laptop', 'mouse', 'teclado']
+ventas = [
+    {'producto': 'laptop', 'cantidad': 2, 'precio': 500},
+    {'producto': 'mouse', 'cantidad': 5, 'precio': 25},
+    {'producto': 'teclado', 'cantidad': 3, 'precio': 50},
+    {'producto': 'laptop', 'cantidad': 1, 'precio': 500},
+    {'producto': 'monitor', 'cantidad': 1, 'precio': 200}
+]
+
+resultado_final, total = procesar_ventas(productos, ventas)
+\end{lstlisting}
+
+\begin{enumerate}[label=\alph*)]
+    \item ¿Cuál es el valor de \texttt{resultado\_final} al final de la ejecución?
+    \item ¿Cuál es el valor de \texttt{total}?
+    \item ¿Por qué el producto 'monitor' no aparece en el resultado final?
+    \item Si cambiamos el último elemento de \texttt{ventas} por \texttt{'producto': 'mouse', 'cantidad': 2, 'precio': 25}, ¿cuál sería el nuevo valor de \texttt{total}?
+\end{enumerate}
+
+\section{Algoritmos de Investigación Operativa}
+
+Un sistema de inventarios necesita calcular el punto de reorden óptimo. Se pide crear un algoritmo que simule el comportamiento del inventario.
+
+\begin{enumerate}[label=\alph*)]
+    \item Crear una función \texttt{simular\_inventario(demanda\_diaria, stock\_inicial, punto\_reorden, dias\_simulacion)} que:
+    \begin{itemize}
+        \item Simule el comportamiento del inventario día a día generando una demanda aleatoria entre 0 y \texttt{demanda\_diaria}
+        \item Si el stock cae por debajo del punto de reorden, haga un pedido de 50 unidades
+        \item Retorne una lista con el stock de cada día
+    \end{itemize}
+\end{enumerate}
+
+\end{document}
