@@ -1,0 +1,860 @@
+\documentclass{beamer}
+\usetheme{metropolis}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{fontawesome5}
+
+\usetikzlibrary{positioning,shapes.multipart,calc,arrows,shapes.geometric}
+
+% Definición de colores personalizados
+\definecolor{primary}{RGB}{46, 204, 113}
+\definecolor{secondary}{RGB}{52, 152, 219}
+\definecolor{accent}{RGB}{231, 76, 60}
+\definecolor{background}{RGB}{236, 240, 241}
+\definecolor{gradient1}{RGB}{255, 107, 107}
+\definecolor{gradient2}{RGB}{255, 159, 67}
+
+% Configuración del tema
+\setbeamercolor{normal text}{fg=black,bg=background}
+\setbeamercolor{structure}{fg=primary}
+\setbeamercolor{alerted text}{fg=accent}
+
+\definecolor{lightgray}{rgb}{0.95,0.95,0.95}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{darkblue}{rgb}{0,0,0.5}
+
+\lstset{
+  backgroundcolor=\color{lightgray},
+  basicstyle=\tiny\ttfamily,
+  keywordstyle=\color{darkblue}\bfseries,
+  commentstyle=\color{darkgreen},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  frame=single,
+  tabsize=2,
+  language=Python,
+  breaklines=true,
+  breakatwhitespace=true
+}
+
+\title{\Huge\textbf{Algoritmos de Búsqueda}}
+\author{Investigación Operativa}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south west,inner sep=30pt] at (current page.south west) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{¿Qué son los algoritmos de búsqueda?}
+    \textbf{Herramientas fundamentales} en la resolución de problemas de optimización y toma de decisiones.
+    
+    \vspace{0.5cm}
+    
+    \begin{center}
+        \begin{tabular}{cc}
+            \begin{minipage}{4cm}
+                \centering
+                {\Large \faSitemap}\\[0.2cm]
+                \textbf{Árboles y Grafos}\\[0.1cm]
+                {\scriptsize BFS, DFS, Dijkstra, A*}
+            \end{minipage} &
+            \begin{minipage}{4cm}
+                \centering
+                {\Large \faList}\\[0.2cm]
+                \textbf{Listas}\\[0.1cm]
+                {\scriptsize Secuencial, Binaria}
+            \end{minipage}
+        \end{tabular}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Tipos de algoritmos de búsqueda}
+    \only<1>{
+        \textbf{Algoritmos para árboles y grafos:}
+        \begin{itemize}
+            \item \textbf{Búsqueda Ciega}: BFS, DFS
+            \item \textbf{Búsqueda Informada}: A*, Greedy Best-First
+            \item \textbf{Dijkstra}: Búsqueda de costo uniforme
+        \end{itemize}
+    }
+    \only<2>{
+        \textbf{Algoritmos para listas:}
+        \begin{itemize}
+            \item \textbf{Búsqueda Secuencial}: Listas desordenadas
+            \item \textbf{Búsqueda Binaria}: Listas ordenadas
+        \end{itemize}
+    }
+\end{frame}
+
+\begin{frame}{Conceptos básicos de grafos}
+    \begin{center}
+        \begin{tabular}{ccc}
+            \begin{minipage}{2.5cm}
+                \centering
+                \textbf{Nodo}\\[0.1cm]
+                {\scriptsize Elemento fundamental}
+            \end{minipage} &
+            \begin{minipage}{2.5cm}
+                \centering
+                \textbf{Arista}\\[0.1cm]
+                {\scriptsize Conexion entre nodos}
+            \end{minipage} &
+            \begin{minipage}{2.5cm}
+                \centering
+                \textbf{Camino}\\[0.1cm]
+                {\scriptsize Secuencia de nodos}
+            \end{minipage}
+        \end{tabular}
+        
+        \vspace{0.8cm}
+        
+        \begin{tabular}{cc}
+            \begin{minipage}{2.5cm}
+                \centering
+                \textbf{No Dirigido}\\[0.1cm]
+                {\scriptsize Sin direccion}
+            \end{minipage} &
+            \begin{minipage}{2.5cm}
+                \centering
+                \textbf{Ponderado}\\[0.1cm]
+                {\scriptsize Con pesos}
+            \end{minipage}
+        \end{tabular}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Notación Big O}
+    \textbf{Complejidades más comunes:}
+    \begin{itemize}
+        \item<1-> \textbf{$O(1)$ - Constante}: No depende del tamaño
+        \item<2-> \textbf{$O(\log n)$ - Logarítmica}: Muy eficiente
+        \item<3-> \textbf{$O(n)$ - Lineal}: Proporcional al tamaño
+        \item<4-> \textbf{$O(n^2)$ - Cuadrática}: Como ordenamiento simple
+        \item<5-> \textbf{$O(2^n)$ - Exponencial}: Muy ineficiente
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Búsquedas No Informadas (Ciegas)}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \textbf{Características:}
+            \begin{itemize}
+                \item No tienen información adicional
+                \item No tienen función de evaluación
+                \item Exploran sistemáticamente
+                \item Garantizan encontrar la solución
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            \centering
+            {\fontsize{60}{60}\selectfont \faBlind}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Breadth-First Search (BFS)}
+    \textbf{Características principales:}
+    \begin{itemize}
+        \item Explora nivel por nivel
+        \item Usa cola FIFO
+        \item Garantiza camino mas corto
+        \item Complejidad: $O(V + E)$
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Orden de exploración:}
+    \begin{center}
+        \begin{tikzpicture}[
+            node distance=1.2cm,
+            every node/.style={circle, draw, minimum size=0.6cm, font=\footnotesize}
+        ]
+            \node (0) at (0,0) {0};
+            \node (1) at (-1.2,-1.2) {1};
+            \node (2) at (1.2,-1.2) {2};
+            \node (3) at (-2,-2.4) {3};
+            \node (4) at (-0.4,-2.4) {4};
+            \node (5) at (0.4,-2.4) {5};
+            \node (6) at (2,-2.4) {6};
+            
+            \draw[thick] (0) -- (1);
+            \draw[thick] (0) -- (2);
+            \draw[thick] (1) -- (3);
+            \draw[thick] (1) -- (4);
+            \draw[thick] (2) -- (5);
+            \draw[thick] (2) -- (6);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Ejemplo BFS: Buscando el premio}
+    \textbf{Problema:} Tenemos una caja con cajas adentro que no sabemos cuántas hay, ni qué tantas cajas y subcajas tenemos adentro. En algún momento hay un regalo, pero no sabemos cuándo vamos a llegar a él.
+    
+    \vspace{0.5cm}
+    
+    \textbf{¿Cómo funciona BFS?}
+    \begin{itemize}
+        \item Abrimos todas las cajas del primer nivel
+        \item Luego todas las cajas del segundo nivel
+        \item Y así sucesivamente nivel por nivel
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{BFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{BFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (-2,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, opacity=0] (caja2) at (0,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, opacity=0] (caja3) at (2,-2) {\faBox};
+
+            \draw (regalo) -- (caja1);
+            \draw[opacity=0] (regalo) -- (caja2);
+            \draw[opacity=0] (regalo) -- (caja3);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{BFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (-2,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja2) at (0,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, opacity=0] (caja3) at (2,-2) {\faBox};
+
+            \draw (regalo) -- (caja1);
+            \draw (regalo) -- (caja2);
+            \draw[opacity=0] (regalo) -- (caja3);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{BFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (-2,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja2) at (0,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja3) at (2,-2) {\faBox};
+
+            \draw (regalo) -- (caja1);
+            \draw (regalo) -- (caja2);
+            \draw (regalo) -- (caja3);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{BFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (-2,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja2) at (0,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja3) at (2,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja4) at (-2.5,-4) {\faBox};
+
+            \draw (regalo) -- (caja1);
+            \draw (regalo) -- (caja2);
+            \draw (regalo) -- (caja3);
+
+            \draw (caja1) -- (caja4);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{BFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (-2,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja2) at (0,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja3) at (2,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja4) at (-2.5,-4) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja5) at (-1.5,-4) {\faBox};
+
+            \draw (regalo) -- (caja1);
+            \draw (regalo) -- (caja2);
+            \draw (regalo) -- (caja3);
+
+            \draw (caja1) -- (caja4);
+            \draw (caja1) -- (caja5);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{BFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (-2,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja2) at (0,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja3) at (2,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja4) at (-2.5,-4) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja5) at (-1.5,-4) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja6) at (-0.5,-4) {\faBox};
+
+            \draw (regalo) -- (caja1);
+            \draw (regalo) -- (caja2);
+            \draw (regalo) -- (caja3);
+
+            \draw (caja1) -- (caja4);
+            \draw (caja1) -- (caja5);
+            \draw (caja2) -- (caja6);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{BFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (-2,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja2) at (0,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja3) at (2,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja4) at (-2.5,-4) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja5) at (-1.5,-4) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja6) at (-0.5,-4) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=green] (caja7) at (0.5,-4) {\faGift};
+
+            \draw (regalo) -- (caja1);
+            \draw (regalo) -- (caja2);
+            \draw (regalo) -- (caja3);
+
+            \draw (caja1) -- (caja4);
+            \draw (caja1) -- (caja5);
+            \draw (caja2) -- (caja6);
+            \draw (caja2) -- (caja7);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Depth-First Search (DFS)}
+    \textbf{Características principales:}
+    \begin{itemize}
+        \item Explora una rama completa
+        \item Usa pila LIFO
+        \item No garantiza camino mas corto
+        \item Complejidad: $O(V + E)$
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Orden de exploración:}
+    \begin{center}
+        \begin{tikzpicture}[
+            node distance=1.2cm,
+            every node/.style={circle, draw, minimum size=0.6cm, font=\footnotesize}
+        ]
+            \node (0) at (0,0) {0};
+            \node (1) at (-1.2,-1.2) {1};
+            \node (2) at (1.2,-1.2) {4};
+            \node (3) at (-2,-2.4) {2};
+            \node (4) at (-0.4,-2.4) {3};
+            \node (5) at (0.4,-2.4) {5};
+            \node (6) at (2,-2.4) {6};
+            
+            \draw[thick] (0) -- (1);
+            \draw[thick] (0) -- (2);
+            \draw[thick] (1) -- (3);
+            \draw[thick] (1) -- (4);
+            \draw[thick] (2) -- (5);
+            \draw[thick] (2) -- (6);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Ejemplo DFS: Buscando el premio}
+    \textbf{Problema:} Tenemos una caja con cajas adentro que no sabemos cuántas hay, ni qué tantas cajas y subcajas tenemos adentro. En algún momento hay un regalo, pero no sabemos cuándo vamos a llegar a él.
+    
+    \vspace{0.5cm}
+    
+    \textbf{¿Cómo funciona DFS?}
+    \begin{itemize}
+        \item Abrimos una caja y nos metemos en ella
+        \item Si tiene más cajas, seguimos metiéndonos
+        \item Solo retrocedemos cuando llegamos al final de una rama
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{DFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{DFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (0,-2) {\faBox};
+
+            \draw (regalo) -- (caja1);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{DFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (0,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja2) at (-1,-4) {\faBox};
+
+            \draw (regalo) -- (caja1);
+            \draw (caja1) -- (caja2);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{DFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (0,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja2) at (-1,-4) {\faTimes};
+
+            \draw (regalo) -- (caja1);
+            \draw (caja1) -- (caja2);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{DFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (0,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja2) at (-1,-4) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja3) at (1,-4) {\faBox};
+
+            \draw (regalo) -- (caja1);
+            \draw (caja1) -- (caja2);
+            \draw (caja1) -- (caja3);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{DFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (0,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja2) at (-1,-4) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja3) at (1,-4) {\faTimes};
+
+            \draw (regalo) -- (caja1);
+            \draw (caja1) -- (caja2);
+            \draw (caja1) -- (caja3);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{DFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (-1,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja2) at (-1.5,-4) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja3) at (-0.5,-4) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja4) at (1,-2) {\faBox};
+
+            \draw (regalo) -- (caja1);
+            \draw (caja1) -- (caja2);
+            \draw (caja1) -- (caja3);
+            \draw (regalo) -- (caja4);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{DFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (-1,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja2) at (-1.5,-4) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja3) at (-0.5,-4) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja4) at (1,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja5) at (1,-4) {\faBox};
+
+            \draw (regalo) -- (caja1);
+            \draw (caja1) -- (caja2);
+            \draw (caja1) -- (caja3);
+            \draw (regalo) -- (caja4);
+            \draw (caja4) -- (caja5);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{DFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (-1,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja2) at (-1.5,-4) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja3) at (-0.5,-4) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja4) at (1,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja5) at (1,-4) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja6) at (1,-6) {\faBox};
+
+            \draw (regalo) -- (caja1);
+            \draw (caja1) -- (caja2);
+            \draw (caja1) -- (caja3);
+            \draw (regalo) -- (caja4);
+            \draw (caja4) -- (caja5);
+            \draw (caja5) -- (caja6);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{DFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (-1,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja2) at (-1.5,-4) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja3) at (-0.5,-4) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja4) at (1,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja5) at (1,-4) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja6) at (1,-6) {\faTimes};
+
+            \draw (regalo) -- (caja1);
+            \draw (caja1) -- (caja2);
+            \draw (caja1) -- (caja3);
+            \draw (regalo) -- (caja4);
+            \draw (caja4) -- (caja5);
+            \draw (caja5) -- (caja6);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{DFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (-1,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja2) at (-1.5,-4) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja3) at (-0.5,-4) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja4) at (1,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja5) at (0.5,-4) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja6) at (0.5,-6) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja7) at (1.5,-4) {\faBox};
+
+            \draw (regalo) -- (caja1);
+            \draw (caja1) -- (caja2);
+            \draw (caja1) -- (caja3);
+            \draw (regalo) -- (caja4);
+            \draw (caja4) -- (caja5);
+            \draw (caja5) -- (caja6);
+            \draw (caja4) -- (caja7);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{DFS}
+    \begin{center}
+        \begin{tikzpicture}
+            \node[draw, circle, minimum size=1cm, line width=1pt] (regalo) at (0,0) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja1) at (-1,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja2) at (-1.5,-4) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja3) at (-0.5,-4) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja4) at (1,-2) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt] (caja5) at (0.5,-4) {\faBox};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=red] (caja6) at (0.5,-6) {\faTimes};
+            \node[draw, circle, minimum size=1cm, line width=1pt, text=green] (caja7) at (1.5,-4) {\faGift};
+
+            \draw (regalo) -- (caja1);
+            \draw (caja1) -- (caja2);
+            \draw (caja1) -- (caja3);
+            \draw (regalo) -- (caja4);
+            \draw (caja4) -- (caja5);
+            \draw (caja5) -- (caja6);
+            \draw (caja4) -- (caja7);
+        \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Comparación BFS vs DFS}
+    \begin{center}
+        \begin{tabular}{cc}
+            \begin{minipage}{4cm}
+                \centering
+                \textbf{BFS}\\[0.1cm]
+                {\scriptsize Nivel por nivel}
+            \end{minipage} &
+            \begin{minipage}{4cm}
+                \centering
+                \textbf{DFS}\\[0.1cm]
+                {\scriptsize Rama completa}
+            \end{minipage}
+        \end{tabular}
+        
+        \vspace{0.8cm}
+        
+        \textbf{¿Cuándo usar cada uno?}
+        \begin{itemize}
+            \item \textbf{BFS}: Cuando la solución está cerca del inicio
+            \item \textbf{DFS}: Cuando la solución está profunda en el árbol
+            \item \textbf{Problema}: Nunca sabemos donde está el premio
+        \end{itemize}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Algoritmo de Dijkstra}
+    \textbf{Propósito:}
+    Encontrar el camino más corto desde un nodo origen a \textbf{todos} los demás nodos en un grafo ponderado con pesos no negativos.
+    
+    \vspace{0.5cm}
+    
+    \textbf{Características:}
+    \begin{itemize}
+        \item Garantiza camino más corto
+        \item Funciona con pesos positivos
+        \item Complejidad: $O(V^2)$ o $O(E + V \log V)$
+        \item Base para algoritmos más avanzados
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Búsquedas Informadas}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \textbf{Características:}
+            \begin{itemize}
+                \item Tienen información adicional
+                \item Usan función de evaluación
+                \item Exploran menos nodos
+                \item Pueden no ser óptimas
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            \centering
+            {\fontsize{60}{60}\selectfont \faBook}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{A* (A-Star)}
+    \textbf{Función de evaluación:}
+    \begin{center}
+        $f(n) = g(n) + h(n)$
+    \end{center}
+    
+    \vspace{0.3cm}
+    
+    \begin{itemize}
+        \item $g(n)$: Costo desde inicio hasta $n$
+        \item $h(n)$: Heurística de $n$ hasta meta
+        \item $f(n)$: Costo total estimado
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Ventajas:}
+    \begin{itemize}
+        \item Más eficiente que Dijkstra
+        \item Garantiza optimalidad si $h(n)$ es admisible
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Greedy Best-First Search}
+    \textbf{Función de evaluación:}
+    \begin{center}
+        $f(n) = h(n)$
+    \end{center}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Características:}
+    \begin{itemize}
+        \item Solo considera heurística
+        \item No garantiza camino óptimo
+        \item Puede ser más rápido
+        \item Puede quedar atrapado
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Comparación con A*:}
+    \begin{itemize}
+        \item A* considera costo acumulado + heurística
+        \item GBFS solo considera heurística
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Búsquedas en Listas}
+    \begin{center}
+        \begin{tabular}{cc}
+            \begin{minipage}{4cm}
+                \centering
+                {\Large \faArrowRight}\\[0.2cm]
+                \textbf{Secuencial}\\[0.1cm]
+                {\scriptsize $O(n)$ - No ordenada}
+            \end{minipage} &
+            \begin{minipage}{4cm}
+                \centering
+                {\Large \faArrowRight}\\[0.2cm]
+                \textbf{Binaria}\\[0.1cm]
+                {\scriptsize $O(\log n)$ - Ordenada}
+            \end{minipage}
+        \end{tabular}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Búsqueda Secuencial}
+    \textbf{Características:}
+    \begin{itemize}
+        \item No requiere ordenamiento
+        \item Revisa elemento por elemento
+        \item Complejidad: $O(n)$
+        \item Peor caso: último elemento
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Ejemplo:}
+    Buscar una figurita de Messi en una bolsa de figuritas del mundial.
+\end{frame}
+
+\begin{frame}{Búsqueda Binaria}
+    \textbf{Características:}
+    \begin{itemize}
+        \item Requiere lista ordenada
+        \item Divide y conquista
+        \item Complejidad: $O(\log n)$
+        \item Muy eficiente
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \textbf{Ejemplo:}
+    Buscar un número en una guía telefónica.
+\end{frame}
+
+\begin{frame}{Aplicaciones Prácticas - BFS y DFS}
+    \textbf{Breadth-First Search y Depth-First Search:}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Ejemplo:} Estamos en París y queremos comer una baguette. Salimos del hotel y nos encontramos con una calle que se llama Rue de Falopini. Buscamos en esa cuadra y no hay nada, giramos a la derecha y buscamos y seguimos girando y buscando...
+    
+    \vspace{0.3cm}
+    
+    \begin{itemize}
+        \item \textbf{DFS}: Caminar la Rue de Falopini hasta el fondo
+        \item \textbf{BFS}: Girar y buscar en la de al lado
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Aplicación de negocios:} Segmentación de marketing
+    \begin{itemize}
+        \item \textbf{DFS}: Fitness $\rightarrow$ fitness vegano $\rightarrow$ fitness vegano de embarazadas
+        \item \textbf{BFS}: Fitness $\rightarrow$ ropa $\rightarrow$ computadoras
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Aplicaciones Prácticas - Dijkstra, A* y GBFS}
+    \textbf{Dijkstra, A* y Greedy Best-First Search:}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Aplicaciones principales:}
+    \begin{itemize}
+        \item Rutas de entrega o logística para optimizar costos de transporte
+        \item Calcular rutas de transporte de datos entre torres
+        \item Optimización de costos en telecomunicaciones
+        \item Cualquier problema de optimización de rutas
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \textbf{¿Cuándo usar cada uno?}
+    \begin{itemize}
+        \item \textbf{Dijkstra}: Si no tenemos idea donde está la meta
+        \item \textbf{A*}: Si tenemos forma de estimar la meta
+        \item \textbf{GBFS}: Para sugerir algo rápido sin importar que sea óptimo
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Aplicaciones Prácticas - Búsqueda en Listas}
+    \textbf{Búsqueda Secuencial:}
+    \begin{itemize}
+        \item La usamos cuando no tenemos las cosas ordenadas
+        \item Como buscar un elemento en una bolsa
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Búsqueda Binaria:}
+    \begin{itemize}
+        \item Para encontrar un momento en el tiempo en que se produjo un evento
+        \item Si tenemos un video de seguridad y queremos encontrar cuando se robaron una bici
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejemplo: Búsqueda en video de seguridad}
+    \textbf{Problema:} Encontrar el momento exacto del robo de mi bicicleta y el video es desde el comienzo de los tiempos, el Big Bang.
+    
+    \vspace{0.5cm}
+    
+    \textbf{Solución con búsqueda binaria:}
+    \begin{center}
+        $\text{pasos} = \left[ \log_2 \left( \frac{\text{rango de tiempo}}{\text{precision}} \right) \right]$
+    \end{center}
+    
+    \vspace{0.3cm}
+    
+    \begin{itemize}
+        \item Para encontrar al segundo: 59 pasos
+        \item Para encontrar al milisegundo: 69 pasos
+        \item Tiempo total: $\approx$ 3 minutos
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \begin{center}
+        \textbf{¡God bless binary search!}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Terminamos}
+    \begin{center}
+        \Large{\textbf{¿Dudas?\\¿Consultas?}}
+    \end{center}
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south,inner sep=30pt] at (current page.south) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\end{document}
