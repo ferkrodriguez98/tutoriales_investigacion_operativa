@@ -7,7 +7,7 @@ Este repositorio contiene los materiales, notebooks, apuntes y recursos de las c
 - [Clase 1 - Python para Investigación Operativa](Clase%2001%20-%20Python%20para%20Investigación%20Operativa/): Introducción a Python, NumPy, Pandas y SciPy para Investigación Operativa.
 - [Clase 2 - Programación Lineal (Parte 1)](Clase%2002%20-%20Programación%20Lineal%20(Parte%201)/): Fundamentos de Programación Lineal, formulación de problemas y método gráfico.
 - [Clase 3 - Programación Lineal (Parte 2)](Clase%2003%20-%20Programación%20Lineal%20(Parte%202)/): Método Simplex, dualidad y análisis de sensibilidad.
-- [Clase 4 - Algoritmos de Búsqueda](./Clase%2004%20-%20Algoritmos%20de%20Búsqueda/): 
+- [Clase 4 - Algoritmos de Búsqueda](./Clase%2004%20-%20Algoritmos%20de%20Búsqueda/): Búsqueda en arboles, algoritmos de shortest path y búsquedas en listas. 
 - [Clase 4 - Programación Entera (Parte 1)](Clase%2004%20-%20Programación%20Entera%20(Parte%201)/): Introducción a Programación Entera, formulación de problemas y método de ramificación y acotamiento.
 - [Clase 5 - Programación Entera (Parte 2)](Clase%2005%20-%20Programación%20Entera%20(Parte%202)/): Algoritmos de planos cortantes y aplicaciones prácticas.
 - [Clase 6 - Programación No Lineal](./Clase%2006%20-%20Programación%20No%20Lineal/): Optimización no lineal, condiciones de optimalidad y métodos de gradiente.
@@ -34,7 +34,7 @@ Ambas tutoriales (Benégas y Rodríguez del Castillo) de la cátedra Severino so
 |   5    | 04/09   | Programación Entera (Parte 1) |
 |   6    | 11/09   | Programación Entera (Parte 2) |
 |   7    | 18/09   | Programación No Lineal (Parte 1) |
-|   8    | 25/09   | Programación No Lineal (Parte 2) |
+|   8    | 25/09   | Repaso Pre Parcial |
 |   -    | --/--   | Parciales |
 |   8    | 16/10   | Estadística para Investigación Operativa |
 |   9    | 23/10   | Cadenas de Markov |

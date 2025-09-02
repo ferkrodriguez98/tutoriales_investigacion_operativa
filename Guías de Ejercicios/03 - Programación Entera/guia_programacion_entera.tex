@@ -1,0 +1,785 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\allowdisplaybreaks
+\usepackage{amsthm}
+\usepackage{forest}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{siunitx}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\sloppy
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{center}
+    {\LARGE \textbf{Guía de Ejercicios \\Programación Entera}}\\[0.5em]
+    {Investigación Operativa, Universidad de San Andrés}
+\end{center}
+
+Si encuentran algún error en el documento o hay alguna duda, mandenmé un mail a rodriguezf@udesa.edu.ar y lo revisamos.
+
+\section{Ejercicios}
+
+\subsection{Asignación de Tareas}
+Lola y Manu quieren dividir sus principales tareas domésticas (limpieza, cocina, lavado de platos y lavandería) entre ellos de manera que cada uno tenga dos tareas, pero el tiempo total que pasan en las tareas domésticas se mantenga al mínimo. Sus eficiencias en estas tareas difieren, donde el tiempo en horas que cada uno necesitaría para realizar la tarea está dado por la siguiente tabla:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+& \textbf{Limpieza} & \textbf{Cocina} & \textbf{Lavado de platos} & \textbf{Lavandería} \\
+\midrule
+\textbf{Lola} & 4.5 & 7.8 & 3.6 & 2.9 \\
+\textbf{Manu} & 4.9 & 7.2 & 4.3 & 3.1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Formular este problema como un problema de programación entera. ¿Cuál es la división de tareas óptima?
+
+\subsection{Selección de Empleados}
+Una empresa de consultoría necesita contratar exactamente 3 empleados de un grupo de 5 candidatos disponibles. Cada candidato tiene diferentes habilidades y la empresa ha evaluado la productividad estimada de cada uno en una escala del 1 al 10. Además, cada candidato tiene un salario anual diferente. La siguiente tabla muestra esta información:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Candidato} & 1 & 2 & 3 & 4 & 5 \\
+\midrule
+Productividad & 8 & 6 & 9 & 7 & 8 \\
+Salario anual (\$000) & 45 & 35 & 55 & 40 & 50 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La empresa tiene un presupuesto máximo de \$150,000 para salarios anuales. El objetivo es seleccionar exactamente 3 empleados que maximicen la productividad total sin exceder el presupuesto. Formular este problema como un problema de programación entera.
+
+\subsection{Selección de Proyectos de Desarrollo}
+Una empresa de desarrollo inmobiliario, Severino y asociados, está considerando cinco posibles proyectos de desarrollo. La siguiente tabla muestra la ganancia estimada a largo plazo (valor presente neto) que cada proyecto generaría, así como la cantidad de inversión requerida para emprender el proyecto, en unidades de millones de dólares.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Proyecto de Desarrollo} & 1 & 2 & 3 & 4 & 5 \\
+\midrule
+Ganancia estimada & 1 & 1.8 & 1.6 & 0.8 & 1.4 \\
+Capital requerido & 6 & 12 & 10 & 4 & 8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El dueño de la empresa ha recaudado \$20 millones de capital de inversión para estos proyectos. Mr. Severino y sus socios ahora quieren seleccionar la combinación de proyectos que maximizará su ganancia total estimada a largo plazo (valor presente neto) sin invertir más de \$20 millones. Formular este problema como un problema de programación entera.
+
+\subsection{Planificación de Horarios}
+Una empresa de delivery necesita asignar conductores a diferentes turnos durante la semana. Hay 4 conductores disponibles y 6 turnos que deben cubrirse. Cada conductor puede trabajar en máximo 2 turnos por semana y cada turno debe ser cubierto por exactamente 1 conductor. La siguiente tabla muestra la eficiencia de cada conductor en cada turno (puntuación del 1 al 10):
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ccccccc}
+\toprule
+\textbf{Conductor} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} \\
+\midrule
+1 & 8 & 6 & 9 & 7 & 8 & 6 \\
+2 & 7 & 8 & 6 & 9 & 7 & 8 \\
+3 & 9 & 7 & 8 & 6 & 9 & 7 \\
+4 & 6 & 9 & 7 & 8 & 6 & 9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El objetivo es maximizar la eficiencia total de la asignación. Formular este problema como un problema de programación entera.
+
+\subsection{Planificación de Turnos Hospitalarios}
+El hospital de Sellia Marina necesita asignar médicos a diferentes turnos durante la semana. Hay 5 médicos disponibles y 7 turnos que deben cubrirse. Cada médico puede trabajar en máximo 3 turnos por semana y cada turno debe ser cubierto por exactamente 1 médico. Además, hay restricciones específicas:
+
+\begin{enumerate}[label=\arabic*.]
+    \item El Dr. Mazzoleni solo puede trabajar en turnos de mañana (turnos 1, 2, 3).
+    \item La Dra. Torcia no puede trabajar en turnos consecutivos.
+    \item El Dr. Martínez debe trabajar al menos 2 turnos por semana.
+    \item La Dra. Fargas y el Dr. Rodríguez no pueden trabajar el mismo día.
+\end{enumerate}
+
+La siguiente tabla muestra la eficiencia de cada médico en cada turno (puntuación del 1 al 10):
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccccccc}
+\toprule
+\textbf{Médico} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} \\
+\midrule
+Dr. Mazzoleni & 9 & 8 & 7 & 0 & 0 & 0 & 0 \\
+Dra. Torcia & 7 & 8 & 9 & 8 & 7 & 6 & 8 \\
+Dr. Martínez & 6 & 7 & 8 & 9 & 8 & 7 & 6 \\
+Dra. Fargas & 8 & 7 & 6 & 7 & 8 & 9 & 7 \\
+Dr. Rodríguez & 7 & 6 & 8 & 9 & 7 & 8 & 9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El objetivo es maximizar la eficiencia total de la asignación cumpliendo todas las restricciones.
+
+\subsection{Inversiones de Capital con Restricciones}
+La junta directiva de Falopini Inc. está considerando seis grandes inversiones de capital. Cada inversión puede hacerse solo una vez. Estas inversiones difieren en la ganancia estimada a largo plazo (valor presente neto) que generarán, así como en la cantidad de capital requerido, como se muestra en la siguiente tabla (en unidades de millones de dólares):
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Oportunidad de Inversión} & 1 & 2 & 3 & 4 & 5 & 6 \\
+\midrule
+Ganancia estimada & 15 & 12 & 16 & 18 & 9 & 11 \\
+Capital requerido & 38 & 33 & 39 & 45 & 23 & 27 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La cantidad total de capital disponible para estas inversiones es de \$100 millones. Las oportunidades de inversión 1 y 2 son mutuamente excluyentes, y también lo son 3 y 4. Además, ni 3 ni 4 pueden emprenderse a menos que se emprenda una de las dos primeras oportunidades. No hay tales restricciones en las oportunidades de inversión 5 y 6. El objetivo es seleccionar la combinación de inversiones de capital que maximizará la ganancia total estimada a largo plazo (valor presente neto).
+
+\subsection{Planificación de Producción}
+Vincent Vega es el dueño y gerente de un taller de máquinas que hace trabajos por encargo. Este miércoles por la tarde recibió llamadas de dos clientes que les gustaría hacer pedidos urgentes. Uno es una empresa de enganches de remolque que le gustaría algunas barras de remolque de alta resistencia hechas a medida. El otro es una empresa de transportadores de mini-autos que necesita algunas barras estabilizadoras personalizadas. Ambos clientes les gustaría tantas como sea posible para el final de la semana (dos días laborables). Dado que ambos productos requerirían el uso de las mismas dos máquinas, Vincent necesita decidir e informar a los clientes esta tarde sobre cuántos de cada producto acordará hacer en los próximos dos días.
+
+\vspace{0.5em}
+
+Cada barra de remolque requiere 3.2 horas en la máquina 1 y 2 horas en la máquina 2. Cada barra estabilizadora requiere 2.4 horas en la máquina 1 y 3 horas en la máquina 2. La máquina 1 estará disponible durante 16 horas en los próximos dos días y la máquina 2 estará disponible durante 15 horas. La ganancia por cada barra de remolque producida sería de \$130 y la ganancia por cada barra estabilizadora producida sería de \$150.
+
+\vspace{0.5em}
+
+Vincent ahora quiere determinar la mezcla de estas cantidades de producción que maximizará la ganancia total.
+
+\subsection{Distribución de Productos}
+La nueva unidad de negocio de Falopini Inc. se basa en la distribución de productos. Ellos tienen 3 almacenes y 4 clientes principales. Cada almacén tiene una capacidad de almacenamiento limitada y cada cliente tiene una demanda específica. Los costos de transporte desde cada almacén a cada cliente se muestran en la siguiente tabla (en miles de pesos):
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Almacén} & \textbf{Cliente 1} & \textbf{Cliente 2} & \textbf{Cliente 3} & \textbf{Cliente 4} \\
+\midrule
+1 & 12 & 15 & 18 & 20 \\
+2 & 14 & 12 & 16 & 19 \\
+3 & 16 & 14 & 13 & 17 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Las capacidades de los almacenes son: Almacén 1 = 200 unidades, Almacén 2 = 150 unidades, Almacén 3 = 180 unidades. Las demandas de los clientes son: Cliente 1 = 120 unidades, Cliente 2 = 80 unidades, Cliente 3 = 100 unidades, Cliente 4 = 130 unidades.
+
+\vspace{0.5em}
+
+Además, por políticas de la empresa, cada cliente debe ser atendido por exactamente un almacén (no se permite dividir la demanda entre almacenes). El objetivo es minimizar el costo total de transporte. Formular este problema como un problema de programación entera.
+
+\subsection{Selección de Proveedores}
+El emprendimiento botánico de alto calibre de PFP necesita seleccionar proveedores para 3 materias primas diferentes. Hay 4 proveedores disponibles para cada materia prima. La siguiente tabla muestra los costos unitarios y las capacidades máximas de cada proveedor:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Materia Prima} & \textbf{Proveedor 1} & \textbf{Proveedor 2} & \textbf{Proveedor 3} & \textbf{Proveedor 4} \\
+\midrule
+Costo A & 25 & 30 & 28 & 32 \\
+Costo B & 40 & 35 & 42 & 38 \\
+Costo C & 15 & 18 & 16 & 20 \\
+\midrule
+Capacidad A & 500 & 400 & 600 & 300 \\
+Capacidad B & 300 & 500 & 400 & 600 \\
+Capacidad C & 800 & 600 & 700 & 500 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La empresa necesita exactamente 400 unidades de la materia prima A, 350 unidades de B y 600 unidades de C. Por políticas de diversificación, no se puede comprar más del 60\% de la demanda total de cada materia prima a un solo proveedor. El objetivo es minimizar el costo total de compra. Formular este problema como un problema de programación entera.
+
+\subsection{Planificación de Red de Distribución}
+Una empresa de logística necesita diseñar una red de distribución para 4 centros de distribución y 6 clientes principales. La empresa puede abrir hasta 3 centros de distribución de los 4 disponibles. Cada centro tiene una capacidad de almacenamiento y un costo fijo de apertura. Los costos de transporte desde cada centro a cada cliente se muestran en la siguiente tabla (en miles de pesos):
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ccccccc}
+\toprule
+\textbf{Centro} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} \\
+\midrule
+1 & 15 & 18 & 20 & 22 & 25 & 28 \\
+2 & 12 & 15 & 18 & 20 & 23 & 26 \\
+3 & 18 & 16 & 14 & 17 & 20 & 23 \\
+4 & 20 & 18 & 16 & 14 & 17 & 20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Las capacidades de los centros son: Centro 1 = 300 unidades, Centro 2 = 250 unidades, Centro 3 = 200 unidades, Centro 4 = 180 unidades. Los costos fijos de apertura son: Centro 1 = \$50,000, Centro 2 = \$40,000, Centro 3 = \$35,000, Centro 4 = \$30,000.
+
+\vspace{0.5em}
+
+Las demandas de los clientes son: Cliente 1 = 80 unidades, Cliente 2 = 120 unidades, Cliente 3 = 100 unidades, Cliente 4 = 90 unidades, Cliente 5 = 110 unidades, Cliente 6 = 70 unidades.
+
+\vspace{0.5em}
+
+Además, por políticas de la empresa:
+\begin{enumerate}[label=\arabic*.]
+    \item Cada cliente debe ser atendido por exactamente un centro abierto.
+    \item Si se abre el centro 1, también debe abrirse el centro 2.
+    \item Los centros 3 y 4 no pueden abrirse simultáneamente.
+    \item El centro 4 solo puede abrirse si se abre al menos uno de los centros 1 o 2.
+\end{enumerate}
+
+El objetivo es minimizar el costo total (costos fijos + costos de transporte). Formular este problema como un problema de programación entera.
+
+\subsection{Producción de Juguetes}
+Una empresa de juguetes para niños ha desarrollado dos nuevos juguetes para posible inclusión en su línea de productos para la próxima temporada navideña. Configurar las instalaciones de producción para comenzar la producción costaría \$50,000 para el juguete 1 y \$80,000 para el juguete 2. Una vez cubiertos estos costos, los juguetes generarían una ganancia unitaria de \$10 para el juguete 1 y \$15 para el juguete 2.
+
+\vspace{0.5em}
+
+La empresa tiene dos fábricas que son capaces de producir estos juguetes. Sin embargo, para evitar duplicar los costos de inicio, solo se usaría una fábrica, donde la elección se basaría en maximizar la ganancia. Por razones administrativas, la misma fábrica se usaría para ambos juguetes nuevos si ambos se producen.
+
+\vspace{0.5em}
+
+El juguete 1 puede producirse a una tasa de 50 por hora en la fábrica 1 y 40 por hora en la fábrica 2. El juguete 2 puede producirse a una tasa de 40 por hora en la fábrica 1 y 25 por hora en la fábrica 2. Las fábricas 1 y 2, respectivamente, tienen 500 horas y 700 horas de tiempo de producción disponible antes de Navidad que podrían usarse para producir estos juguetes.
+
+\vspace{0.5em}
+
+No se sabe si estos dos juguetes continuarían después de Navidad. Por lo tanto, el problema es determinar cuántas unidades (si las hay) de cada juguete nuevo deben producirse antes de Navidad para maximizar la ganancia total.
+
+\subsection{Selección de Líneas de Productos}
+La División de Investigación y Desarrollo de la Gallagher Brothers Inc. ha estado desarrollando cuatro posibles nuevas líneas de productos. La gerencia ahora debe tomar una decisión sobre cuál de estos cuatro productos se producirá realmente y en qué niveles. Por lo tanto, se ha solicitado un estudio de investigación de operaciones para encontrar la mezcla de productos más rentable.
+
+\vspace{0.5em}
+
+Un costo sustancial está asociado con comenzar la producción de cualquier producto, como se da en la primera fila de la siguiente tabla. El objetivo de la gerencia es encontrar la mezcla de productos que maximice la ganancia total (ingresos netos totales menos costos de inicio).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Producto} & 1 & 2 & 3 & 4 \\
+\midrule
+Costo de inicio & \$50,000 & \$40,000 & \$70,000 & \$60,000 \\
+Ingreso marginal & \$70 & \$60 & \$90 & \$80 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Sean las variables de decisión continuas $x_1$, $x_2$, $x_3$ y $x_4$ los niveles de producción de los productos 1, 2, 3 y 4, respectivamente. La gerencia ha impuesto las siguientes restricciones de política sobre estas variables:
+
+\begin{enumerate}[label=\arabic*.]
+    \item No más de dos de los productos pueden ser producidos.
+    \item El producto 3 o 4 solo puede ser producido si se produce el producto 1 o 2.
+    \item O bien $5x_1 + 3x_2 + 6x_3 + 4x_4 \leq 6,000$ o bien $4x_1 + 6x_2 + 3x_3 + 5x_4 \leq 6,000$.
+\end{enumerate}
+
+Formular este problema como un problema de programación entera.
+
+\subsection{Planificación de Producción Multiperíodo}
+Una empresa manufacturera necesita planificar la producción de 3 productos durante 4 períodos. Cada producto tiene diferentes costos de producción, costos de almacenamiento y demandas por período. La siguiente tabla muestra los datos relevantes:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Producto} & \textbf{Costo prod.} & \textbf{Costo almac.} & \textbf{Cap. máx.} & \textbf{Cap. mín.} \\
+\midrule
+1 & 25 & 2 & 200 & 50 \\
+2 & 30 & 3 & 150 & 30 \\
+3 & 35 & 4 & 100 & 20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Las demandas por período son:
+\begin{table}[h]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Producto} & \textbf{Período 1} & \textbf{Período 2} & \textbf{Período 3} & \textbf{Período 4} \\
+\midrule
+1 & 120 & 140 & 160 & 180 \\
+2 & 80 & 100 & 120 & 90 \\
+3 & 60 & 70 & 80 & 90 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La empresa tiene restricciones adicionales:
+\begin{enumerate}[label=\arabic*.]
+    \item La capacidad total de producción por período es de 400 unidades.
+    \item Si se produce el producto 1 en un período, no se puede producir el producto 3 en el mismo período.
+    \item El producto 2 debe producirse en al menos 2 períodos diferentes.
+    \item No se puede tener inventario al final del período 4.
+    \item El inventario inicial es cero para todos los productos.
+\end{enumerate}
+
+El objetivo es minimizar el costo total (costos de producción + costos de almacenamiento). Formular este problema como un problema de programación entera.
+
+\subsection{Compra de Aviones}
+Ferkairlines está considerando la compra de nuevos aviones de pasajeros de largo, mediano y corto alcance. El precio de compra sería de \$67 millones por cada avión de largo alcance, \$50 millones por cada avión de mediano alcance y \$35 millones por cada avión de corto alcance. La junta directiva ha autorizado un compromiso máximo de \$1.5 mil millones para estas compras. Independientemente de qué aviones se compren, se espera que el viaje aéreo de todas las distancias sea suficientemente grande para que estos aviones se utilicen esencialmente a capacidad máxima. Se estima que la ganancia neta anual (después de restar los costos de recuperación de capital) sería de \$4.2 millones por avión de largo alcance, \$3 millones por avión de mediano alcance y \$2.3 millones por avión de corto alcance.
+
+\vspace{0.5em}
+
+Se predice que habrá suficientes pilotos entrenados disponibles para la empresa para tripular 30 nuevos aviones. Si solo se compraran aviones de corto alcance, las instalaciones de mantenimiento podrían manejar 40 nuevos aviones. Sin embargo, cada avión de mediano alcance es equivalente a $1\frac{1}{3}$ aviones de corto alcance, y cada avión de largo alcance es equivalente a $1\frac{2}{3}$ aviones de corto alcance en términos de su uso de las instalaciones de mantenimiento.
+
+\vspace{0.5em}
+
+La información anterior se obtuvo mediante un análisis preliminar del problema. Se realizará un análisis más detallado posteriormente. Sin embargo, usando los datos anteriores como una primera aproximación, la gerencia desea saber cuántos aviones de cada tipo deben comprarse para maximizar la ganancia.
+
+\subsection{Planificación del Festival}
+El festival Falopalooza necesita planificar 3 shows (Pájaro, Triciclo, Superlocro) en 4 ciudades disponibles (Buenos Aires, Córdoba, Rosario, Mendoza) durante 3 días (viernes, sábado, domingo). Cada banda puede tocar en una ciudad en un día específico o no tocar en absoluto. El problema es que Manusa, el bajista de Pájaro, también toca en Superlocro, y Marki, el tecladista de Pájaro, toca en las tres bandas.
+
+\vspace{0.5em}
+
+Los datos que tenemos sobre cuánto cuesta contratar a cada banda y cuánta gente trae son:
+\begin{table}[H]
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Banda} & \textbf{Costo prod.} & \textbf{Ingresos} & \textbf{Demanda} \\
+\midrule
+Pájaro & \$80k & \$200k & 30k \\
+Triciclo & \$60k & \$150k & 25k \\
+Superlocro & \$50k & \$120k & 20k \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Las capacidades de los estadios por ciudad son:
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Ciudad} & \textbf{Buenos Aires} & \textbf{Córdoba} & \textbf{Rosario} & \textbf{Mendoza} \\
+\midrule
+Capacidad & 50k & 40k & 35k & 45k \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El festival tiene las siguientes restricciones:
+\begin{enumerate}[label=\arabic*.]
+    \item O bien todas las bandas tocan en la misma ciudad (mega festival), o bien tocan en ciudades diferentes.
+    \item Como Marki está en las 3 bandas y Manusa en Pájaro y Superlocro, o bien tocan en el mismo día, o bien tocan en días diferentes (porque los músicos necesitan tiempo para viajar).
+    \item Para cada ciudad-día, o bien se respeta el límite de capacidad, o bien se paga una multa de \$30k por exceder.
+\end{enumerate}
+
+El objetivo es maximizar la ganancia neta (ingresos - costos - multas). Formular este problema como un problema de programación entera.
+
+\newpage
+
+\section{Soluciones}
+
+\subsection{Solución Asignación de Tareas}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $x_{ij} = 1$ si la persona $i$ (Lola o Manu) realiza la tarea $j$ (limpieza, cocina, lavado de platos, lavandería), 0 en caso contrario
+    \item $i \in \{L, M\}$ donde $L$ = Lola, $M$ = Manu
+    \item $j \in \{1, 2, 3, 4\}$ donde 1 = limpieza, 2 = cocina, 3 = lavado de platos, 4 = lavandería
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\min Z = 4.5x_{L1} + 7.8x_{L2} + 3.6x_{L3} + 2.9x_{L4} + 4.9x_{M1} + 7.2x_{M2} + 4.3x_{M3} + 3.1x_{M4}$$
+
+\textbf{Restricciones:}
+\begin{align*}
+    x_{L1} + x_{L2} + x_{L3} + x_{L4} = 2 && \text{(Lola tiene que hacer 2 tareas)} \\
+    x_{M1} + x_{M2} + x_{M3} + x_{M4} = 2 && \text{(Manu tiene que hacer 2 tareas)} \\
+    x_{L1} + x_{M1} = 1 && \text{(Solo una persona hace limpieza)} \\
+    x_{L2} + x_{M2} = 1 && \text{(Solo una persona hace cocina)} \\
+    x_{L3} + x_{M3} = 1 && \text{(Solo una persona hace lavado de platos)} \\
+    x_{L4} + x_{M4} = 1 && \text{(Solo una persona hace lavanderia)} \\
+    x_{ij} \in \{0,1\} \quad \forall i,j
+\end{align*}
+
+\subsection{Solución Selección de Empleados}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $x_i = 1$ si se contrata al candidato $i$, 0 en caso contrario
+    \item $i \in \{1, 2, 3, 4, 5\}$
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\max Z = 8x_1 + 6x_2 + 9x_3 + 7x_4 + 8x_5$$
+
+\textbf{Restricciones:}
+\begin{align*}
+    x_1 + x_2 + x_3 + x_4 + x_5 = 3 && \text{(Se deben contratar exactamente 3 empleados)} \\
+    45x_1 + 35x_2 + 55x_3 + 40x_4 + 50x_5 \leq 150 && \text{(Presupuesto máximo de \$150,000)} \\
+    x_i \in \{0,1\} \quad \forall i
+\end{align*}
+
+\subsection{Solución Selección de Proyectos de Desarrollo}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $x_i = 1$ si se selecciona el proyecto $i$, 0 en caso contrario
+    \item $i \in \{1, 2, 3, 4, 5\}$
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\max Z = x_1 + 1.8x_2 + 1.6x_3 + 0.8x_4 + 1.4x_5$$
+
+\textbf{Restricciones:}
+\begin{align*}
+    6x_1 + 12x_2 + 10x_3 + 4x_4 + 8x_5 \leq 20 && \text{(Capital disponible máximo de \$20 millones)} \\
+    x_i \in \{0,1\} \quad \forall i
+\end{align*}
+
+\subsection{Solución Planificación de Horarios}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $x_{ij} = 1$ si el conductor $i$ es asignado al turno $j$, 0 en caso contrario
+    \item $i \in \{1, 2, 3, 4\}$ (conductores)
+    \item $j \in \{1, 2, 3, 4, 5, 6\}$ (turnos)
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\max Z = \sum_{i=1}^{4} \sum_{j=1}^{6} e_{ij} x_{ij}$$
+\begin{center}
+donde $e_{ij}$ es la eficiencia del conductor $i$ en el turno $j$
+\end{center}
+
+\textbf{Restricciones:}
+\begin{align*}
+    \sum_{j=1}^{6} x_{ij} \leq 2 \quad \forall i && \text{(Maximo 2 turnos por conductor)} \\
+    \sum_{i=1}^{4} x_{ij} = 1 \quad \forall j && \text{(Exactamente 1 conductor por turno)} \\
+    x_{ij} \in \{0,1\} \quad \forall i,j
+\end{align*}
+
+\subsection{Solución Planificación de Turnos Hospitalarios}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $x_{ij} = 1$ si el médico $i$ es asignado al turno $j$, 0 en caso contrario
+    \item $i \in \{1, 2, 3, 4, 5\}$ donde 1=Mazzoleni, 2=Torcia, 3=Martínez, 4=Fargas, 5=Rodríguez
+    \item $j \in \{1, 2, 3, 4, 5, 6, 7\}$ (turnos)
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\max Z = \sum_{i=1}^{5} \sum_{j=1}^{7} e_{ij} x_{ij}$$
+\begin{center}
+donde $e_{ij}$ es la eficiencia del medico $i$ en el turno $j$
+\end{center}
+
+\textbf{Restricciones:}
+\begin{align*}
+    \sum_{j=1}^{7} x_{ij} \leq 3 \quad \forall i && \text{(Maximo 3 turnos por medico)} \\
+    \sum_{i=1}^{5} x_{ij} = 1 \quad \forall j && \text{(Exactamente 1 medico por turno)} \\
+    x_{1j} = 0 \quad \forall j \in \{4,5,6,7\} && \text{(Mazzoleni solo turnos 1,2,3)} \\
+    x_{2j} + x_{2,j+1} \leq 1 \quad \forall j \in \{1,2,3,4,5,6\} && \text{(Torcia no turnos consecutivos)} \\
+    \sum_{j=1}^{7} x_{3j} \geq 2 && \text{(Martinez al menos 2 turnos)} \\
+    x_{4j} + x_{5j} \leq 1 \quad \forall j && \text{(Fargas y Rodriguez no mismo dia)} \\
+    x_{ij} \in \{0,1\} \quad \forall i,j
+\end{align*}
+
+\subsection{Solución Inversiones de Capital con Restricciones}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $x_i = 1$ si se selecciona la inversión $i$, 0 en caso contrario
+    \item $i \in \{1, 2, 3, 4, 5, 6\}$
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\max Z = 15x_1 + 12x_2 + 16x_3 + 18x_4 + 9x_5 + 11x_6$$
+
+\textbf{Restricciones:}
+\begin{align*}
+    38x_1 + 33x_2 + 39x_3 + 45x_4 + 23x_5 + 27x_6 \leq 100 && \text{(Capital disponible)} \\
+    x_1 + x_2 \leq 1 && \text{(1 y 2 mutuamente excluyentes)} \\
+    x_3 + x_4 \leq 1 && \text{(3 y 4 mutuamente excluyentes)} \\
+    x_3 + x_4 \leq x_1 + x_2 && \text{(3 o 4 solo si 1 o 2)} \\
+    x_i \in \{0,1\} \quad \forall i
+\end{align*}
+
+\subsection{Solución Planificación de Producción}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $x_1$ = cantidad de barras de remolque a producir
+    \item $x_2$ = cantidad de barras estabilizadoras a producir
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\max Z = 130x_1 + 150x_2$$
+
+\textbf{Restricciones:}
+\begin{align*}
+    3.2x_1 + 2.4x_2 \leq 16 && \text{(Horas disponibles maquina 1)} \\
+    2x_1 + 3x_2 \leq 15 && \text{(Horas disponibles maquina 2)} \\
+    x_1, x_2 \geq 0 && \text{(No negatividad)}
+\end{align*}
+
+\subsection{Solución Distribución de Productos}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $x_{ij} = 1$ si el almacén $i$ atiende al cliente $j$, 0 en caso contrario
+    \item $i \in \{1, 2, 3\}$ (almacenes)
+    \item $j \in \{1, 2, 3, 4\}$ (clientes)
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\min Z = \sum_{i=1}^{3} \sum_{j=1}^{4} c_{ij} x_{ij}$$
+\begin{center}
+donde $c_{ij}$ es el costo de transporte del almacén $i$ al cliente $j$
+\end{center}
+
+\textbf{Restricciones:}
+\begin{align*}
+    \sum_{i=1}^{3} x_{ij} = 1 \quad \forall j && \text{(Cada cliente atendido por 1 almacen)} \\
+    \sum_{j=1}^{4} d_j x_{ij} \leq C_i \quad \forall i && \text{(Capacidad de cada almacen)} \\
+    x_{ij} \in \{0,1\} \quad \forall i,j
+\end{align*}
+\begin{center}
+donde $d_j$ es la demanda del cliente $j$ y $C_i$ es la capacidad del almacén $i$
+\end{center}
+
+\subsection{Solución Selección de Proveedores}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $x_{ij}$ = cantidad de materia prima $i$ comprada al proveedor $j$
+    \item $i \in \{A, B, C\}$ (materias primas)
+    \item $j \in \{1, 2, 3, 4\}$ (proveedores)
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\min Z = \sum_{i \in \{A,B,C\}} \sum_{j=1}^{4} c_{ij} x_{ij}$$
+\begin{center}
+donde $c_{ij}$ es el costo unitario de la materia prima $i$ del proveedor $j$
+\end{center}
+
+\textbf{Restricciones:}
+\begin{align*}
+    \sum_{j=1}^{4} x_{Aj} = 400 && \text{(Demanda materia prima A)} \\
+    \sum_{j=1}^{4} x_{Bj} = 350 && \text{(Demanda materia prima B)} \\
+    \sum_{j=1}^{4} x_{Cj} = 600 && \text{(Demanda materia prima C)} \\
+    x_{ij} \leq 0.6D_i \quad \forall i,j && \text{(Maximo 60\% por proveedor)} \\
+    x_{ij} \leq C_{ij} \quad \forall i,j && \text{(Capacidad de cada proveedor)} \\
+    x_{ij} \geq 0 \quad \forall i,j
+\end{align*}
+\begin{center}
+donde $D_i$ es la demanda total de la materia prima $i$ y $C_{ij}$ es la capacidad del proveedor $j$ para la materia prima $i$
+\end{center}
+
+\subsection{Solución Planificación de Red de Distribución}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $y_i = 1$ si se abre el centro $i$, 0 en caso contrario
+    \item $x_{ij} = 1$ si el centro $i$ atiende al cliente $j$, 0 en caso contrario
+    \item $i \in \{1, 2, 3, 4\}$ (centros)
+    \item $j \in \{1, 2, 3, 4, 5, 6\}$ (clientes)
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\min Z = \sum_{i=1}^{4} f_i y_i + \sum_{i=1}^{4} \sum_{j=1}^{6} c_{ij} x_{ij}$$
+\begin{center}
+donde $f_i$ es el costo fijo del centro $i$ y $c_{ij}$ es el costo de transporte del centro $i$ al cliente $j$
+\end{center}
+
+\textbf{Restricciones:}
+\begin{align*}
+    \sum_{i=1}^{4} y_i \leq 3 && \text{(Maximo 3 centros abiertos)} \\
+    \sum_{i=1}^{4} x_{ij} = 1 \quad \forall j && \text{(Cada cliente atendido por 1 centro)} \\
+    \sum_{j=1}^{6} d_j x_{ij} \leq C_i y_i \quad \forall i && \text{(Capacidad de cada centro)} \\
+    y_2 \geq y_1 && \text{(Si se abre centro 1, debe abrirse centro 2)} \\
+    y_3 + y_4 \leq 1 && \text{(Centros 3 y 4 no pueden abrirse juntos)} \\
+    y_4 \leq y_1 + y_2 && \text{(Centro 4 solo si se abre 1 o 2)} \\
+    x_{ij} \leq y_i \quad \forall i,j && \text{(Solo centros abiertos pueden atender)} \\
+    y_i, x_{ij} \in \{0,1\} \quad \forall i,j
+\end{align*}
+\begin{center}
+donde $d_j$ es la demanda del cliente $j$ y $C_i$ es la capacidad del centro $i$
+\end{center}
+
+\subsection{Solución Producción de Juguetes}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $x_1$ = cantidad de juguete 1 a producir
+    \item $x_2$ = cantidad de juguete 2 a producir
+    \item $y_i = 1$ si se usa la fábrica $i$, 0 en caso contrario
+    \item $z_i = 1$ si se produce al menos una unidad del juguete $i$, 0 en caso contrario
+    \item $i \in \{1, 2\}$ (fábricas y juguetes)
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\max Z = 10x_1 + 15x_2 - 50000z_1 - 80000z_2$$
+
+\textbf{Restricciones:}
+\begin{align*}
+    \frac{x_1}{50} + \frac{x_2}{40} \leq 500y_1 && \text{(Capacidad fábrica 1)} \\
+    \frac{x_1}{40} + \frac{x_2}{25} \leq 700y_2 && \text{(Capacidad fábrica 2)} \\
+    y_1 + y_2 \leq 1 && \text{(Solo una fábrica)} \\
+    x_1 \leq Mz_1 && \text{(Z1 solo si se produce juguete 1)} \\
+    x_2 \leq Mz_2 && \text{(Z2 solo si se produce juguete 2)} \\
+    x_1, x_2 \geq 0 && \text{(No negatividad)} \\
+    y_i, z_i \in \{0,1\} \quad \forall i
+\end{align*}
+\begin{center}
+donde $M$ es un número suficientemente grande
+\end{center}
+
+\subsection{Solución Selección de Líneas de Productos}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $x_i$ = nivel de producción del producto $i$
+    \item $y_i = 1$ si se produce el producto $i$, 0 en caso contrario
+    \item $z = 1$ si se cumple la primera restricción de capacidad, 0 si se cumple la segunda
+    \item $i \in \{1, 2, 3, 4\}$
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\max Z = \sum_{i=1}^{4} (70x_1 + 60x_2 + 90x_3 + 80x_4 - 50000y_1 - 40000y_2 - 70000y_3 - 60000y_4)$$
+
+\textbf{Restricciones:}
+\begin{align*}
+    \sum_{i=1}^{4} y_i \leq 2 && \text{(Maximo 2 productos)} \\
+    y_3 + y_4 \leq y_1 + y_2 && \text{(Producto 3 o 4 solo si 1 o 2)} \\
+    5x_1 + 3x_2 + 6x_3 + 4x_4 \leq 6000 + M(1-z) && \text{(Primera restricción de capacidad)} \\
+    4x_1 + 6x_2 + 3x_3 + 5x_4 \leq 6000 + Mz && \text{(Segunda restricción de capacidad)} \\
+    x_i \leq My_i \quad \forall i && \text{(Producción solo si se selecciona)} \\
+    x_i \geq 0 \quad \forall i && \text{(No negatividad)} \\
+    y_i, z \in \{0,1\} \quad \forall i
+\end{align*}
+\begin{center}
+donde $M$ es un número suficientemente grande
+\end{center}
+
+\subsection{Solución Planificación de Producción Multiperíodo}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $x_{it}$ = cantidad producida del producto $i$ en el período $t$
+    \item $I_{it}$ = inventario del producto $i$ al final del período $t$
+    \item $y_{it} = 1$ si se produce el producto $i$ en el período $t$, 0 en caso contrario
+    \item $w_{it} = 1$ si se produce el producto $i$ en al menos un período, 0 en caso contrario
+    \item $i \in \{1, 2, 3\}, t \in \{1, 2, 3, 4\}$
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\min Z = \sum_{i=1}^{3} \sum_{t=1}^{4} (c_i x_{it} + h_i I_{it})$$
+\begin{center}
+donde $c_i$ es el costo de producción y $h_i$ es el costo de almacenamiento del producto $i$
+\end{center}
+
+\textbf{Restricciones:}
+\begin{align*}
+    I_{i,t-1} + x_{it} - I_{it} = d_{it} \quad \forall i,t && \text{(Balance de inventario)} \\
+    \sum_{i=1}^{3} x_{it} \leq 400 \quad \forall t && \text{(Capacidad total por período)} \\
+    x_{it} \leq C_i y_{it} \quad \forall i,t && \text{(Capacidad máxima por producto)} \\
+    x_{it} \geq c_i y_{it} \quad \forall i,t && \text{(Capacidad mínima por producto)} \\
+    y_{1t} + y_{3t} \leq 1 \quad \forall t && \text{(Productos 1 y 3 no juntos)} \\
+    \sum_{t=1}^{4} y_{2t} \geq 2w_2 && \text{(Producto 2 en al menos 2 períodos)} \\
+    I_{i4} = 0 \quad \forall i && \text{(Sin inventario final)} \\
+    I_{i0} = 0 \quad \forall i && \text{(Inventario inicial cero)} \\
+    x_{it}, I_{it} \geq 0 \quad \forall i,t && \text{(No negatividad)} \\
+    y_{it}, w_i \in \{0,1\} \quad \forall i,t
+\end{align*}
+\begin{center}
+donde $d_{it}$ es la demanda del producto $i$ en el período $t$, $C_i$ es la capacidad máxima y $c_i$ es la capacidad mínima
+\end{center}
+
+\subsection{Solución Compra de Aviones}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $x_1$ = cantidad de aviones de largo alcance
+    \item $x_2$ = cantidad de aviones de mediano alcance
+    \item $x_3$ = cantidad de aviones de corto alcance
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\max Z = 4.2x_1 + 3x_2 + 2.3x_3$$
+
+\textbf{Restricciones:}
+\begin{align*}
+    67x_1 + 50x_2 + 35x_3 \leq 1500 && \text{(Presupuesto máximo)} \\
+    x_1 + x_2 + x_3 \leq 30 && \text{(Pilotos disponibles)} \\
+    \frac{5}{3}x_1 + \frac{4}{3}x_2 + x_3 \leq 40 && \text{(Capacidad mantenimiento)} \\
+    x_1, x_2, x_3 \geq 0 && \text{(No negatividad)}
+\end{align*}
+
+\subsection{Solución Planificación del Festival}
+
+\textbf{Variables de decisión:}
+\begin{itemize}
+    \item $x_{ijk} = 1$ si la banda $i$ toca en la ciudad $j$ el día $k$, 0 en caso contrario
+    \item $y = 1$ si todas las bandas tocan en la misma ciudad, 0 si tocan en ciudades diferentes
+    \item $w = 1$ si todas las bandas tocan en el mismo día, 0 si tocan en días diferentes
+    \item $p_{jk} = 1$ si se excede la capacidad en ciudad $j$ día $k$, 0 en caso contrario
+    \item $i \in \{1, 2, 3\}$ donde 1=Pájaro, 2=Triciclo, 3=Superlocro
+    \item $j \in \{1, 2, 3, 4\}$ donde 1=Buenos Aires, 2=Córdoba, 3=Rosario, 4=Mendoza
+    \item $k \in \{1, 2, 3\}$ donde 1=viernes, 2=sábado, 3=domingo
+\end{itemize}
+
+\textbf{Función objetivo:}
+$$\max Z = \sum_{i=1}^{3} \sum_{j=1}^{4} \sum_{k=1}^{3} (r_i - c_i) x_{ijk} - \sum_{j=1}^{4} \sum_{k=1}^{3} 30p_{jk}$$
+\begin{center}
+donde $r_i$ es el ingreso de la banda $i$ y $c_i$ es el costo de la banda $i$
+\end{center}
+
+\textbf{Restricciones:}
+\begin{align*}
+    \sum_{j=1}^{4} \sum_{k=1}^{3} x_{ijk} \leq 1 \quad \forall i && \text{(Cada banda toca máximo una vez)} \\
+    \sum_{i=1}^{3} x_{ijk} \leq 1 \quad \forall j,k && \text{(Máximo una banda por ciudad-día)} \\
+    \sum_{i=1}^{3} \sum_{j=1}^{4} x_{i1k} \leq 1 \quad \forall k && \text{(Marki solo puede tocar en un lugar por día)} \\
+    \sum_{i \in \{1,3\}} \sum_{j=1}^{4} x_{ijk} \leq 1 \quad \forall k && \text{(Manusa solo puede tocar en un lugar por día)} \\
+    \sum_{i=1}^{3} \sum_{k=1}^{3} x_{i1k} \geq 3y && \text{(Si y=1, todas las bandas en Buenos Aires)} \\
+    \sum_{i=1}^{3} \sum_{k=1}^{3} x_{i1k} \leq 3 - 0.1(1-y) && \text{(Si y=0, no todas en Buenos Aires)} \\
+    \sum_{i=1}^{3} \sum_{j=1}^{4} x_{ij1} \geq 3w && \text{(Si w=1, todas las bandas el viernes)} \\
+    \sum_{i=1}^{3} \sum_{j=1}^{4} x_{ij1} \leq 3 - 0.1(1-w) && \text{(Si w=0, no todas el viernes)} \\
+    \sum_{i=1}^{3} d_i x_{ijk} \leq C_j + M p_{jk} \quad \forall j,k && \text{(Capacidad con penalización)} \\
+    x_{ijk}, y, w, p_{jk} \in \{0,1\} \quad \forall i,j,k
+\end{align*}
+\begin{center}
+donde $d_i$ es la demanda de la banda $i$, $C_j$ es la capacidad de la ciudad $j$ y $M$ es un número suficientemente grande
+\end{center}
+
+\end{document}

@@ -1,0 +1,10 @@
+name: investigacion_operativa
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - spyder
+  - pip
+  - pip:
+      - picos
+      - swiglpk
