@@ -1,0 +1,263 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{forest}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{siunitx}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\sloppy
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{center}
+    {\LARGE \textbf{Guía de Ejercicios \\Programación No Lineal}}\\[0.5em]
+    {Investigación Operativa, Universidad de San Andrés}
+\end{center}
+
+Si encuentran algún error en el documento o hay alguna duda, mandenmé un mail a rodriguezf@udesa.edu.ar y lo revisamos.
+
+\section{Optimización Irrestricta}
+
+\subsection{Visualización de Funciones con Python}
+
+Para cada una de las siguientes funciones, hallar su función derivada primera y derivada segunda. Utilice Python para realizar gráficos de las mismas en un dominio adecuado. Halle analíticamente (si existen) las raíces de $f(x)$, $f'(x)$ y $f''(x)$ y chequeelo numéricamente con Python.
+\begin{itemize}
+    \item[a)] $f(x) = xe^{-x}$
+    \item[b)] $f(x) = x^2 (x^2+1)^{-1}$
+    \item[c)] $f(x) = 2 + e^{3x}$
+    \item[d)] $f(x) = (3x+2)^{-2}$
+\end{itemize}
+
+\subsection{Curva de aprendizaje del costo}
+
+Sea $c(x)$ el costo total de producir una cantidad $x$ de unidades de un cierto producto. La \textit{curva de aprendizaje del costo} se define como $c(x) = kx^{1-b}$ con $0 < b < 1$ y $k>0$.
+\begin{itemize}
+    \item[a)] Calcule la función costo por unidad, $c_u (x)$. 
+    \item[b)] Calcule las derivadas de las funciones $c(x)$ y $c_u (x)$
+    \item[c)] Determine los intervalos de crecimiento y decrecimiento de $c_u (x)$ ¿Qué conclusión puede extraer? Chequee sus resultados con un código en Python, dando valores adecuados a los números.
+\end{itemize}
+
+\subsection{Descuentos por grandes volúmenes }
+
+Una empresa de software necesita publicitar su nuevo desarrollo. A tal fin, ofrece un descuento por volúmenes grandes de compras. El lanzamiento inicial requiere de \$ 100.000 y el costo variable por habilitar usuarios es de \$ 3500 por unidad vendida. El descuento se manifiesta en un función de precio que depende de las unidades vendidas y que se estima como $p(x) = 8000 - 500x$.
+\begin{itemize}
+    \item[a)] Escriba la función costos y la función ingresos.
+    \item[b)] Escriba la función ganancias totales de la empresa.
+    \item[c)] Halle la cantidad óptima de unidades vendidas que maximiza las ganancias. Chequee su método a partir de un código en Python usando la técnica de semillas aleatorias.
+\end{itemize}
+
+\subsection{Programación Financiera}
+
+Una empresa tiene un sobrante en pesos este año que quiere invertirlo en el mercado financiero con el objetivo de pagar los sueldos de los trabajadores de su empresa a partir de la propia inversión. A partir de una consulta con un programador financiero, determinan invertir el dinero en un bono cuyo retorno por cada $x$ de millones de pesos invertidos es aproximadamente del 30\% anual. Ante la voluntad de la empresa de pagar los salarios del próximo año a partir de las ganancias de la inversión, los programadores determinan que en función de lo invertido y teniendo en cuenta paritarias salariales, los costos se comportan según la función $0.2 x \ln x$. 
+\begin{itemize}
+    \item[a)] Halle la función que determina las ganancias en función de la cantidad de pesos $x$ invertida. Realice un gráfico en Python
+    \item[b)] Determine los rangos de inversión con ganancias positivas y con ganancias negativas.
+    \item[c)] Halle el valor que hace extremo a la función. Determine si es un máximo o un mínimo con el criterio de la derivada segunda.
+\end{itemize}
+
+\subsection{Optimización de precios}
+
+Un minorista de productos electr\'{o}nicos desea determinar el precio \'{o}ptimo para maximizar su beneficio. La empresa ha analizado el mercado y ha determinado que la demanda de un nuevo modelo de tel\'{e}fono inteligente, $x$ (en miles de unidades), depende del precio unitario $p$ (en d\'{o}lares), de acuerdo con la funci\'{o}n de demanda:
+\[ x(p) = 200 - 0.5p \]
+El costo total de producir $x$ miles de unidades del tel\'{e}fono est\'{a} dado por la siguiente funci\'{o}n no lineal:
+\[ C(x) = 2000 + 4x^2 \]
+donde $C(x)$ est\'{a} en miles de d\'{o}lares.
+
+Determine el precio \'{o}ptimo al que el minorista debe vender el tel\'{e}fono para maximizar su beneficio total. Adem\'{a}s, calcule el beneficio m\'{a}ximo que se puede obtener con este precio.
+
+\subsection{Localización de almacen}
+
+\textit{Trucko} está tratando de decidir donde localizar un almacén. Un estudio de agrimensura del entorno de la fábrica determina un sistema de coordenadas y desde el centro del mismo, las coordenadas de sus distintos clientes así como la cantidad anual de envíos se muestran en la siguiente tabla:
+\begin{table}[h!]
+    \centering
+    \label{tab:shipments}
+    \begin{tabular}{lccc}
+        \toprule
+        \textbf{Cliente} & \multicolumn{2}{c}{\textbf{Coordenadas}} & \textbf{Número de Envíos} \\
+        \cmidrule(lr){2-3}
+        \textbf{Empresa} & \textbf{$x$} & \textbf{$y$} & \\
+        \midrule
+        La Dulce Canasta & 5 & 10 & 200 \\
+        Pastelitos del Sol & 10 & 5 & 150 \\
+        Quesos de la Sierra & 0 & 12 & 200 \\
+        Fábrica de Postres & 12 & 0 & 300 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\textit{Trucko} desea localizar su almacén de forma que la distancia total que deben hacer anualmente los camiones sea mínima. 
+
+\begin{itemize}
+    \item[a)] Escriba la función distancia que debe minimizar para resolver el problema.
+    \item[b)] Calcule el gradiente de la función distancia (al cuadrado). Halle el punto óptimo analíticamente.
+    \item[c)] Chequee su respuesta con Python y haga un gráfico donde se vean los puntos y la solución óptima.
+\end{itemize}
+
+\subsection{Zonas de tránsito en eventos masivos}
+
+Se quiere realizar un concierto en un predio y se quiere diseñar las zonas de tránsito para el público. Los organizadores reciben de parte de los dueños del predio que la zona permitida para el tránsito de peatones debe ser en forma de triangulo isósceles, por detrás de los escenarios. Los lados iguales del triángulo los llamamos $a$ y el lado restante es $b$. 
+\begin{itemize}
+    \item[a)] Escriba el área del triangulo en función de los lados $a$ y $b$, sabiendo que el área de un triangulo se calcula como $A = \frac{\text{base}\times\text{altura}}{2}$. \textit{Ayuda: use el teorema de Pitágoras para calcular la altura.}
+    \item[b)] Calcule el gradiente de la función area y halle analíticamente los valores de $a$ y $b$ que maximizan la zona de tránsito.
+    \item[c)] Mediante un código en Python, realice un gráfico que permita mostrar al público dónde podrá transitar.
+\end{itemize}
+
+\section{Teoría de funciones Convexas y Cóncavas}
+
+\subsection{Determinación de concavidad/convexidad}
+
+Determine los intervalos en dónde las siguientes funciones son cóncavas o convexas a través del estudio de su segunda derivada. 
+\begin{itemize}
+    \item[a)] $f(x) = x^2$
+    \item[b)] $f(x) = x^2 e^{x}$
+    \item[c)] $f(x) = 3x^3 + 2x + 1$
+    \item[d)] $f(x) = x ln(x)$
+    \item[e)] $f(x) = 2 x^2 + 3x - 1 $
+    \item[f)] $f(x) = \sqrt{x+1} + 3x $    
+\end{itemize}
+
+\subsection{Matriz Hessiana}
+
+Halle la matriz hessiana de las siguientes funciones, así como sus menores principales. Determine si puede definir convexidad o concavidad de la función a partir de ellos. 
+
+\begin{itemize}
+    \item[a)] $f(x,y) = x^2 + 2xy + x^2$
+    \item[b)] $f(x,y) = -x^2 -xy -2y^2$
+    \item[c)] $f(x,y) = x^2 + y^2 +2x^2y - 2xy $
+    \item[d)] $f(x,y) = -x^2 -3xy+2y^2$
+\end{itemize}
+
+\section{Condiciones KKT}
+
+\subsection{Inversión en Publicidad}
+
+Una agencia de publicidad necesita diseñar una estrategia para invertir de forma inteligente en dos eventos masivos: un partido de fútbol y un evento musical. La inversión en el partido de fútbol se espera que tenga un alto impacto de ventas de entradas rápidamente y luego se vendan de forma lenta pero sostenida a medida que pasa el tiempo. Por lo tanto, por cada $x_1$ millones de pesos invertidos, se modela la cantidad de ventas como $V_1 = 12.3 \ln (x_1+1)$. En cambio, se sabe que por cada $x_2$ millones invertidos en eventos musicales las ventas son mas lentas, pero constantes en el tiempo. Entonces, se modela la cantidad de ventas como $V_2 = 1.17 x_2$.
+ 
+Sabiendo que:
+\begin{itemize}
+    \item Las entradas cuestan \$ 25.000 para los partidos y \$ 150.000 para el evento musical
+    \item El doble de lo que se invierte en partidos de fútbol mas lo que se invierta en eventos no debe superar los 30M
+\end{itemize}
+utilice las condiciones KKT para hallar analíticamente el valor óptimo de inversión en publicidad que maximice las ventas.
+
+\subsection{Curva de Cobb-Douglas}
+
+Una empresa contrata un equipo econométrico para que realice un análisis de la empresa. En particular, se quiere conocer que pasa con la relación entre el gasto en herramientas de eficiencia, las horas de trabajo invertidas por los trabajadores  y la productividad de los mismos. Esta última se relaciona con las anteriores según la formula:
+\begin{equation*}
+    P(H,L) = 1.47  E^{1/2} H^{-1}
+\end{equation*}
+
+Se sabe tambien que la suma de la inversión en eficiencia sumada a la tarifa por hora de trabajo sigue la relación $E + 1.17 H \leq 2.4$. Halle el valor óptimo de inversión y horas de labor por trabajador que maximicen la productividad.
+
+\section{Programación Cuadrática. Cuadrados Mínimos.}
+
+\subsection{Programación cuadrática: caso unidimensional}
+
+Considere el problema
+\[
+\min_{0 \le x \le 1} \; f(x) = \tfrac{1}{2} q x^2 + c x,\quad q=4,\; c=-3.
+\]
+\begin{itemize}
+    \item[a)] Calcule $f'(x)$ y justifique si $f$ es convexa.
+    \item[b)] Halle el candidato interior resolviendo $f'(x)=0$ y proyecte al intervalo $[0,1]$ si es necesario.
+    \item[c)] Reporte $x^*$ y $f(x^*)$ y verifique con un pequeño barrido en Python.
+\end{itemize}
+
+\subsection{Cuadrados mínimos: recta que pasa por el origen}
+
+Se desea ajustar el modelo $y \approx b x$ a los siguientes datos:
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+$x$ & 1 & 2 & 3 \\
+$y$ & 0.9 & 2.1 & 3.2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{itemize}
+    \item[a)] Plantee el problema de mínimos cuadrados: $\min_b \sum_i (y_i - b x_i)^2$.
+    \item[b)] Derive la solución cerrada $\hat b = \dfrac{\sum_i x_i y_i}{\sum_i x_i^2}$ y calcúlela para los datos.
+    \item[c)] Grafique en Python los puntos y la recta $y=\hat b x$.
+\end{itemize}
+
+\subsection{Programación cuadrática: selección de cartera}
+
+Un analista desea asignar proporciones $x = (x_1, x_2, x_3)$ en tres activos. La varianza de la cartera está dada por $x^\top Q x$ con
+\[
+Q = \begin{pmatrix}
+0.040 & 0.010 & 0.012 \\
+0.010 & 0.025 & 0.008 \\
+0.012 & 0.008 & 0.036
+\end{pmatrix},\quad r = \begin{pmatrix}0.14 \\ 0.10 \\ 0.12\end{pmatrix}
+\]
+y se busca minimizar el riesgo penalizado por retorno, $\tfrac{1}{2} x^\top Q x - \lambda\, r^\top x$, con $\lambda>0$ fijo.
+\begin{itemize}
+    \item[a)] Escriba el modelo completo: función objetivo y restricciones $\sum_i x_i = 1$, $x_i \ge 0$.
+    \item[b)] Justifique la convexidad del problema. ¿Qué condición debe cumplir $Q$?
+    \item[c)] Para $\lambda = 2$, resuelva las condiciones KKT y obtenga $x^*$.
+    \item[d)] Verifique numéricamente en Python la solución y reporte $x^*$ y el valor óptimo.
+\end{itemize}
+
+\subsection{Cuadrados mínimos: ajuste lineal}
+
+Se observa la relación entre una variable explicativa $x$ y una respuesta $y$. Se registraron los siguientes datos:
+\begin{center}
+\begin{tabular}{cccccc}
+\toprule
+$x$ & 1 & 2 & 3 & 4 & 5 \\
+$y$ & 1.4 & 1.9 & 3.2 & 3.9 & 5.1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{itemize}
+    \item[a)] Plantee el problema de mínimos cuadrados para el modelo $y \approx a + b x$: \(\min_{a,b} \sum_{i=1}^5 (y_i - a - b x_i)^2\). Escríbalo en forma matricial y como problema cuadrático en la variable $\beta=(a,b)$.
+    \item[b)] Derive las ecuaciones normales y obtenga la solución cerrada $\hat\beta = (X^\top X)^{-1} X^\top y$ para estos datos.
+    \item[c)] Calcule $\hat a, \hat b$ y reporte el error cuadrático mínimo. Grafique datos y recta ajustada en Python.
+\end{itemize}
+
+
+\end{document}
