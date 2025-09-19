@@ -232,7 +232,8 @@ Capacidad C & 800 & 600 & 700 & 500 \\
 \end{tabular}
 \end{table}
 
-La empresa necesita exactamente 400 unidades de la materia prima A, 350 unidades de B y 600 unidades de C. Por políticas de diversificación, no se puede comprar más del 60\% de la demanda total de cada materia prima a un solo proveedor. El objetivo es minimizar el costo total de compra. Formular este problema como un problema de programación entera.
+La empresa necesita exactamente 400 unidades de la materia prima A, 350 unidades de B y 600 unidades de C. Por políticas de diversificación, no se puede comprar más del 60\% de la demanda total de cada materia prima a un solo proveedor. 
+Adicionalmente, para cada materia prima se puede utilizar como máximo a 2 proveedores, y si se compra la materia prima A al Proveedor 1, entonces no se puede comprar la materia prima B al Proveedor 3. El objetivo es minimizar el costo total de compra. Formular este problema como un problema de programación entera.
 
 \subsection{Planificación de Red de Distribución}
 Una empresa de logística necesita diseñar una red de distribución para 4 centros de distribución y 6 clientes principales. La empresa puede abrir hasta 3 centros de distribución de los 4 disponibles. Cada centro tiene una capacidad de almacenamiento y un costo fijo de apertura. Los costos de transporte desde cada centro a cada cliente se muestran en la siguiente tabla (en miles de pesos):
@@ -587,6 +588,7 @@ donde $d_j$ es la demanda del cliente $j$ y $C_i$ es la capacidad del almacén $
     \item $x_{ij}$ = cantidad de materia prima $i$ comprada al proveedor $j$
     \item $i \in \{A, B, C\}$ (materias primas)
     \item $j \in \{1, 2, 3, 4\}$ (proveedores)
+    \item $y_{ij} = 1$ si se usa el proveedor $j$ para la materia prima $i$, 0 en caso contrario
 \end{itemize}
 
 \textbf{Función objetivo:}
@@ -602,7 +604,11 @@ donde $c_{ij}$ es el costo unitario de la materia prima $i$ del proveedor $j$
     \sum_{j=1}^{4} x_{Cj} = 600 && \text{(Demanda materia prima C)} \\
     x_{ij} \leq 0.6D_i \quad \forall i,j && \text{(Maximo 60\% por proveedor)} \\
     x_{ij} \leq C_{ij} \quad \forall i,j && \text{(Capacidad de cada proveedor)} \\
-    x_{ij} \geq 0 \quad \forall i,j
+    x_{ij} \leq D_i\, y_{ij} \quad \forall i,j && \text{(Si no compro no puedo usar nada de Prov i)} \\
+    \sum_{j=1}^{4} y_{ij} \leq 2 \quad \forall i && \text{(A lo sumo 2 proveedores por materia)} \\
+    y_{A1} + y_{B3} \leq 1 && \text{(Incompatibilidad A-Prov1 con B-Prov3)} \\
+    x_{ij} \geq 0 \quad \forall i,j \\
+    y_{ij} \in \{0,1\} \quad \forall i,j
 \end{align*}
 \begin{center}
 donde $D_i$ es la demanda total de la materia prima $i$ y $C_{ij}$ es la capacidad del proveedor $j$ para la materia prima $i$
