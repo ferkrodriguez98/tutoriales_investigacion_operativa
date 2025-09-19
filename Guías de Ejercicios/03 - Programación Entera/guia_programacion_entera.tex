@@ -184,7 +184,7 @@ Vincent Vega es el dueño y gerente de un taller de máquinas que hace trabajos 
 
 \vspace{0.5em}
 
-Cada barra de remolque requiere 3.2 horas en la máquina 1 y 2 horas en la máquina 2. Cada barra estabilizadora requiere 2.4 horas en la máquina 1 y 3 horas en la máquina 2. La máquina 1 estará disponible durante 16 horas en los próximos dos días y la máquina 2 estará disponible durante 15 horas. La ganancia por cada barra de remolque producida sería de \$130 y la ganancia por cada barra estabilizadora producida sería de \$150.
+Cada barra de remolque requiere 3.2 horas en la máquina 1 y 2 horas en la máquina 2. Cada barra estabilizadora requiere 2.4 horas en la máquina 1 y 3 horas en la máquina 2. La máquina 1 estará disponible durante 16 horas en los próximos dos días y la máquina 2 estará disponible durante 15 horas. Si produce barras de remolque incurre en un costo fijo de puesta a punto de \$500, y si produce barras estabilizadoras incurre en un costo fijo de \$600. La ganancia por cada barra de remolque producida sería de \$130 y la ganancia por cada barra estabilizadora producida sería de \$150. 
 
 \vspace{0.5em}
 
@@ -544,17 +544,25 @@ $$\max Z = 15x_1 + 12x_2 + 16x_3 + 18x_4 + 9x_5 + 11x_6$$
 \begin{itemize}
     \item $x_1$ = cantidad de barras de remolque a producir
     \item $x_2$ = cantidad de barras estabilizadoras a producir
+    \item $y_1 = 1$ si se producen barras de remolque (incurre en costo fijo), 0 en caso contrario
+    \item $y_2 = 1$ si se producen barras estabilizadoras (incurre en costo fijo), 0 en caso contrario
 \end{itemize}
 
 \textbf{Función objetivo:}
-$$\max Z = 130x_1 + 150x_2$$
+$$\max Z = 130x_1 + 150x_2 - 500y_1 - 600y_2$$
 
 \textbf{Restricciones:}
 \begin{align*}
     3.2x_1 + 2.4x_2 \leq 16 && \text{(Horas disponibles maquina 1)} \\
     2x_1 + 3x_2 \leq 15 && \text{(Horas disponibles maquina 2)} \\
-    x_1, x_2 \geq 0 && \text{(No negatividad)}
+    x_1 \leq My_1 && \text{(Solo producir barras de remolque si se incurre en costo fijo)} \\
+    x_2 \leq My_2 && \text{(Solo producir barras estabilizadoras si se incurre en costo fijo)} \\
+    x_1, x_2 \geq 0 && \text{(No negatividad)} \\
+    y_1, y_2 \in \{0,1\} && \text{(Variables binarias)}
 \end{align*}
+\begin{center}
+donde $M$ es un número suficientemente grande (por ejemplo, $M = 100000$)
+\end{center}
 
 \subsection{Solución Distribución de Productos}
 
