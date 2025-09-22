@@ -790,13 +790,15 @@ donde $r_i$ es el ingreso de la banda $i$ y $c_i$ es el costo de la banda $i$
 \textbf{Restricciones:}
 \begin{align*}
     \sum_{j=1}^{4} \sum_{k=1}^{3} x_{ijk} \leq 1 \quad \forall i && \text{(Cada banda toca máximo una vez)} \\
-    \sum_{i=1}^{3} x_{ijk} \leq 1 \quad \forall j,k && \text{(Máximo una banda por ciudad-día)} \\
-    \sum_{i=1}^{3} \sum_{j=1}^{4} x_{i1k} \leq 1 \quad \forall k && \text{(Marki solo puede tocar en un lugar por día)} \\
-    \sum_{i \in \{1,3\}} \sum_{j=1}^{4} x_{ijk} \leq 1 \quad \forall k && \text{(Manusa solo puede tocar en un lugar por día)} \\
+    \sum_{j=1}^{4} x_{1jk} + \sum_{j=1}^{4} x_{2jk} + \sum_{j=1}^{4} x_{3jk} \leq 1 \quad \forall k && \text{(Marki no puede tocar en dos ciudades diferentes el mismo día)} \\
+    \sum_{j=1}^{4} x_{1jk} + \sum_{j=1}^{4} x_{3jk} \leq 1 \quad \forall k && \text{(Manusa no puede tocar en dos ciudades diferentes el mismo día)} \\
     \sum_{i=1}^{3} \sum_{k=1}^{3} x_{i1k} \geq 3y && \text{(Si y=1, todas las bandas en Buenos Aires)} \\
-    \sum_{i=1}^{3} \sum_{k=1}^{3} x_{i1k} \leq 3 - 0.1(1-y) && \text{(Si y=0, no todas en Buenos Aires)} \\
+    \sum_{i=1}^{3} \sum_{k=1}^{3} x_{i2k} \geq 3y && \text{(Si y=1, todas las bandas en Córdoba)} \\
+    \sum_{i=1}^{3} \sum_{k=1}^{3} x_{i3k} \geq 3y && \text{(Si y=1, todas las bandas en Rosario)} \\
+    \sum_{i=1}^{3} \sum_{k=1}^{3} x_{i4k} \geq 3y && \text{(Si y=1, todas las bandas en Mendoza)} \\
     \sum_{i=1}^{3} \sum_{j=1}^{4} x_{ij1} \geq 3w && \text{(Si w=1, todas las bandas el viernes)} \\
-    \sum_{i=1}^{3} \sum_{j=1}^{4} x_{ij1} \leq 3 - 0.1(1-w) && \text{(Si w=0, no todas el viernes)} \\
+    \sum_{i=1}^{3} \sum_{j=1}^{4} x_{ij2} \geq 3w && \text{(Si w=1, todas las bandas el sábado)} \\
+    \sum_{i=1}^{3} \sum_{j=1}^{4} x_{ij3} \geq 3w && \text{(Si w=1, todas las bandas el domingo)} \\
     \sum_{i=1}^{3} d_i x_{ijk} \leq C_j + M p_{jk} \quad \forall j,k && \text{(Capacidad con penalización)} \\
     x_{ijk}, y, w, p_{jk} \in \{0,1\} \quad \forall i,j,k
 \end{align*}
