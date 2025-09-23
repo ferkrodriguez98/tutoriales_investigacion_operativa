@@ -633,9 +633,9 @@ donde $D_i$ es la demanda total de la materia prima $i$ y $C_{ij}$ es la capacid
 \end{itemize}
 
 \textbf{Función objetivo:}
-$$\min Z = \sum_{i=1}^{4} f_i y_i + \sum_{i=1}^{4} \sum_{j=1}^{6} c_{ij} x_{ij}$$
+$$\min Z = \sum_{i=1}^{4} f_i y_i + \sum_{i=1}^{4} \sum_{j=1}^{6} c_{ij} d_j x_{ij}$$
 \begin{center}
-donde $f_i$ es el costo fijo del centro $i$ y $c_{ij}$ es el costo de transporte del centro $i$ al cliente $j$
+donde $f_i$ es el costo fijo del centro $i$, $c_{ij}$ es el costo de transporte del centro $i$ al cliente $j$ y $d_j$ es la demanda del cliente $j$
 \end{center}
 
 \textbf{Restricciones:}
@@ -790,8 +790,8 @@ donde $r_i$ es el ingreso de la banda $i$ y $c_i$ es el costo de la banda $i$
 \textbf{Restricciones:}
 \begin{align*}
     \sum_{j=1}^{4} \sum_{k=1}^{3} x_{ijk} \leq 1 \quad \forall i && \text{(Cada banda toca máximo una vez)} \\
-    \sum_{j=1}^{4} x_{1jk} + \sum_{j=1}^{4} x_{2jk} + \sum_{j=1}^{4} x_{3jk} \leq 1 \quad \forall k && \text{(Marki no puede tocar en dos ciudades diferentes el mismo día)} \\
-    \sum_{j=1}^{4} x_{1jk} + \sum_{j=1}^{4} x_{3jk} \leq 1 \quad \forall k && \text{(Manusa no puede tocar en dos ciudades diferentes el mismo día)} \\
+    \sum_{j=1}^{4} x_{1jk} + \sum_{j=1}^{4} x_{2jk} + \sum_{j=1}^{4} x_{3jk} \leq 1 \quad \forall k && \text{(Marki no puede teletransportarse)} \\
+    \sum_{j=1}^{4} x_{1jk} + \sum_{j=1}^{4} x_{3jk} \leq 1 \quad \forall k && \text{(Manusa no puede teletransportarse tampoco)} \\
     \sum_{i=1}^{3} \sum_{k=1}^{3} x_{i1k} \geq 3y && \text{(Si y=1, todas las bandas en Buenos Aires)} \\
     \sum_{i=1}^{3} \sum_{k=1}^{3} x_{i2k} \geq 3y && \text{(Si y=1, todas las bandas en Córdoba)} \\
     \sum_{i=1}^{3} \sum_{k=1}^{3} x_{i3k} \geq 3y && \text{(Si y=1, todas las bandas en Rosario)} \\
