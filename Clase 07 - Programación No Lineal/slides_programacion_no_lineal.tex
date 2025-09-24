@@ -1,0 +1,559 @@
+\documentclass{beamer}
+\usetheme{metropolis}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{fontawesome}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\usetikzlibrary{positioning,shapes.multipart,calc,arrows,shapes.geometric}
+
+% Definición de colores personalizados
+\definecolor{primary}{RGB}{46, 204, 113}
+\definecolor{secondary}{RGB}{52, 152, 219}
+\definecolor{accent}{RGB}{231, 76, 60}
+\definecolor{background}{RGB}{236, 240, 241}
+\definecolor{gradient1}{RGB}{255, 107, 107}
+\definecolor{gradient2}{RGB}{255, 159, 67}
+
+% Configuración del tema
+\setbeamercolor{normal text}{fg=black,bg=background}
+\setbeamercolor{structure}{fg=primary}
+\setbeamercolor{alerted text}{fg=accent}
+
+\definecolor{lightgray}{rgb}{0.95,0.95,0.95}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{darkblue}{rgb}{0,0,0.5}
+
+\lstset{
+  backgroundcolor=\color{lightgray},
+  basicstyle=\tiny\ttfamily,
+  keywordstyle=\color{darkblue}\bfseries,
+  commentstyle=\color{darkgreen},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  frame=single,
+  tabsize=2,
+  language=Python,
+  breaklines=true,
+  breakatwhitespace=true
+}
+
+\title{\Huge\textbf{Programación No Lineal}}
+\author{Investigación Operativa}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south west,inner sep=30pt] at (current page.south west) {
+            \includegraphics[height=1cm]{/Users/fermin/Desktop/UdeSA/TEMPLATES_TEX/misc/UdeSA.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Introducción a la Programación No Lineal}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \textbf{Programación Lineal vs No Lineal:}
+            \begin{itemize}
+                \item \textbf{Lineal:} Función objetivo y restricciones lineales
+                \item \textbf{No Lineal:} Al menos una función no es lineal
+            \end{itemize}
+            
+            \vspace{0.5cm}
+            
+            \textbf{Características:}
+            \begin{itemize}
+                \item Múltiples mínimos locales
+                \item Dependencia del punto inicial
+                \item Mayor complejidad computacional
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            \centering
+            \begin{tikzpicture}
+            \begin{axis}[
+                xlabel=$x_1$,
+                ylabel=$x_2$,
+                xmin=-1, xmax=7,
+                ymin=-1, ymax=7,
+                grid=both,
+                width=5cm,
+                height=4cm
+            ]
+            \addplot[color=red, thick] coordinates {(0,-1) (0,7)};
+            \addplot[color=blue, thick] coordinates {(-1,0) (7,0)};
+            \addplot[color=green, thick] coordinates {(4,-1) (4,7)};
+            \addplot[color=purple, thick] coordinates {(-1,6) (7,6)};
+            \addplot[color=orange, thick, domain=-1:7] { (18 - 3*x)/2 };
+            \fill[gray!50,opacity=0.3] (0,0) -- (0,6) -- (2,6) -- (4,3) -- (4,0) -- cycle;
+            \end{axis}
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Convexidad}
+    \textbf{Definición:} Una función es convexa si la recta que une dos puntos cualesquiera de su gráfica queda por encima o sobre la función.
+    
+    \vspace{0.5cm}
+    
+    \begin{center}
+    \begin{minipage}{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{axis}[
+        axis lines=middle,
+        width=5.5cm,
+        height=4cm,
+        xlabel={$x$}, ylabel={$f(x)$},
+        domain=-1:1,
+        samples=100,
+        xtick={-1,0,1},
+        ytick={0,2,4,6},
+        ymin=0, ymax=5.5,
+        xmin=-1, xmax=1
+      ]
+        \addplot[thick,red]   {exp(2*x)};
+        \addplot[thick,orange]{exp(x)};
+        \addplot[thick,blue]  {exp(-x)};
+        \addplot[thick,green] {exp(-2*x)};
+      \end{axis}
+    \end{tikzpicture}
+    \\
+    \textbf{Funciones Exponenciales}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \begin{axis}[
+        axis lines=middle,
+        width=5.5cm,
+        height=4cm,
+        xlabel={$x$}, ylabel={$f(x)$},
+        domain=0.1:2,
+        samples=100,
+        xtick={0,1,2},
+        ytick={0,2,4,6,8},
+        ymin=0, ymax=8,
+        xmin=0, xmax=2
+      ]
+        \addplot[thick,blue]  {x^2};
+        \addplot[thick,orange]{x};
+        \addplot[thick,green] {x^(-1)};
+        \addplot[thick,red]   {x^(-2)};
+      \end{axis}
+    \end{tikzpicture}
+    \\
+    \textbf{Funciones Potenciales}
+    \end{minipage}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Propiedades de Convexidad}
+    \textbf{Propiedades importantes:}
+    \begin{itemize}
+        \item La suma de dos funciones \textbf{convexas} es convexa
+        \item Un problema de optimización es convexo si y solo si:
+        \begin{enumerate}
+            \item El conjunto factible es convexo
+            \item El objetivo es minimizar una función convexa (o maximizar una cóncava)
+        \end{enumerate}
+        \item Si un problema es convexo, \textbf{cualquier óptimo local es un óptimo global}
+    \end{itemize}
+    
+    \vspace{0.5cm}
+    
+    \begin{alertblock}{Importante}
+        En problemas convexos, alcanza con encontrar \textit{algún} mínimo local que sabremos que es global.
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}{Múltiples Mínimos Locales}
+    \begin{columns}
+        \begin{column}{0.6\textwidth}
+            \textbf{Problema:} En problemas no lineales puede haber varios mínimos locales.
+            
+            \vspace{0.3cm}
+            
+            \textbf{Solución:} Usar seeds (semillas aleatorias) para explorar diferentes regiones.
+            
+            \vspace{0.3cm}
+            
+            \textbf{El resultado depende del punto inicial:}
+            \begin{itemize}
+                \item Punto A $\rightarrow$ Mínimo 1
+                \item Punto B $\rightarrow$ Mínimo 2
+                \item Punto C $\rightarrow$ Mínimo 3
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            \centering
+            \begin{tikzpicture}
+              \begin{axis}[
+                width=5cm,
+                height=4cm,
+                xlabel={$x$}, ylabel={$f(x)$},
+                domain=1:5,
+                samples=200,
+                grid=major
+              ]
+                \addplot[thick,blue] {3*sin(deg(2*x)) + cos(deg(3*x))};
+              \end{axis}
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Ejemplo 1: Asignación de Presupuesto}
+    \textbf{Problema:} Una empresa desea asignar su presupuesto diario de publicidad entre Google Ads ($x_1$) e Instagram Ads ($x_2$).
+    
+    \vspace{0.3cm}
+    
+    \textbf{Función objetivo:}
+    \[f(x_1, x_2) = - \left( 100 \cdot \left(1 - e^{-0.05 x_1}\right) + 80 \cdot \left(1 - e^{-0.08 x_2}\right) \right)\]
+    
+    \textbf{Restricciones:}
+    \begin{itemize}
+        \item $x_1 + x_2 \leq 10,000$ (presupuesto total)
+        \item $x_1 \geq 2,000$ (mínimo Google Ads)
+        \item $x_2 \geq 1,000$ (mínimo Instagram Ads)
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \textbf{¿Es convexo?} Sí, porque la función objetivo es cóncava (estamos maximizando) y las restricciones son lineales.
+\end{frame}
+
+\begin{frame}[fragile]{Resolución en Python - Ejemplo 1}
+    \begin{lstlisting}[numbers=left, numbersep=5pt]
+def impacto_negativo(x):
+    x1, x2 = x
+    return -(100 * (1 - np.exp(-0.05 * x1)) + 
+             80 * (1 - np.exp(-0.08 * x2)))
+
+restricciones = [
+    {'type': 'ineq', 'fun': lambda x: 10000 - (x[0] + x[1])},
+    {'type': 'ineq', 'fun': lambda x: x[0] - 2000},
+    {'type': 'ineq', 'fun': lambda x: x[1] - 1000}
+]
+
+bounds = [(2000, None), (1000, None)]
+x0 = [5000, 3000]
+
+res = minimize(impacto_negativo, x0, method='SLSQP', 
+               bounds=bounds, constraints=restricciones)
+
+if res.success:
+    x1_opt, x2_opt = res.x
+    impacto_max = -res.fun
+    print(f'Inversion optima en Google Ads: ${x1_opt:.2f}')
+    print(f'Inversion optima en Instagram Ads: ${x2_opt:.2f}')
+    print(f'Impacto total maximo: {impacto_max:.2f}')
+    print(f'Total invertido: ${x1_opt + x2_opt:.2f}')
+else:
+    print('Error:', res.message)
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Ejemplo 2: Producción Óptima}
+    \textbf{Problema:} Una empresa fabrica dos productos A y B con ganancias unitarias de \$40 y \$30.
+    
+    \vspace{0.3cm}
+    
+    \textbf{Función objetivo:}
+    \[\max f(x_1, x_2) = 40x_1 + 30x_2\]
+    
+    \textbf{Restricciones no lineales:}
+    \begin{itemize}
+        \item \textbf{Capacidad de máquinas:} $x_1^2 + x_2^2 \leq 2500$
+        \item \textbf{Compatibilidad:} $\dfrac{x_1}{x_2 + 1} \leq 4$
+        \item \textbf{No negatividad:} $x_1 \geq 0$, $x_2 \geq 0$
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \textbf{¿Es convexo?} Sí, porque el conjunto factible es convexo (intersección de conjuntos convexos) y la función objetivo es lineal.
+\end{frame}
+
+\begin{frame}{Ejemplo 3: Optimización en Biotecnología}
+    \textbf{Problema:} Una startup busca desarrollar empaques ecológicos usando fibra vegetal ($x_1$) y alga marina ($x_2$).
+    
+    \vspace{0.3cm}
+    
+    \textbf{Función objetivo:}
+    \[f(x_1, x_2) = \sin(x_1) \cdot \cos(x_2) + 0.1(x_1 + x_2) + 25\]
+    
+    \textbf{Restricciones:}
+    \begin{itemize}
+        \item $x_1 + x_2 \geq 2$ (mínimo de ingredientes)
+        \item $x_1 + 2x_2 \leq 8$ (capacidad máxima)
+        \item $0 \leq x_1 \leq 6$, $0 \leq x_2 \leq 6$
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \textbf{¿Es convexo?} \textcolor{red}{NO}, porque contiene términos trigonométricos que pueden tener múltiples mínimos locales. Necesitamos múltiples puntos iniciales aleatorios.
+\end{frame}
+
+\begin{frame}[fragile]{Resolución con Múltiples Puntos Iniciales}
+    \begin{lstlisting}[numbers=left, numbersep=5pt]
+import numpy as np
+from scipy.optimize import minimize
+
+def costo(x):
+    x1, x2 = x
+    return np.sin(x1) * np.cos(x2) + 0.1 * (x1 + x2) + 25
+
+restricciones = [
+    {'type': 'ineq', 'fun': lambda x: x[0] + x[1] - 2},
+    {'type': 'ineq', 'fun': lambda x: 8 - (x[0] + 2 * x[1])}
+]
+
+bounds = [(0, 6), (0, 6)]
+
+np.random.seed(42)
+resultados = []
+for i in range(10):
+    x0 = np.random.uniform(0, 6, size=2)
+    res = minimize(costo, x0, method='SLSQP', 
+                   bounds=bounds, constraints=restricciones)
+    if res.success:
+        resultados.append((res.fun, res.x))
+
+resultados.sort()
+mejor_valor, mejor_x = resultados[0]
+print(f'Mejor solucion: x1 = {mejor_x[0]:.4f}, x2 = {mejor_x[1]:.4f}')
+print(f'Costo minimo: {mejor_valor:.4f}')
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Programación Cuadrática (QP)}
+    \textbf{Definición:} Problemas donde la función objetivo es cuadrática y las restricciones son lineales.
+    
+    \vspace{0.3cm}
+    
+    \textbf{Forma general:}
+    \[\min_{x} x^T Q x - a^T x\]
+    \[\text{s.a. } Ax \leq b, \quad x \geq 0\]
+\end{frame}
+    
+\begin{frame}{Ejemplo: Asignación de presupuesto en medios}
+    \textbf{Contexto:} Un estudio de televisión quiere distribuir 100 unidades de presupuesto entre tres canales.
+    
+    \vspace{0.3cm}
+    
+    \textbf{Impacto lineal:} $a^T x = 5x_1 + 4x_2 + 3x_3$
+    
+    \textbf{Penalización cuadrática:} Por rendimientos decrecientes y canibalización
+        \[Q=\begin{pmatrix}
+        0.04 & 0.01 & 0    \\
+        0.01 & 0.05 & 0.005\\
+        0    & 0.005& 0.03
+        \end{pmatrix}\]
+    
+    \textbf{Restricciones:}
+    \begin{itemize}
+        \item $x_1 + x_2 + x_3 = 100$
+        \item $10 \leq x_1 \leq 60$, $5 \leq x_2 \leq 60$, $0 \leq x_3 \leq 40$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Función Objetivo QP Expandida}
+    \textbf{Objetivo:} Maximizar impacto neto = impacto lineal - penalización cuadrática
+    
+    \vspace{0.3cm}
+    
+    \textbf{Versión de minimización:} $\min Z(x) = x^T Q x - a^T x$
+    
+    \vspace{0.3cm}
+    
+    \textbf{Forma expandida:}
+    \begin{align*}
+    Z(x) &= 0.04x_1^2 + 0.02x_1x_2 + 0.05x_2^2 \\
+         &\quad + 0.01x_2x_3 + 0.03x_3^2 \\
+         &\quad - 5x_1 - 4x_2 - 3x_3
+    \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]{Resolución QP en Python}
+    \begin{lstlisting}[numbers=left, numbersep=5pt]
+import numpy as np
+from scipy.optimize import minimize
+
+# Datos del QP
+a = np.array([5.0, 4.0, 3.0])  # Impacto lineal
+Q = np.array([
+    [0.04, 0.01, 0.00],
+    [0.01, 0.05, 0.005],
+    [0.00, 0.005, 0.03]
+], dtype=float)
+
+def Z(x):
+    return float(x @ Q @ x - a @ x)
+
+restricciones = [
+    {'type': 'eq', 'fun': lambda x: 100.0 - (x[0] + x[1] + x[2])}
+]
+bounds = [(10.0, 60.0), (5.0, 60.0), (0.0, 40.0)]
+
+x0 = np.array([40.0, 30.0, 30.0])
+res = minimize(Z, x0, method='SLSQP', bounds=bounds, 
+               constraints=restricciones)
+
+if res.success:
+    x1_opt, x2_opt, x3_opt = res.x
+    impacto_neto = a @ res.x - res.x @ Q @ res.x
+    print(f'TV: {x1_opt:.2f}, Online: {x2_opt:.2f}, Radio: {x3_opt:.2f}')
+    print(f'Impacto neto: {impacto_neto:.2f}')
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Optimización Multiobjetivo}
+    \textbf{Problema:} Cuando queremos optimizar varias cosas a la vez que suelen estar en conflicto.
+    
+    \vspace{0.3cm}
+    
+    \textbf{Ejemplos:}
+    \begin{itemize}
+        \item Minimizar costo, tiempo y emisiones
+        \item Maximizar ganancia y minimizar contaminación
+        \item Maximizar retorno y minimizar riesgo
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Solución:} Buscar el frente de Pareto (conjunto de opciones eficientes donde ninguna es mejor en todo al mismo tiempo).
+    
+    \vspace{0.3cm}
+    
+    \textbf{Métodos:} Suma ponderada (weighted sum), $\epsilon$-constraint, Programación por metas, Metaheurísticas (algoritmos genéticos, etc.)
+    
+\end{frame}
+
+\begin{frame}{Frentes de Pareto}
+    \textbf{Definición:} Conjunto de opciones donde ninguna es mejor en todo al mismo tiempo.
+    
+    \vspace{0.3cm}
+    
+    \textbf{Ejemplos cotidianos:}
+    \begin{itemize}
+        \item \textbf{Celular:} Mejor cámara vs precio más bajo
+        \item \textbf{Ruta:} Más rápida vs sin peajes
+        \item \textbf{Dieta:} Más sana vs más barata
+    \end{itemize}
+    
+    \vspace{0.3cm}
+    
+    \textbf{Método Weighted Sum:}
+    \[\min \sum_{i=1}^{n} w_i \cdot f_i(x)\]
+    
+    Donde $w_i$ son los pesos (que suman 1) y $f_i(x)$ son los objetivos normalizados.
+\end{frame}
+
+\begin{frame}{Normalización de Objetivos}
+    \textbf{Problema:} Los objetivos pueden tener escalas muy distintas (costo en millones, tiempo en decenas).
+    
+    \textbf{Solución:} Normalizar los valores:
+    \[f_1^{\text{norm}}(x) = \frac{f_1(x) - f_1^{\min}}{f_1^{\max} - f_1^{\min}}\]
+    \[f_2^{\text{norm}}(x) = \frac{f_2(x) - f_2^{\min}}{f_2^{\max} - f_2^{\min}}\]
+    
+    \textbf{Función combinada:}
+    \[f(x) = \alpha \, f_1^{\text{norm}}(x) + (1-\alpha) \, f_2^{\text{norm}}(x), \quad 0 \leq \alpha \leq 1\]
+    
+    \textbf{Proceso:} Generar soluciones factibles, encontrar mín/máx de cada objetivo, normalizar y aplicar weighted sum.
+\end{frame}
+
+\begin{frame}[fragile]{Ejemplo Multiobjetivo en Python}
+    \begin{lstlisting}[numbers=left, numbersep=5pt]
+# Puntos iniciales para normalizacion
+initial_points = [[10,5],[50,30],[80,15],[20,70],[60,20]]
+f1_vals = np.array([f1(x) for x in initial_points])
+f2_vals = np.array([f2(x) for x in initial_points])
+f1_min, f1_max = f1_vals.min(), f1_vals.max()
+f2_min, f2_max = f2_vals.min(), f2_vals.max()
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Weighted sum para distintos alphas}
+    \begin{lstlisting}[numbers=left, numbersep=5pt]
+# Weighted sum para distintos alphas
+alphas = np.linspace(0,1,11)
+pareto_points = []
+
+for alpha in alphas:
+    def weighted(x):
+        f1_val = f1(x)
+        f2_val = f2(x)
+        f1_norm = (f1_val - f1_min)/(f1_max - f1_min) if f1_max!=f1_min else 0
+        f2_norm = (f2_val - f2_min)/(f2_max - f2_min) if f2_max!=f2_min else 0
+        return alpha*f1_norm + (1-alpha)*f2_norm
+
+    x0 = [50, 25]  # punto inicial factible
+    res = minimize(weighted, x0=x0, bounds=bounds, constraints=cons, method='SLSQP')
+    if res.success:
+        pareto_points.append([res.x[0], res.x[1], -f1(res.x), f2(res.x)])
+
+pareto_points = np.array(pareto_points)
+    \end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Visualizar frente de Pareto}
+    \begin{lstlisting}[numbers=left, numbersep=5pt]
+# Visualizar frente de Pareto
+plt.scatter(pareto_points[:,2], pareto_points[:,3], c='red', label='Frente de Pareto')
+plt.xlabel("Retorno")
+plt.ylabel("Riesgo")
+plt.title("Frente de Pareto: Inversion A y B")
+plt.legend()
+plt.show()
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Decisión Final}
+    \textbf{Importante:} En optimización multiobjetivo la máquina solo encuentra las soluciones óptimas para un criterio ponderado.
+    
+    \vspace{0.5cm}
+    
+    \textbf{La elección final depende de la decisión del negocio:}
+    \begin{itemize}
+        \item ¿Más ganancia aunque haya más contaminación?
+        \item ¿Menos contaminación aunque haya menos ganancia?
+        \item ¿Qué tanto puedo ganar contaminando en el borde de lo que dice la ley?
+    \end{itemize}
+    
+    \vspace{0.5cm}
+
+    El solver solo te da todos los posibles trade-offs para distintos $\alpha$ y calcula los valores de las variables que minimizan la función ponderada. La decisión final la tiene un humano.
+    
+\end{frame}
+
+\begin{frame}{Terminamos}
+    \begin{center}
+        \Large{\textbf{¿Dudas?\\¿Consultas?}}
+    \end{center}
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south,inner sep=30pt] at (current page.south) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\end{document}
