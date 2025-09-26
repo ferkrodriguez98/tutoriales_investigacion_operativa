@@ -1263,28 +1263,42 @@ Costo total = 1190.0
 \begin{itemize}
 \item Variables: $x_{ij}$ = unidades enviadas de planta $i$ a warehouse $j$, $y_{jk}$ = unidades enviadas de warehouse $j$ a local $k$
 \item Función objetivo: Min $Z = \sum_{i=1}^2 \sum_{j=1}^2 c_{ij}x_{ij} + \sum_{j=1}^2 \sum_{k=1}^3 d_{jk}y_{jk}$
-\item Restricciones de balance y capacidad
+\item Restricciones de capacidad de producción, transporte, balance en warehouses y demanda.
 \end{itemize}
 
 \textbf{Código de resolución en PICOS:}
 \begin{lstlisting}[language=Python]
 P = picos.Problem()
 
-# Costos de transporte planta-warehouse y warehouse-local
+# Costos de transporte planta-warehouse (de la consigna)
 c_planta_warehouse = np.array([
     [425, 560],  # Planta 1
     [510, 600]   # Planta 2
 ])
 
+# Costos warehouse-local (de la consigna)
 c_warehouse_local = np.array([
-    [100, 150, 200],  # Warehouse 1
-    [120, 180, 160]   # Warehouse 2
+    [470, 505, 490],  # Warehouse 1
+    [390, 410, 440]   # Warehouse 2
 ])
 
-# Capacidades
+# Capacidades de plantas
 cap_planta = [200, 300]
-cap_warehouse = [125, 150, 175, 200]  # [w1_planta1, w1_planta2, w2_planta1, w2_planta2]
-demanda = [100, 150, 200]  # locales
+
+# Capacidades de transporte planta-warehouse (de la consigna)
+cap_planta_warehouse = np.array([
+    [125, 150],  # Planta 1
+    [175, 200]   # Planta 2
+])
+
+# Capacidades de transporte warehouse-local (de la consigna)
+cap_warehouse_local = np.array([
+    [100, 150, 100],  # Warehouse 1
+    [125, 150, 75]    # Warehouse 2
+])
+
+# Demanda (de la consigna)
+demanda = [150, 200, 150]
 
 # Variables
 x = picos.RealVariable('x', (2,2))  # planta a warehouse
@@ -1294,11 +1308,15 @@ y = picos.RealVariable('y', (2,3))  # warehouse a local
 for i in range(2):
     P.add_constraint(picos.sum(x[i,j] for j in range(2)) <= cap_planta[i])
 
-# Restricciones de capacidad de warehouses
-P.add_constraint(x[0,0] <= 125)  # planta 1 a warehouse 1
-P.add_constraint(x[1,0] <= 175)  # planta 2 a warehouse 1
-P.add_constraint(x[0,1] <= 150)  # planta 1 a warehouse 2
-P.add_constraint(x[1,1] <= 200)  # planta 2 a warehouse 2
+# Restricciones de capacidad de transporte planta-warehouse
+for i in range(2):
+    for j in range(2):
+        P.add_constraint(x[i,j] <= cap_planta_warehouse[i,j])
+
+# Restricciones de capacidad de transporte warehouse-local
+for j in range(2):
+    for k in range(3):
+        P.add_constraint(y[j,k] <= cap_warehouse_local[j,k])
 
 # Restricciones de balance en warehouses
 for j in range(2):
@@ -1338,14 +1356,16 @@ Solucion optima:
 Planta a Warehouse:
 x[1,1] = 125.0
 x[1,2] = 75.0
-x[2,1] = 175.0
-x[2,2] = 75.0
+x[2,1] = 125.0
+x[2,2] = 175.0
 Warehouse a Local:
 y[1,1] = 100.0
-y[1,2] = 150.0
-y[1,3] = 50.0
-y[2,3] = 150.0
-Costo total = 295875.0
+y[1,2] = 50.0
+y[1,3] = 100.0
+y[2,1] = 50.0
+y[2,2] = 150.0
+y[2,3] = 50.0
+Costo total = 488125.0
 \end{lstlisting}
 
 \subsection{Problema de Transporte 3: El regreso del transporte}
