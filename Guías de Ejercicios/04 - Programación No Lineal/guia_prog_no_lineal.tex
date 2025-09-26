@@ -60,7 +60,9 @@
 
 Si encuentran algún error en el documento o hay alguna duda, mandenmé un mail a rodriguezf@udesa.edu.ar y lo revisamos.
 
-\section{Optimización Irrestricta}
+\section{Ejercicios}
+
+\section*{Optimización Irrestricta}
 
 \subsection{Visualización de Funciones con Python}
 
@@ -83,7 +85,7 @@ Sea $c(x)$ el costo total de producir una cantidad $x$ de unidades de un cierto 
 
 \subsection{Descuentos por grandes volúmenes }
 
-Una empresa de software necesita publicitar su nuevo desarrollo. A tal fin, ofrece un descuento por volúmenes grandes de compras. El lanzamiento inicial requiere de \$ 100.000 y el costo variable por habilitar usuarios es de \$ 3500 por unidad vendida. El descuento se manifiesta en un función de precio que depende de las unidades vendidas y que se estima como $p(x) = 8000 - 500x$.
+Una empresa de software necesita publicitar su nuevo desarrollo. A tal fin, ofrece un descuento por volúmenes grandes de compras. El lanzamiento inicial requiere de \$ 75.000 y el costo variable por habilitar usuarios es de \$ 350 por unidad vendida. El descuento se manifiesta en un función de precio que depende de las unidades vendidas y que se estima como $p(x) = 15000 - 500x$.
 \begin{itemize}
     \item[a)] Escriba la función costos y la función ingresos.
     \item[b)] Escriba la función ganancias totales de la empresa.
@@ -137,16 +139,7 @@ Determine el precio \'{o}ptimo al que el minorista debe vender el tel\'{e}fono p
     \item[c)] Chequee su respuesta con Python y haga un gráfico donde se vean los puntos y la solución óptima.
 \end{itemize}
 
-\subsection{Zonas de tránsito en eventos masivos}
-
-Se quiere realizar un concierto en un predio y se quiere diseñar las zonas de tránsito para el público. Los organizadores reciben de parte de los dueños del predio que la zona permitida para el tránsito de peatones debe ser en forma de triangulo isósceles, por detrás de los escenarios. Los lados iguales del triángulo los llamamos $a$ y el lado restante es $b$. 
-\begin{itemize}
-    \item[a)] Escriba el área del triangulo en función de los lados $a$ y $b$, sabiendo que el área de un triangulo se calcula como $A = \frac{\text{base}\times\text{altura}}{2}$. \textit{Ayuda: use el teorema de Pitágoras para calcular la altura.}
-    \item[b)] Calcule el gradiente de la función area y halle analíticamente los valores de $a$ y $b$ que maximizan la zona de tránsito.
-    \item[c)] Mediante un código en Python, realice un gráfico que permita mostrar al público dónde podrá transitar.
-\end{itemize}
-
-\section{Teoría de funciones Convexas y Cóncavas}
+\section*{Teoría de Funciones Convexas y Cóncavas}
 
 \subsection{Determinación de concavidad/convexidad}
 
@@ -171,7 +164,7 @@ Halle la matriz hessiana de las siguientes funciones, así como sus menores prin
     \item[d)] $f(x,y) = -x^2 -3xy+2y^2$
 \end{itemize}
 
-\section{Condiciones KKT}
+\section*{Condiciones KKT}
 
 \subsection{Inversión en Publicidad}
 
@@ -188,43 +181,14 @@ utilice las condiciones KKT para hallar analíticamente el valor óptimo de inve
 
 Una empresa contrata un equipo econométrico para que realice un análisis de la empresa. En particular, se quiere conocer que pasa con la relación entre el gasto en herramientas de eficiencia, las horas de trabajo invertidas por los trabajadores  y la productividad de los mismos. Esta última se relaciona con las anteriores según la formula:
 \begin{equation*}
-    P(H,L) = 1.47  E^{1/2} H^{-1}
+    P(H,L) = 1.47  E^{1/2} H
 \end{equation*}
 
 Se sabe tambien que la suma de la inversión en eficiencia sumada a la tarifa por hora de trabajo sigue la relación $E + 1.17 H \leq 2.4$. Halle el valor óptimo de inversión y horas de labor por trabajador que maximicen la productividad.
 
-\section{Programación Cuadrática. Cuadrados Mínimos.}
+\section*{Programación Cuadrática}
 
-\subsection{Programación cuadrática: caso unidimensional}
-
-Considere el problema
-\[
-\min_{0 \le x \le 1} \; f(x) = \tfrac{1}{2} q x^2 + c x,\quad q=4,\; c=-3.
-\]
-\begin{itemize}
-    \item[a)] Calcule $f'(x)$ y justifique si $f$ es convexa.
-    \item[b)] Halle el candidato interior resolviendo $f'(x)=0$ y proyecte al intervalo $[0,1]$ si es necesario.
-    \item[c)] Reporte $x^*$ y $f(x^*)$ y verifique con un pequeño barrido en Python.
-\end{itemize}
-
-\subsection{Cuadrados mínimos: recta que pasa por el origen}
-
-Se desea ajustar el modelo $y \approx b x$ a los siguientes datos:
-\begin{center}
-\begin{tabular}{cccc}
-\toprule
-$x$ & 1 & 2 & 3 \\
-$y$ & 0.9 & 2.1 & 3.2 \\
-\bottomrule
-\end{tabular}
-\end{center}
-\begin{itemize}
-    \item[a)] Plantee el problema de mínimos cuadrados: $\min_b \sum_i (y_i - b x_i)^2$.
-    \item[b)] Derive la solución cerrada $\hat b = \dfrac{\sum_i x_i y_i}{\sum_i x_i^2}$ y calcúlela para los datos.
-    \item[c)] Grafique en Python los puntos y la recta $y=\hat b x$.
-\end{itemize}
-
-\subsection{Programación cuadrática: selección de cartera}
+\subsection{Programación Financiera}
 
 Un analista desea asignar proporciones $x = (x_1, x_2, x_3)$ en tres activos. La varianza de la cartera está dada por $x^\top Q x$ con
 \[
@@ -242,22 +206,136 @@ y se busca minimizar el riesgo penalizado por retorno, $\tfrac{1}{2} x^\top Q x 
     \item[d)] Verifique numéricamente en Python la solución y reporte $x^*$ y el valor óptimo.
 \end{itemize}
 
-\subsection{Cuadrados mínimos: ajuste lineal}
+\subsection{Planeación Industrial}
 
-Se observa la relación entre una variable explicativa $x$ y una respuesta $y$. Se registraron los siguientes datos:
-\begin{center}
-\begin{tabular}{cccccc}
-\toprule
-$x$ & 1 & 2 & 3 & 4 & 5 \\
-$y$ & 1.4 & 1.9 & 3.2 & 3.9 & 5.1 \\
-\bottomrule
-\end{tabular}
-\end{center}
+Una planta fabrica tres tipos de componentes: A, B, C. El costo a los niveles de producción de cada producto se puede modelar con una función cuadrática:
+\begin{equation*}
+    C(x_1, x_2, x_3) = 3x_1^2 + 2x_1 x_2 + 2x_2^2+x_2 x_3 + 2x_3^2 - 8x_1 - 3x_2 - 3x_3
+\end{equation*}
+Por motivos contractuales, se debe cumplir con al menos una producción de 3 millones de unidades, contando los 3 productos. El cliente pide que al menos un 30\% de la producción total sea del producto B. Escriba un código en Python que permita resolver el problema y reporte el valor óptimo de los niveles de producción y el costo esperado.
+
+\subsection{Asignación en Centro Logístico}
+
+Un centro logístico debe asignar personal a tres áreas: Recepción (\(x_1\)), Almacenamiento (\(x_2\)) y Despacho (\(x_3\)). El coste operativo (en miles de dolares) se modela por
+\[
+C(x)=\tfrac12 x^\top Q x + c^\top x,
+\]
+con
+\[
+Q=\begin{pmatrix}3&-1&0\\[4pt]-1&4&1\\[4pt]0&1&2\end{pmatrix},\qquad
+c=\begin{pmatrix}0\\[4pt]-2\\[4pt]-1\end{pmatrix},
+\]
+sujeto a las restricciones (en decenas de personas):
+\[
+\begin{cases}
+x_1+x_3=2,\\[4pt]
+x_2+x_3=2.
+\end{cases}
+\]
+Encuentre la asignación óptima de personal que minimiza los costos de la empresa.
+
+\newpage
+
+\section{Soluciones}
+
+\subsection{Visualización de Funciones con Python}
+
+\textbf{Derivadas:}
 \begin{itemize}
-    \item[a)] Plantee el problema de mínimos cuadrados para el modelo $y \approx a + b x$: \(\min_{a,b} \sum_{i=1}^5 (y_i - a - b x_i)^2\). Escríbalo en forma matricial y como problema cuadrático en la variable $\beta=(a,b)$.
-    \item[b)] Derive las ecuaciones normales y obtenga la solución cerrada $\hat\beta = (X^\top X)^{-1} X^\top y$ para estos datos.
-    \item[c)] Calcule $\hat a, \hat b$ y reporte el error cuadrático mínimo. Grafique datos y recta ajustada en Python.
+    \item[a)] $f'(x) = e^{-x} (1-x)$, $f''(x) = -e^{-x} (2-x)$. 
+    \item[b)] $f'(x) = \frac{2 x}{x^2+1}-\frac{2 x^3}{\left(x^2+1\right)^2}$, $f''(x) = \frac{2}{x^2 +1} - \frac{10x^2}{(x^2+1)^2} + \frac{8x^4}{(x^2 + 1)^3}$
+    \item[c)] $f'(x) = 3e^{3x}$, $f''(x) = 9e^{3x}$
+    \item[d)] $f'(x) = -2(3x+2)^{-3}$, $f''(x) = 6(3x+2)^{-4}$
 \end{itemize}
 
+\subsection{Curva de aprendizaje del costo}
+
+\begin{itemize}
+    \item[a)] $c_u (x) = kx^{-b}$
+    \item[b)] $c'(x) = (1-b) c_u(x)$, $c_u ' (x) = -kbx^{-(1+b)}$
+    \item[c)] $c_u ' (x) < 0 $ si y sólo si $x>0$. Esto es que el costo decrece a medida que aumenta las cantidades producidas. Se traduce en la experiencia de los trabajadores.
+\end{itemize}
+
+\subsection{Descuentos por grandes volúmenes}
+
+\begin{itemize}
+    \item[a)] Ingresos = $15000x - 500x^2$
+    \item[b)] Costos = $75000 + 350x$
+    \item[c)] $\mathcal{Z}$ = Ingresos - Costos = $-500x^2 + 14650x - 75000$
+    \item[d)] $\mathcal{Z}' = 0 \Longleftrightarrow x = 14.65$
+\end{itemize}
+
+\subsection{Programación Financiera}
+
+\begin{itemize}
+    \item[a)] $g(x) = x (0.3 - 0.2 \ln x)$
+    \item[b)] Ganancias positivas entre $[0, \cong 1.65)$ y ganancias negativas para $ x > 1.65$
+    \item[c)] $g''(x_{opt} = e^{0.5}) < 0$, por lo tanto la función es cóncava y tiene un máximo global.
+\end{itemize}
+
+\subsection{Optimización de precios}
+
+\begin{itemize}
+    \item Precio óptimo: $p = 200$ dólares
+    \item Beneficio máximo: $I = 20000$ miles de dólares
+\end{itemize}
+
+\subsection{Localización de almacén}
+
+\begin{itemize}
+    \item[a)] $\mathcal{Z} = \sum_{i=1}^2 d(P,S_i)^2 =  (x-5)^2 + (x-10)^2 + (x-12)^2 + (y-10)^2 + (y-5)^2 + (y-12)^2 + x^2 + y^2$
+    \item[b)] $x = 6.75$, $y = 6.25$
+\end{itemize}
+
+\section*{Teoría de Funciones Convexas y Cóncavas}
+
+\subsection{Determinación de concavidad/convexidad}
+
+\begin{itemize}
+    \item[a)] $f''(x) = 2 > 0 \forall \mathbb{R}$. Entonces, es convexa en todo su dominio y tiene un mínimo global en $x = 0$
+    \item[b)] $f''(x) = e^{x} (x^2 + 4x + 2)$ que es positiva para cualquier valor de x. Se puede chequear gráfica o analíticamente.
+    \item[c)] $f''(x) = 18 x$, es convexa si $x >0$ y cóncava si $x < 0$
+    \item[d)] $f''(x) = \frac{1}{x}$ es siempre positiva pues $ x > 0$ para que exista (viene del logaritmo).
+    \item[e)] $f''(x) = 4 > 0$, es convexa en todo su dominio.
+    \item[f)] $f''(x) = -\frac{1}{4}(x+1)^{-3/2} < 0$ para $x > -1$, es cóncava en su dominio.
+\end{itemize}
+
+\subsection{Matriz Hessiana}
+
+\begin{itemize}
+    \item[a)] $\begin{pmatrix} 4 & 2 \\ 2 & 0 \end{pmatrix}$, $D_1 = 4$, $D_2 = -4$. No es definida positiva ni negativa.
+    \item[b)] $\begin{pmatrix} -2 & -1 \\ -1 & -4 \end{pmatrix}$, $D_1 = -2$, $D_2 = 7$. Los líderes alternan signo, por lo que es cóncava y por lo tanto tiene un máximo.
+    \item[c)] $\begin{pmatrix} 2+4y & 4x-2 \\ 4x-2 & 2 \end{pmatrix}$, $D_1 = 2+4y$ es positivo solo si $y > -1/2$. Para todos los demás es negativo. En el caso de $D_2 = 4 + 8y - 16x^2 + 16x$. En este caso, no podemos determinar bien la concavidad o convexidad sin analizar numéricamente los líderes.
+    \item[d)] $\begin{pmatrix} -4 & -3 \\ -3 & 4 \end{pmatrix}$, $D_1 = -4$, $D_2 = -7$. En este caso, no estamos bajo los aspectos de ningún criterio. La matriz está indefinida y el punto puede ser silla, máximo o mínimo dependiendo desde dónde nos acercamos. La llamamos no convexa.
+\end{itemize}
+
+\section*{Condiciones KKT}
+
+\subsection{Inversión en Publicidad}
+
+Una vez obtenido el valor óptimo de inversión en ventas, se tiene que la ganancia por la inversión es:
+\begin{equation}
+   \text{ganancia} = 25.000 V_1(x_1^{*}) + 150.000 V_2(x_2^{*}) 
+\end{equation}
+
+\subsection{Curva de Cobb-Douglas}
+
+$u_1 = 1.17$, $H^{*} = 1.36$, $E^{*} = 0.8$
+
+\section*{Programación Cuadrática}
+
+\subsection{Programación Financiera}
+
+\begin{itemize}
+    \item [a)]  $F(x_1,x_2,x_3)= 0.020x_1^2+0.0125x_2^2+0.018x_3^2 +0.010x_1x_2+0.012x_1x_3+0.008x_2x_3 -0.28x_1-0.20x_2-0.24x_3.$ 
+    \item[b)] Los tres menores líderes son positivos por lo que la matriz Q es definida positiva. La parte cuadrática es estrictamente convexa, por lo que tiene un mínimo. 
+    \item[c)] El valor óptimo es $x^{*} = (1,0,0)$ y el retorno es de pérdida en $F(x^{*}) = -0.26$
+\end{itemize}
+
+\subsection{Planeación Industrial}
+
+$x^{*} = (1.66;0.29;1.05)$
+
+\subsection{Asignación en Centro Logístico}
 
 \end{document}
