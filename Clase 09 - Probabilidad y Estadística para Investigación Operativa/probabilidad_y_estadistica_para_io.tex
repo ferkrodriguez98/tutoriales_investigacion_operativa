@@ -1,45 +1,61 @@
 \documentclass[12pt]{article}
-\usepackage[spanish]{babel}
+
 \usepackage[utf8]{inputenc}
-\usepackage{amsmath, amssymb}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{forest}
+\usepackage{float}
 \usepackage{listings}
 \usepackage{xcolor}
-\usepackage{float}
-\usepackage{placeins}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
 \usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{siunitx}
 
-\definecolor{lightgray}{rgb}{0.95,0.95,0.95}
-\definecolor{darkgreen}{rgb}{0,0.5,0}
-\definecolor{darkblue}{rgb}{0,0,0.5}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
-\lstset{
-  backgroundcolor=\color{lightgray},
-  basicstyle=\ttfamily\footnotesize,
-  keywordstyle=\color{darkblue}\bfseries,
-  commentstyle=\color{darkgreen},
-  stringstyle=\color{red},
-  numbers=left,
-  numberstyle=\tiny\color{gray},
-  stepnumber=1,
-  numbersep=5pt,
-  showspaces=false,
-  showstringspaces=false,
-  showtabs=false,
-  frame=single,
-  tabsize=2,
-  language=Python,
-  breaklines=true,
-  breakatwhitespace=true
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
 }
 
+\lstset{style=mystyle}
+
+\sloppy
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{1em}
 
 \begin{document}
 
 \begin{center}
-    {\LARGE \textbf{Repaso de Probabilidad}}\\[0.5em]
-    {Investigación Operativa, Universidad de San Andrés}
+  {\LARGE \textbf{Probabilidad y Estadística para I.O.}}\\[0.5em]
+  {Investigación Operativa, Universidad de San Andrés}
 \end{center}
 
 \vspace{0.5cm}
@@ -234,6 +250,57 @@ sigma = 15    # Desviacion estandar
 # Probabilidad de incumplir contrato: P(X > 100)
 prob_incumplimiento = 1 - norm.cdf(100, loc=mu, scale=sigma)
 print(f"Probabilidad de incumplimiento del contrato: {prob_incumplimiento:.4f}")
+\end{lstlisting}
+
+\subsection{Ejemplo 4: Binomial Negativa y fallas}
+
+Una máquina tiene una probabilidad del 5\% de fallar en cada operación. Se necesita que la máquina complete exitosamente 10 operaciones antes de que falle por tercera vez. \textbf{¿Cuál es la probabilidad de que esto ocurra?}
+
+\begin{itemize}
+    \item Número de éxitos requeridos: $r = 10$
+    \item Probabilidad de éxito: $p = 0.95$
+    \item Variable aleatoria: $X \sim \text{Binomial Negativa}(10, 0.95)$
+    \item Queremos calcular: $P(X \leq 2)$ (máximo 2 fallas antes del éxito 10)
+\end{itemize}
+
+\textbf{Resolución:}
+
+La distribución binomial negativa cuenta el número de fallas antes de obtener $r$ éxitos. La probabilidad de obtener exactamente $k$ fallas antes de $r$ éxitos es:
+\[
+P(X = k) = \binom{k + r - 1}{k} p^r (1-p)^k
+\]
+
+Para este caso:
+\[
+r = 10, \quad p = 0.95
+\]
+
+Calculamos:
+\[
+P(X = 0) = \binom{9}{0} (0.95)^{10} (0.05)^0 \approx 0.599
+\]
+\[
+P(X = 1) = \binom{10}{1} (0.95)^{10} (0.05)^1 \approx 0.315
+\]
+\[
+P(X = 2) = \binom{11}{2} (0.95)^{10} (0.05)^2 \approx 0.074
+\]
+\[
+P(X \leq 2) \approx 0.599 + 0.315 + 0.074 = 0.988
+\]
+
+\textbf{Resolución en Python:}
+
+\begin{lstlisting}[language=Python]
+from scipy.stats import nbinom
+
+# Parametros
+r = 10       # Numero de exitos requeridos
+p = 0.95     # Probabilidad de exito
+
+# Probabilidad de completar 10 operaciones con maximo 2 fallas
+prob_exito = nbinom.cdf(2, r, p)
+print(f"Probabilidad de completar 10 operaciones con maximo 2 fallas: {prob_exito:.4f}")
 \end{lstlisting}
 
 \section{Simulaciones: Método de Monte Carlo}

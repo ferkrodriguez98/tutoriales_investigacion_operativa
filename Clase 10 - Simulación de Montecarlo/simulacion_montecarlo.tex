@@ -1,0 +1,335 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{forest}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\sloppy
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE \textbf{Simulación de Montecarlo}}\\[0.5em]
+  {Investigación Operativa, Universidad de San Andrés}
+\end{center}
+
+Si encuentran algún error en el documento o hay alguna duda, mandenmé un mail a rodriguezf@udesa.edu.ar y lo revisamos.
+
+\section{¿Qué es?}
+
+La simulación de Montecarlo es una técnica que usa números aleatorios para resolver problemas. Básicamente, en lugar de resolver algo de forma analítica (que a veces es imposible), generamos miles de escenarios aleatorios y vemos qué pasa en promedio. El proceso es simple:
+\begin{itemize}
+    \item Identificamos qué variables son aleatorias en nuestro problema
+    \item Generamos miles de valores aleatorios para cada variable
+    \item Ejecutamos nuestro modelo para cada combinación de valores
+    \item Analizamos los resultados estadísticamente
+\end{itemize}
+
+Por ejemplo, si queremos saber cuánto inventario pedir pero la demanda es incierta, simulamos 10000 escenarios con demandas aleatorias y vemos cuál es la cantidad que nos da mejor resultado en promedio. La clave está en que cada escenario es una ``realización'' de lo que podría pasar. Si simulamos 10000 veces, tenemos 10000 versiones diferentes de la realidad. Al final, promediamos todos los resultados y obtenemos una estimación de lo que esperamos que pase.
+
+\vspace{1em}
+
+¿Por qué funciona? Porque si generamos suficientes escenarios aleatorios, la ley de los grandes números nos dice que el promedio de nuestros resultados se va a acercar al valor esperado real del problema.
+
+\section{Distribuciones que usamos}
+
+Las más comunes son:
+
+\begin{itemize}
+    \item \textbf{Uniforme:} $U(0,1)$ - Genera valores equiprobables entre 0 y 1.
+    \item \textbf{Normal:} $N(\mu, \sigma^2)$ - Para cosas como demanda, tiempos, etc. Es la más común porque muchas variables en la vida real siguen esta distribución (o se aproximan).
+    \item \textbf{Exponencial:} $Exp(\lambda)$ - Para tiempos entre llegadas. Si los eventos llegan de forma aleatoria e independiente, los tiempos entre llegadas son exponenciales.
+    \item \textbf{Poisson:} $Pois(\lambda)$ - Para contar eventos (clientes que llegan). Si los tiempos entre llegadas son exponenciales, entonces el número de llegadas en un período fijo es Poisson.
+    \item \textbf{Binomial:} $Bin(n,p)$ - Para éxitos/fracasos. Cada ensayo es independiente y tiene la misma probabilidad de éxito.
+    \item \textbf{Binomial Negativa:} $NB(r,p)$ - Para contar fallas antes de obtener $r$ éxitos. Útil para modelar tiempos hasta el fallo o número de intentos hasta el éxito.
+\end{itemize}
+
+\vspace{1em}
+
+¿Cómo elegimos qué distribución usar? Depende del problema:
+\begin{itemize}
+    \item Si no sabemos nada, empezamos con normal
+    \item Si es tiempo entre eventos, exponencial
+    \item Si es conteo de eventos, Poisson
+    \item Si es sí/no, binomial
+    \item Si es número de fallas antes del éxito, binomial negativa
+\end{itemize}
+
+\section{Ejemplo: ¿Cuánto inventario pedir?}
+
+Tenemos que decidir cuántas unidades pedir cada mes. La demanda es incierta: en promedio se venden 100 unidades pero puede variar (desviación estándar de 20). Los costos son:
+\begin{itemize}
+    \item Comprar: \$50 por unidad
+    \item Guardar inventario: \$5 por unidad por mes
+    \item Quedarse sin stock: \$100 por unidad que no pudimos vender
+\end{itemize}
+
+El problema es que si pedimos poco, nos quedamos sin stock y perdemos ventas. Si pedimos mucho, nos sobra inventario y pagamos costos de almacenamiento. Necesitamos encontrar el punto óptimo.
+
+\vspace{1em}
+
+La idea es probar diferentes cantidades (60, 65, 70, ..., 140 unidades) y para cada una simular 10000 meses con demandas aleatorias. Calculamos el costo total de cada escenario y promediamos. La cantidad que nos dé el menor costo promedio es la óptima.
+
+\vspace{1em}
+
+\textbf{Resolución en Python:}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+import matplotlib.pyplot as plt
+
+def simulacion_inventario(n_simulaciones=10000):
+    # Parametros del problema
+    media_demanda = 100
+    desvio_demanda = 20
+    costo_compra = 50
+    costo_almacenamiento = 5
+    costo_stockout = 100
+    
+    # Rango de cantidades a evaluar
+    cantidades = range(60, 141, 5)
+    costos_promedio = []
+    
+    for Q in cantidades:
+        costos_totales = []
+        
+        for _ in range(n_simulaciones):
+            # Generar demanda aleatoria
+            demanda = max(0, np.random.normal(media_demanda, desvio_demanda))
+            
+            # Calcular costos
+            costo_total = Q * costo_compra
+            
+            if demanda <= Q:
+                # Hay inventario sobrante
+                inventario_sobrante = Q - demanda
+                costo_total += inventario_sobrante * costo_almacenamiento
+            else:
+                # Hay stockout
+                stockout = demanda - Q
+                costo_total += stockout * costo_stockout
+            
+            costos_totales.append(costo_total)
+        
+        costos_promedio.append(np.mean(costos_totales))
+    
+    return cantidades, costos_promedio
+
+# Ejecutar simulacion
+cantidades, costos = simulacion_inventario()
+
+# Encontrar cantidad optima
+indice_optimo = np.argmin(costos)
+cantidad_optima = cantidades[indice_optimo]
+costo_optimo = costos[indice_optimo]
+
+print(f"Cantidad optima: {cantidad_optima} unidades")
+print(f"Costo promedio optimo: ${costo_optimo:.2f}")
+
+# Graficar resultados
+plt.plot(cantidades, costos, 'b-', linewidth=2)
+plt.axvline(cantidad_optima, color='r', linestyle='--', 
+           label=f'Optimo: {cantidad_optima} unidades')
+plt.xlabel('Cantidad a pedir (Q)')
+plt.ylabel('Costo promedio total')
+plt.title('Optimizacion de Inventario - Simulacion Montecarlo')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+\end{lstlisting}
+
+\section{Ejemplo: ¿Vale la pena el proyecto?}
+
+Queremos evaluar un proyecto de inversión pero hay mucha incertidumbre:
+\begin{itemize}
+    \item Inversión inicial: puede ser \$100000 pero puede variar ±\$10000
+    \item Flujo de caja anual: esperamos \$30000 pero puede variar ±\$5000
+    \item Tasa de descuento: entre 8\% y 12\%
+    \item Duración del proyecto: entre 5 y 10 años (más probable 8 años)
+\end{itemize}
+El problema es que no sabemos exactamente cuánto va a costar el proyecto, cuánto vamos a ganar cada año, ni cuánto va a durar. Si calculamos el VPN con valores fijos, nos perdemos toda la incertidumbre.
+
+\vspace{1em}
+
+La simulación nos permite generar 10000 escenarios diferentes, cada uno con valores aleatorios para todas las variables. Calculamos el VPN de cada escenario y vemos la distribución de resultados. Así sabemos no solo el VPN esperado, sino también qué tan riesgoso es el proyecto.
+
+\vspace{1em}
+
+\textbf{Resolución en Python:}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import triang
+
+def simulacion_proyecto(n_simulaciones=10000):
+    np.random.seed(42)
+    
+    # Parametros de las distribuciones
+    inv_media, inv_std = 100000, 10000
+    flujo_media, flujo_std = 30000, 5000
+    tasa_min, tasa_max = 0.08, 0.12
+    
+    # Parametros para distribucion triangular (min, moda, max)
+    vida_min, vida_moda, vida_max = 5, 8, 10
+    
+    vpn_resultados = []
+    
+    for _ in range(n_simulaciones):
+        # Generar valores aleatorios
+        inversion_inicial = np.random.normal(inv_media, inv_std)
+        flujo_anual = np.random.normal(flujo_media, flujo_std)
+        tasa_descuento = np.random.uniform(tasa_min, tasa_max)
+        vida_util = triang.rvs(c=(vida_moda-vida_min)/(vida_max-vida_min), 
+                              loc=vida_min, scale=vida_max-vida_min)
+        
+        # Calcular VPN
+        vpn = -inversion_inicial
+        for anio in range(1, int(vida_util) + 1):
+            vpn += flujo_anual / ((1 + tasa_descuento) ** anio)
+        
+        vpn_resultados.append(vpn)
+    
+    return np.array(vpn_resultados)
+
+# Ejecutar simulacion
+vpn_simulaciones = simulacion_proyecto()
+
+# Calcular estadisticas
+media_vpn = np.mean(vpn_simulaciones)
+std_vpn = np.std(vpn_simulaciones)
+percentil_5 = np.percentile(vpn_simulaciones, 5)
+percentil_95 = np.percentile(vpn_simulaciones, 95)
+prob_rentable = np.mean(vpn_simulaciones > 0)
+
+print(f"VPN promedio: ${media_vpn:,.2f}")
+print(f"Desviacion estandar: ${std_vpn:,.2f}")
+print(f"Percentil 5%: ${percentil_5:,.2f}")
+print(f"Percentil 95%: ${percentil_95:,.2f}")
+print(f"Probabilidad de ser rentable: {prob_rentable:.2%}")
+
+# Graficar distribucion del VPN
+plt.figure(figsize=(10, 6))
+plt.hist(vpn_simulaciones, bins=50, alpha=0.7, color='skyblue', edgecolor='black')
+plt.axvline(media_vpn, color='red', linestyle='--', linewidth=2, label=f'Media: ${media_vpn:,.0f}')
+plt.axvline(0, color='green', linestyle='-', linewidth=2, label='VPN = 0')
+plt.xlabel('Valor Presente Neto ($)')
+plt.ylabel('Frecuencia')
+plt.title('Distribucion del VPN - Simulacion Montecarlo')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+\end{lstlisting}
+
+\section{¿Cómo sabemos que está bien?}
+
+Hay que verificar que los resultados se estabilicen. Si simulamos muy pocas veces, el resultado puede ser muy variable. Si simulamos muchas veces, el resultado se estabiliza.
+
+\vspace{1em}
+
+La idea es hacer una ``media móvil'': calculamos el promedio de los primeros 1000 resultados, luego de los primeros 2000, 3000, etc. Si el promedio se estabiliza (no cambia mucho), entonces sabemos que tenemos suficientes simulaciones.
+
+\vspace{1em}
+
+\begin{lstlisting}[language=Python]
+def verificar_convergencia(resultados, ventana=1000):
+    medias_moviles = []
+    for i in range(ventana, len(resultados)):
+        media_movil = np.mean(resultados[i-ventana:i])
+        medias_moviles.append(media_movil)
+    
+    plt.plot(range(ventana, len(resultados)), medias_moviles)
+    plt.xlabel('Numero de iteraciones')
+    plt.ylabel('Media movil')
+    plt.title('Convergencia de la Simulacion')
+    plt.grid(True, alpha=0.3)
+    plt.show()
+    
+    return medias_moviles
+\end{lstlisting}
+
+\section{Código básico}
+
+\begin{lstlisting}[language=Python]
+# Generar numeros aleatorios
+import numpy as np
+
+# Uniforme - valores entre 0 y 1
+uniforme = np.random.uniform(0, 1, 1000)
+
+# Normal - media 100, desviacion 15
+normal = np.random.normal(100, 15, 1000)
+
+# Exponencial - tasa 2
+exponencial = np.random.exponential(2, 1000)
+
+# Poisson - tasa 5
+poisson = np.random.poisson(5, 1000)
+
+# Binomial - 10 ensayos, probabilidad 0.3
+binomial = np.random.binomial(10, 0.3, 1000)
+
+# Binomial Negativa - 5 exitos requeridos, probabilidad 0.7
+binomial_negativa = np.random.negative_binomial(5, 0.7, 1000)
+
+# Ejemplo simple: calcular el area de un circulo
+def simulacion_montecarlo(n_iteraciones=10000):
+    resultados = []
+    
+    for _ in range(n_iteraciones):
+        # Generar punto aleatorio en cuadrado [-1,1] x [-1,1]
+        x = np.random.uniform(-1, 1)
+        y = np.random.uniform(-1, 1)
+        
+        # Verificar si esta dentro del circulo unitario
+        if x**2 + y**2 <= 1:
+            resultados.append(1)  # Dentro del circulo
+        else:
+            resultados.append(0)  # Fuera del circulo
+    
+    return np.array(resultados)
+
+# Ejecutar simulacion
+resultados = simulacion_montecarlo()
+# El area del circulo es aproximadamente 4 * (promedio de resultados)
+area_estimada = 4 * np.mean(resultados)
+print(f"Area estimada del circulo: {area_estimada:.4f}")
+print(f"Area real: {np.pi:.4f}")
+\end{lstlisting}
+
+\end{document}

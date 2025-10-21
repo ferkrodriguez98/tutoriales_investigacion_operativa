@@ -1,0 +1,470 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{forest}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows,shapes.geometric}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{siunitx}
+
+\geometry{margin=2.5cm}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\sloppy
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+% Texto diagonal "¡RESUELTO!" en rojo como estampa
+\begin{tikzpicture}[remember picture,overlay]
+    \node[rotate=-42.69, text=red, font=\Huge\bfseries, anchor=center, 
+          draw=red, line width=1pt, fill=white!90, 
+          inner sep=8pt, outer sep=0pt, z=1] 
+          at (13.5cm, -2.5cm) {¡RESUELTO PARA USTED!};
+\end{tikzpicture}
+
+\begin{center}
+    {\LARGE \textbf{Exámen Parcial\\[0.5em]Investigación Operativa}}\\[0.5em]
+    {Segundo Semestre 2025}\\[0.5em]
+    {Universidad de San Andrés}
+\end{center}
+
+\vspace{1em}
+
+\textbf{Nombre:} Vincent Vega
+
+\vspace{1em}
+
+\textbf{Pautas de Examen:}
+\begin{itemize}
+    \item Cada problema se puntua sobre un total de 10.
+    \item La nota es el promedio de las notas de los 3 problemas. Este parcial es el 50\% de su nota práctica.
+    \item Es condición necesaria para aprobar tener al menos 4 puntos en cada problema.
+    \item Para todo ejercicio escriba claramente cuales son las variables de decisión, la función objetivo y las restricciones.
+    \item Para todo ejercicio escriba el código de Python correspondiente en su computadora y reporte el resultado de la ejecución (valores de las variables y el valor de la función objetivo).
+\end{itemize}
+
+\section{Programación Lineal}
+
+El empleado LG de cierto emprendimiento botánico debe coordinar la ubicación de productos a tres distintos clientes. Tiene dos proveedores del producto, uno en Escobar y el otro en Pueyrredón, que le venden el producto a distintos valores por unidad. Además, el costo de transporte de cada uno de estos proveedores a los clientes es distinto. Se pueden comprar hasta 21 kilos en Escobar y hasta 13 kilos en Pueyrredón. LG necesita llevar 4, 20 y 6 kilos a cada uno de los clientes Ezequiel, Ignacio y Felipe. Los costos de compra y transporte se resumen en la siguiente tabla.
+
+\vspace{1em}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+ & \multicolumn{3}{c|}{\textbf{\$ de transporte (por kg)}} & \textbf{\$ por kg} \\
+\hline
+ & Ezequiel & Ignacio & Felipe &  \\
+\hline
+Escobar & \$100 & \$190 & \$160 & \$300 \\
+\hline
+Pueyrredón & \$180 & \$110 & \$140 & \$420 \\
+\hline
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+
+\subsection{Planteo}
+
+Para resolverlo vamos a definir variables $x_ij$ que nos dirán la cantidad de producto que se compra a cada proveedor $i$ y se manda al cliente $j$. La función objetivo es de la forma:
+
+\begin{align*}
+    \min Z = \sum_{i=1}^{2} \sum_{j=1}^{3} (c_{ij} + t_{ij}) x_{ij}
+\end{align*}
+
+donde $c_{ij}$ es el costo de compra del producto al proveedor $i$ para el cliente $j$ y $t_{ij}$ es el costo de transporte del producto desde el proveedor $i$ al cliente $j$. Las restricciones son las siguientes:
+
+\begin{align*}
+    \sum_{i=1}^{2} x_{ij} = d_j && \forall j \in \{1, 2, 3\} && \text{(Demanda)} \\
+    \sum_{j=1}^{3} x_{ij} \leq C_i && \forall i \in \{1, 2\} && \text{(Capacidad)}
+\end{align*}
+donde $d_j$ es la demanda del cliente $j$ y $C_i$ es la capacidad del proveedor $i$.
+
+\subsection{Python}
+
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+P = picos.Problem()
+
+# Variables de decision
+x = picos.RealVariable('x', (2, 3), lower=0)
+
+# Costos de compra por proveedor y cliente
+c = np.array([
+    [300, 300, 300],
+    [420, 420, 420]
+])
+# Costos de transporte por proveedor y cliente
+t = np.array([
+    [100, 190, 160],
+    [180, 110, 140]
+])
+
+# Demanda de cada cliente
+d = [4, 20, 6]
+# Capacidad de cada proveedor
+C = [21, 13]
+
+# Funcion objetivo: minimizar costos totales
+P.set_objective('min', picos.sum([
+    (c[i, j] + t[i, j]) * x[i, j]
+    for i in range(2)
+    for j in range(3)
+]))
+
+# Restricciones de demanda
+for j in range(3):
+    P.add_constraint(picos.sum(x[:, j]) == d[j])
+
+# Restricciones de capacidad
+for i in range(2):
+    P.add_constraint(picos.sum(x[i, :]) <= C[i])
+
+P.solve(solver='glpk')
+print(f"x = {x.value}")
+print(f"Z = {P.value}")
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+x = [ 4.00e+00  1.10e+01  6.00e+00]
+[ 0.00e+00  9.00e+00  0.00e+00]
+
+Z = 14520.0
+\end{lstlisting}
+
+\subsection{Respuesta}
+
+El costo total mínimo es de \$14520. Se deben comprar 4 kilos en Escobar para Ezequiel, 11 kilos en Escobar con 9 kilos en Pueyrredón para Ignacio y 6 kilos en Escobar para Felipe.
+
+\subsection{Rúbrica de Corrección}
+
+El 50\% del punto se obtiene planteando bien el problema. Dentro de ese 50\% la mitad se obtiene planteando bien las variables y la función objetivo. La otra mitad se obtiene planteando bien las restricciones. El otro 25\% del punto se obtiene con el código en Python. Dentro de ese 25\%, la mitad se obtiene teniendo el código correcto y el otro 50\% teniendo el código claro, ordenado y legible. El 25\% final se obtiene habiendo llegado al resultado exacto y correcto del problema.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Criterio} & \textbf{Puntos} & \textbf{Bien} & \textbf{Regular} & \textbf{Mal} & \textbf{Obtenido} \\
+\hline
+Variables y función objetivo & 2.5 & & & & \_\_\_/2.5 \\
+\hline
+Restricciones & 2.5 & & & & \_\_\_/2.5 \\
+\hline
+Código correcto & 1.25 & & & & \_\_\_/1.25 \\
+\hline
+Código claro y ordenado & 1.25 & & & & \_\_\_/1.25 \\
+\hline
+Resultado correcto & 2.5 & & & & \_\_\_/2.5 \\
+\hline
+\textbf{NOTA FINAL} & \textbf{10} & & & & \textbf{\_\_\_/10} \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Programación Entera Mixta}
+
+La planta de botellas PET recicladas (B) debe planificar su producción para el próximo mes (4 semanas). Cada semana dispone de una capacidad de línea limitada de $H$ = 18 horas. Siempre que en una semana se decida producir es necesario realizar un setup que consume $s$ = 1.5 horas de línea y genera un costo fijo de $f$ = \$75, aun cuando el volumen producido sea pequeño. Las demandas semanales (medidas en miles de botellas) son:
+
+\begin{center}
+$D_1 = 20$, $D_2 = 15$, $D_3 = 22$, $D_4 = 13$.
+\end{center}
+
+El proceso de fabricación insume 0.6 horas por cada mil botellas producidas y tiene un costo variable de 1.8 por mil botellas. Se permite producir por encima de la demanda semanal y almacenar el excedente pagando un costo de inventario de 0.15 por mil botellas y por semana. A fin de mes se quiere que el inventario se encuentre en las mismas condiciones que al comienzo, es decir, nulo. Escriba un problema de programación mixta que permita minimizar los costos totales de la planta.
+
+\subsection{Planteo}
+
+Para resolver este problema de programación entera mixta, definimos las siguientes variables de decisión:
+
+\begin{itemize}
+    \item $x_t$: cantidad de miles de botellas producidas en la semana $t$
+    \item $y_t$: variable binaria que indica si se produce en la semana $t$ (1 si se produce, 0 si no)
+    \item $I_t$: inventario al final de la semana $t$
+\end{itemize}
+
+La función objetivo es minimizar los costos totales:
+
+\begin{align*}
+    \min Z = \sum_{t=1}^{4} (75y_t + 1.8x_t + 0.15I_t)
+\end{align*}
+
+Las restricciones son:
+
+\begin{align*}
+    I_t &= I_{t-1} + x_t - d_t && \forall t \in \{1,2,3,4\} && \text{(Balance de inventario)} \\
+    0.6x_t + 1.5y_t &\leq 18 && \forall t \in \{1,2,3,4\} && \text{(Capacidad de línea)} \\
+    x_t &\leq My_t && \forall t \in \{1,2,3,4\} && \text{(Setup obligatorio)} \\
+    I_0 &= 0 && && \text{(Inventario inicial)} \\
+    I_4 &= 0 && && \text{(Inventario final)} \\
+    x_t &\geq 0, I_t \geq 0 && \forall t \in \{1,2,3,4\} && \text{(No negatividad)} \\
+    y_t &\in \{0,1\} && \forall t \in \{1,2,3,4\} && \text{(Variables binarias)}
+\end{align*}
+
+donde $d_t$ son las demandas semanales [20, 15, 22, 13] y $M$ es una constante suficientemente grande.
+
+\subsection{Python}
+
+\begin{lstlisting}[language=Python]
+import picos
+import numpy as np
+
+P = picos.Problem()
+
+# Variables
+x = picos.RealVariable('x', 4, lower=0)
+y = picos.BinaryVariable('y', 4)
+I = picos.RealVariable('I', 4, lower=0)
+
+# Parametros
+d = [20, 15, 22, 13]  # demandas semanales
+M = 100  # constante grande
+
+# Funcion objetivo
+P.set_objective('min', picos.sum([
+    75 * y[i] + 1.8 * x[i] + 0.15 * I[i] 
+    for i in range(4)
+]))
+
+# Restricciones de balance de inventario
+I_prev = 0  # inventario inicial
+for t in range(4):
+    P.add_constraint(I[t] == I_prev + x[t] - d[t])
+    I_prev = I[t]
+
+# Restricciones de capacidad
+for t in range(4):
+    P.add_constraint(0.6 * x[t] + 1.5 * y[t] <= 18)
+
+# Restricciones de setup obligatorio
+for t in range(4):
+    P.add_constraint(x[t] <= M * y[t])
+
+# Inventario final nulo
+P.add_constraint(I[3] == 0)
+
+P.solve(solver='glpk')
+print(f"x = {x.value}")
+print(f"y = {y.value}")
+print(f"I = {I.value}")
+print(f"Z = {P.value}")
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash,backgroundcolor=\color{black},basicstyle=\color{white}\ttfamily,numbers=none]
+x = [ 2.00e+01]
+[ 2.25e+01]
+[ 2.75e+01]
+[ 1.78e-15]
+
+y = [ 1.00e+00]
+[ 1.00e+00]
+[ 1.00e+00]
+[ 0.00e+00]
+
+I = [ 0.00e+00]
+[ 7.50e+00]
+[ 1.30e+01]
+[ 0.00e+00]
+
+Z = 354.075
+\end{lstlisting}
+
+\subsection{Respuesta}
+
+El plan óptimo de producción tiene un costo total de \$354.075. Se debe producir en las semanas 1, 2 y 3, evitando la semana 4. La producción es de 20, 22.5 y 27.5 miles de botellas respectivamente. El inventario al final de cada semana es de 0, 7.5 y 13 miles de botellas respectivamente.
+
+\subsection{Rúbrica de Corrección}
+
+El 50\% del punto se obtiene planteando bien el problema. Dentro de ese 50\% la mitad se obtiene planteando bien las variables y la función objetivo. La otra mitad se obtiene planteando bien las restricciones. El otro 25\% del punto se obtiene con el código en Python. Dentro de ese 25\%, la mitad se obtiene teniendo el código correcto y el otro 50\% teniendo el código claro, ordenado y legible. El 25\% final se obtiene habiendo llegado al resultado exacto y correcto del problema.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Criterio} & \textbf{Puntos} & \textbf{Bien} & \textbf{Regular} & \textbf{Mal} & \textbf{Obtenido} \\
+\hline
+Variables y función objetivo & 2.5 & & & & \_\_\_/2.5 \\
+\hline
+Restricciones & 2.5 & & & & \_\_\_/2.5 \\
+\hline
+Código correcto & 1.25 & & & & \_\_\_/1.25 \\
+\hline
+Código claro y ordenado & 1.25 & & & & \_\_\_/1.25 \\
+\hline
+Resultado correcto & 2.5 & & & & \_\_\_/2.5 \\
+\hline
+\textbf{NOTA FINAL} & \textbf{10} & & & & \textbf{\_\_\_/10} \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Programación No Lineal}
+
+En mercados donde la demanda de un producto depende del precio de forma no lineal, la fijación del precio se convierte en un problema de programación cuadrática. Considere que tiene que ponerle precio a tres productos y se sabe que la demanda para uno es decreciente de forma lineal con el precio:
+\begin{equation*}
+    d(p) = a - Bp \qquad p^{\top} = (p_1,p_2,p_3)
+\end{equation*}
+\begin{center}
+donde $a^\top = (100,80,90)^{\top}$ y $B = \begin{pmatrix}
+    8 & 1.5 & 1 \\
+    1.5 & 6 & 1.5 \\
+    1 & 1.5 & 7 
+\end{pmatrix}$
+\end{center}
+
+Los costos por producto se escriben como $c^{\top} = (20,18,22)$. Los ingresos se pueden calcular como $I(p) = p^{\top}d(p)$ y los costos como $C(p) = c^{\top} d(p)$. Escriba un código en Python que:
+
+\begin{enumerate}[label=\textbf{\arabic*)}]
+    \item Determine si la función beneficios $B(p) = I(p) - C(p)$ es cóncava o convexa clasificando el Hessiano de $B(p)$.
+    \item Optimice el problema usando SciPy.
+\end{enumerate}
+
+\textit{Ayuda: Si A, B, C son matrices entonces }
+
+\subsection{Resolución}
+
+
+Sea \(p^{\top} = (p_1, p_2, p_3)\) y \(d(p) = a - Bp\). Entonces
+
+\[
+    Bp = \begin{pmatrix}
+        8 & 1.5 & 1 \\
+        1.5 & 6 & 1.5 \\
+        1 & 1.5 & 7
+    \end{pmatrix}
+    \begin{pmatrix}
+        p_1 \\
+        p_2 \\
+        p_3
+    \end{pmatrix}
+    = \begin{pmatrix}
+        8p_1 + 1.5p_2 + p_3 \\
+        1.5p_1 + 6p_2 + 1.5p_3 \\
+        p_1 + 1.5p_2 + 7p_3
+    \end{pmatrix}.
+\]
+
+Con \(a^{\top} = (100, 80, 90)\), se sigue que
+
+\[
+    \alpha(p) = a - Bp =
+    \boxed{\begin{pmatrix}
+        100 - 8p_1 - 1.5p_2 - p_3 \\
+        80 - 1.5p_1 - 6p_2 - 1.5p_3 \\
+        90 - p_1 - 1.5p_2 - 7p_3
+    \end{pmatrix}}.
+\]
+
+Los ingresos son \(I(p) = p^{\top} d(p) = (p_1\; p_2\; p_3)\, \alpha(p)\). Al expandir término a término:
+
+\begin{align*}
+    I(p)
+    &= p_1\,(100 - 8p_1 - 1.5p_2 - p_3)
+     + p_2\,(80 - 1.5p_1 - 6p_2 - 1.5p_3)
+     + p_3\,(90 - p_1 - 1.5p_2 - 7p_3) \\
+    &= 100p_1 - 8p_1^2 - 1.5p_1p_2 - p_1p_3
+     + 80p_2 - 1.5p_1p_2 - 6p_2^2 - 1.5p_2p_3 \\
+    &\quad + 90p_3 - p_1p_3 - 1.5p_2p_3 - 7p_3^2 \\
+    &= \boxed{-8p_1^2 - 6p_2^2 - 7p_3^2 - 3p_1p_2 - 2p_1p_3 - 3p_2p_3 + 100p_1 + 80p_2 + 90p_3}.
+\end{align*}
+
+\[
+    C(p) = c^{\top} d(p) = (20, 18, 22) \begin{pmatrix}
+        100 - 8p_1 - 1.5p_2 - p_3 \\
+        80 - 1.5p_1 - 6p_2 - 1.5p_3 \\
+        90 - p_1 - 1.5p_2 - 7p_3
+    \end{pmatrix}
+\]
+
+\[
+    C(p) = (2000 - 160p_1 - 30p_2 - 20p_3) + (1440 - 29p_1 - 108p_2 - 27p_3) + (1980 - 22p_1 - 33p_2 - 154p_3)
+\]
+\[
+    C(p) = \boxed{5420 - 49p_1 - 141p_2 - 181p_3}.
+\]
+
+El beneficio resulta
+\begin{align*}
+    B(p) &= I(p) - C(p) \\
+         &= -8p_1^2 - 6p_2^2 - 7p_3^2 - 3p_1p_2 - 2p_1p_3 - 3p_2p_3 \\
+         &\quad + (100+209)p_1 + (80+171)p_2 + (90+201)p_3 - 5420 \\
+         &= \boxed{-8p_1^2 - 6p_2^2 - 7p_3^2 - 3p_1p_2 - 2p_1p_3 - 3p_2p_3 + 149p_1 + 221p_2 + 271p_3 - 5420}.
+\end{align*}
+
+Gradiente y Hessiano de \(B(p)\):
+\[
+    \nabla B(p) = \begin{pmatrix}
+        \partial B/\partial p_1 \\
+        \partial B/\partial p_2 \\
+        \partial B/\partial p_3
+    \end{pmatrix}
+    = \begin{pmatrix}
+        -16p_1 - 3p_2 - 2p_3 + 149 \\
+        -3p_1 - 12p_2 - 3p_3 + 221 \\
+        -2p_1 - 3p_2 - 14p_3 + 271
+    \end{pmatrix}.
+\]
+
+\[
+    \nabla^2 B = \begin{pmatrix}
+        -16 & -3 & -2 \\
+        -3 & -12 & -3 \\
+        -2 & -3 & -14
+    \end{pmatrix}.
+\]
+
+\[
+    D_1 = \det\begin{pmatrix}-16\end{pmatrix} = -16 < 0,
+    \qquad
+    D_2 = \det\begin{pmatrix}-16 & -3 \\ -3 & -12\end{pmatrix} = 192 - 9 = 183 > 0,
+\]
+\[
+    D_3 = \det\begin{pmatrix}-16 & -3 & -2 \\ -3 & -12 & -3 \\ -2 & -3 & -14\end{pmatrix} = -2406 < 0.
+\]
+Los signos \(D_1<0\), \(D_2>0\), \(D_3<0\) alternan, por lo tanto el Hessiano es definido negativo. En consecuencia, \(B(p)\) es cóncava y el problema admite un máximo global único.
+
+\end{document}

@@ -1,0 +1,398 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{forest}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\sloppy
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+% Título y materia
+\begin{center}
+  {\LARGE \textbf{Guía de Ejercicios\\ Probabilidad y Estadística para I.O.}}\\[0.5em]
+  {Investigación Operativa, Universidad de San Andrés}
+\end{center}
+
+Si encuentran algún error en el documento o hay alguna duda, mandenmé un mail a rodriguezf@udesa.edu.ar y lo revisamos.
+
+\section{Ejercicios}
+
+\subsection{Conversión de Usuarios}
+
+Una startup de e-commerce tiene tres canales de adquisición de usuarios: redes sociales (40\% de los usuarios), Google Ads (35\%) y referidos (25\%). Se sabe que la tasa de conversión a compra es del 2\% para usuarios de redes sociales, 3\% para Google Ads y 4\% para referidos. Si se selecciona un usuario al azar, ¿cuál es la probabilidad de que realice una compra?
+
+\subsection{A/B Testing}
+
+La app de delivery de cierto emprendimiento botánico de alto calibre está probando una nueva funcionalidad de checkout. Se muestran 100 usuarios la nueva versión y se rechaza el cambio si más de 3 usuarios abandonan el proceso de compra. Si la probabilidad de abandono con la nueva versión es 0.02, ¿cuál es la probabilidad de que el test sea exitoso?
+
+\subsection{Engagement en Redes Sociales}
+
+Una startup de contenido digital publica 20 posts por semana en Instagram. Cada post tiene una probabilidad del 5\% de volverse viral. ¿Cuál es la probabilidad de que exactamente 2 posts se vuelvan virales en una semana?
+
+\subsection{Retención de Usuarios}
+
+Una app de fintech tiene una tasa de retención del 85\% después del primer mes. Si 15 usuarios nuevos se registran, ¿cuál es la probabilidad de que al menos 12 usuarios permanezcan activos después del primer mes?
+
+\subsection{Tráfico Web}
+
+Un sitio de e-commerce recibe en promedio 6 visitas por minuto durante las horas pico. ¿Cuál es la probabilidad de que lleguen exactamente 4 visitas en el próximo minuto?
+
+\subsection{Soporte Técnico}
+
+Un chatbot de una fintech recibe en promedio 10 consultas por hora durante el horario pico. ¿Cuál es la probabilidad de que lleguen más de 12 consultas en una hora?
+
+\subsection{Tiempo de Carga}
+
+El tiempo de carga de una página web sigue una distribución normal con media 2.5 segundos y desviación estándar 0.4 segundos. ¿Cuál es la probabilidad de que una página cargue en menos de 3 segundos?
+
+\subsection{Costos de Adquisición}
+
+Los costos de adquisición de usuarios (CAC) de una startup siguen una distribución normal con media \$120 y desviación estándar \$15. Un inversor exige que el CAC no supere los \$140. ¿Cuál es la probabilidad de cumplir con el requisito?
+
+\subsection{Plataforma de E-learning}
+
+Una plataforma de e-learning tiene una tasa de abandono del 3\% en sus cursos. Se analizan 50 estudiantes y se considera que el curso falló si más de 2 estudiantes abandonan. Además, el tiempo de carga de cada video sigue una distribución normal con media 2 segundos y desviación estándar 0.5 segundos. ¿Cuál es la probabilidad de que un curso sea considerado exitoso y que el tiempo total de carga sea menor a 90 segundos?
+
+\subsection{Sistema de Streaming}
+
+Una plataforma de streaming tiene una tasa de llegada de 8 usuarios por hora (distribución de Poisson) y el tiempo de procesamiento de cada video sigue una distribución exponencial con media 6 minutos. ¿Cuál es la probabilidad de que lleguen más de 10 usuarios en una hora y que el tiempo de procesamiento sea menor a 5 minutos?
+
+\newpage
+
+\section{Soluciones}
+
+\subsection{Conversión de Usuarios}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item $P(\text{Redes}) = 0.40$, $P(\text{Google}) = 0.35$, $P(\text{Referidos}) = 0.25$
+\item $P(\text{Compra}|\text{Redes}) = 0.02$, $P(\text{Compra}|\text{Google}) = 0.03$, $P(\text{Compra}|\text{Referidos}) = 0.04$
+\item Queremos: $P(\text{Compra}) = P(\text{Compra}|\text{Redes})P(\text{Redes}) + P(\text{Compra}|\text{Google})P(\text{Google}) + P(\text{Compra}|\text{Referidos})P(\text{Referidos})$
+\end{itemize}
+
+\textbf{Resolución:}
+\[
+P(\text{Compra}) = 0.02 \times 0.40 + 0.03 \times 0.35 + 0.04 \times 0.25 = 0.008 + 0.0105 + 0.01 = 0.0285
+\]
+
+\textbf{Código Python:}
+\begin{lstlisting}[language=Python]
+# Probabilidades de los canales
+P_redes = 0.40
+P_google = 0.35  
+P_referidos = 0.25
+
+# Probabilidades de conversion por canal
+P_compra_redes = 0.02
+P_compra_google = 0.03
+P_compra_referidos = 0.04
+
+# Probabilidad total de conversion
+P_compra = P_compra_redes * P_redes + P_compra_google * P_google + P_compra_referidos * P_referidos
+print(f"Probabilidad de conversion: {P_compra:.4f}")
+\end{lstlisting}
+
+\subsection{A/B Testing}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item $n = 100$, $p = 0.02$
+\item $X \sim \text{Binomial}(100, 0.02)$
+\item Queremos: $P(X \leq 3) = 1 - P(X > 3)$
+\end{itemize}
+
+\textbf{Resolución:}
+\[
+P(X \leq 3) = \sum_{k=0}^{3} \binom{100}{k} (0.02)^k (0.98)^{100-k}
+\]
+
+\textbf{Código Python:}
+\begin{lstlisting}[language=Python]
+from scipy.stats import binom
+
+n = 100
+p = 0.02
+
+# Probabilidad de que el test sea exitoso (maximo 3 abandonos)
+prob_exitoso = binom.cdf(3, n, p)
+print(f"Probabilidad de test exitoso: {prob_exitoso:.4f}")
+\end{lstlisting}
+
+\subsection{Engagement en Redes Sociales}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item $n = 20$, $p = 0.05$
+\item $X \sim \text{Binomial}(20, 0.05)$
+\item Queremos: $P(X = 2)$
+\end{itemize}
+
+\textbf{Resolución:}
+\[
+P(X = 2) = \binom{20}{2} (0.05)^2 (0.95)^{18} = 190 \times 0.0025 \times 0.3972 \approx 0.1887
+\]
+
+\textbf{Código Python:}
+\begin{lstlisting}[language=Python]
+from scipy.stats import binom
+
+n = 20
+p = 0.05
+
+# Probabilidad de exactamente 2 posts virales
+prob_exacta = binom.pmf(2, n, p)
+print(f"Probabilidad de exactamente 2 posts virales: {prob_exacta:.4f}")
+\end{lstlisting}
+
+\subsection{Retención de Usuarios}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item $n = 15$, $p = 0.85$
+\item $X \sim \text{Binomial}(15, 0.85)$
+\item Queremos: $P(X \geq 12) = 1 - P(X \leq 11)$
+\end{itemize}
+
+\textbf{Resolución:}
+\[
+P(X \geq 12) = 1 - P(X \leq 11) = 1 - \sum_{k=0}^{11} \binom{15}{k} (0.85)^k (0.15)^{15-k}
+\]
+
+\textbf{Código Python:}
+\begin{lstlisting}[language=Python]
+from scipy.stats import binom
+
+n = 15
+p = 0.85
+
+# Probabilidad de al menos 12 usuarios retenidos
+prob_al_menos_12 = 1 - binom.cdf(11, n, p)
+print(f"Probabilidad de al menos 12 usuarios retenidos: {prob_al_menos_12:.4f}")
+\end{lstlisting}
+
+\subsection{Tráfico Web}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item $\lambda = 6$ (tasa promedio de pedidos por hora)
+\item $X \sim \text{Poisson}(6)$
+\item Queremos: $P(X = 4)$
+\end{itemize}
+
+\textbf{Resolución:}
+\[
+P(X = 4) = \frac{6^4 e^{-6}}{4!} = \frac{1296 \times 0.0025}{24} \approx 0.1339
+\]
+
+\textbf{Código Python:}
+\begin{lstlisting}[language=Python]
+from scipy.stats import poisson
+
+lambd = 6
+
+# Probabilidad de exactamente 4 visitas
+prob_exacta = poisson.pmf(4, lambd)
+print(f"Probabilidad de exactamente 4 visitas: {prob_exacta:.4f}")
+\end{lstlisting}
+
+\subsection{Soporte Técnico}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item $\lambda = 10$ (tasa promedio de llamadas por hora)
+\item $X \sim \text{Poisson}(10)$
+\item Queremos: $P(X > 12) = 1 - P(X \leq 12)$
+\end{itemize}
+
+\textbf{Resolución:}
+\[
+P(X > 12) = 1 - P(X \leq 12) = 1 - \sum_{k=0}^{12} \frac{10^k e^{-10}}{k!}
+\]
+
+\textbf{Código Python:}
+\begin{lstlisting}[language=Python]
+from scipy.stats import poisson
+
+lambd = 10
+
+# Probabilidad de mas de 12 consultas
+prob_mas_12 = 1 - poisson.cdf(12, lambd)
+print(f"Probabilidad de mas de 12 consultas: {prob_mas_12:.4f}")
+\end{lstlisting}
+
+\subsection{Tiempo de Carga}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item $\mu = 45$, $\sigma = 8$
+\item $X \sim N(45, 8^2)$
+\item Queremos: $P(X < 50)$
+\end{itemize}
+
+\textbf{Resolución:}
+\[
+P(X < 50) = P\left(Z < \frac{50-45}{8}\right) = P(Z < 0.625) \approx 0.7340
+\]
+
+\textbf{Código Python:}
+\begin{lstlisting}[language=Python]
+from scipy.stats import norm
+
+mu = 45
+sigma = 8
+
+# Probabilidad de cargar en menos de 3 segundos
+prob_menos_3 = norm.cdf(3, loc=mu, scale=sigma)
+print(f"Probabilidad de cargar en menos de 3 segundos: {prob_menos_3:.4f}")
+\end{lstlisting}
+
+\subsection{Costos de Adquisición}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item $\mu = 120$, $\sigma = 15$
+\item $X \sim N(120, 15^2)$
+\item Queremos: $P(X \leq 140)$
+\end{itemize}
+
+\textbf{Resolución:}
+\[
+P(X \leq 140) = P\left(Z \leq \frac{140-120}{15}\right) = P(Z \leq 1.33) \approx 0.9082
+\]
+
+\textbf{Código Python:}
+\begin{lstlisting}[language=Python]
+from scipy.stats import norm
+
+mu = 120
+sigma = 15
+
+# Probabilidad de cumplir requisito (CAC <= 140)
+prob_cumplir = norm.cdf(140, loc=mu, scale=sigma)
+print(f"Probabilidad de cumplir requisito: {prob_cumplir:.4f}")
+\end{lstlisting}
+
+\subsection{Plataforma de E-learning}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Rechazo del lote: $X \sim \text{Binomial}(50, 0.03)$, $P(X > 2)$
+\item Tiempo de inspección: $Y \sim N(2, 0.5^2)$, $P(\text{tiempo total} < 90)$
+\item Eventos independientes: $P(\text{rechazo}) \times P(\text{tiempo} < 90)$
+\end{itemize}
+
+\textbf{Resolución:}
+\[
+P(\text{rechazo}) = 1 - P(X \leq 2) = 1 - \sum_{k=0}^{2} \binom{50}{k} (0.03)^k (0.97)^{50-k}
+\]
+\[
+P(\text{tiempo total} < 90) = P(Y < 1.8) = P\left(Z < \frac{1.8-2}{0.5}\right)
+\]
+
+\textbf{Código Python:}
+\begin{lstlisting}[language=Python]
+from scipy.stats import binom, norm
+
+# Parametros del curso
+n = 50
+p_abandono = 0.03
+
+# Parametros del tiempo de carga
+mu_tiempo = 2  # segundos por video
+sigma_tiempo = 0.5
+tiempo_total = 90  # segundos
+
+# Probabilidad de que el curso sea exitoso
+prob_exitoso = 1 - binom.cdf(2, n, p_abandono)
+
+# Probabilidad de tiempo total menor a 90 segundos
+# Tiempo promedio total = 50 * 2 = 100 segundos
+# Desviacion total = sqrt(50) * 0.5 = 3.54 segundos
+mu_total = n * mu_tiempo
+sigma_total = (n**0.5) * sigma_tiempo
+prob_tiempo = norm.cdf(tiempo_total, loc=mu_total, scale=sigma_total)
+
+# Probabilidad conjunta (eventos independientes)
+prob_conjunta = prob_exitoso * prob_tiempo
+
+print(f"Probabilidad de curso exitoso: {prob_exitoso:.4f}")
+print(f"Probabilidad de tiempo < 90 seg: {prob_tiempo:.4f}")
+print(f"Probabilidad conjunta: {prob_conjunta:.4f}")
+\end{lstlisting}
+
+\subsection{Sistema de Streaming}
+
+\textbf{Planteo:}
+\begin{itemize}
+\item Llegadas: $X \sim \text{Poisson}(8)$, $P(X > 10)$
+\item Tiempo de servicio: $Y \sim \text{Exponencial}(\lambda = 1/6)$, $P(Y < 5)$
+\item Eventos independientes: $P(X > 10) \times P(Y < 5)$
+\end{itemize}
+
+\textbf{Resolución:}
+\[
+P(X > 10) = 1 - P(X \leq 10) = 1 - \sum_{k=0}^{10} \frac{8^k e^{-8}}{k!}
+\]
+\[
+P(Y < 5) = 1 - e^{-\lambda \cdot 5} = 1 - e^{-5/6}
+\]
+
+\textbf{Código Python:}
+\begin{lstlisting}[language=Python]
+from scipy.stats import poisson, expon
+
+# Parametros del sistema
+lambd_llegadas = 8  # clientes por hora
+lambd_servicio = 1/6  # tasa de servicio (clientes por minuto)
+
+# Probabilidad de mas de 10 usuarios
+prob_mas_10 = 1 - poisson.cdf(10, lambd_llegadas)
+
+# Probabilidad de tiempo de procesamiento menor a 5 minutos
+prob_procesamiento_rapido = expon.cdf(5, scale=1/lambd_servicio)
+
+# Probabilidad conjunta
+prob_conjunta = prob_mas_10 * prob_procesamiento_rapido
+
+print(f"Probabilidad de mas de 10 usuarios: {prob_mas_10:.4f}")
+print(f"Probabilidad de procesamiento < 5 min: {prob_procesamiento_rapido:.4f}")
+print(f"Probabilidad conjunta: {prob_conjunta:.4f}")
+\end{lstlisting}
+
+\end{document}

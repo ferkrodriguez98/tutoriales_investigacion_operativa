@@ -1,0 +1,361 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{enumitem}
+
+\geometry{a4paper, margin=1in}
+
+\sloppy
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{center}
+    {\LARGE \textbf{Resolución Parcialito 1 - 2S2025}}\\[0.5em]
+    {Investigación Operativa, Universidad de San Andrés}
+\end{center}
+
+\section*{Problema 1}
+
+Una marca fabricante de autos tiene dos plantas en Campana y Pilar junto con un almacén en San Fernando. La compañía provee autos de alta gama a clientes en San Isidro y Vicente López y busca optimizar la logística de distribución mensual. El costo diario transportar cada auto entre los distintos puntos se condensa en la siguiente tabla:
+
+\begin{center}
+\begin{tabular}{l|ccccc}
+\toprule
+ & \multicolumn{5}{c}{\textbf{Hacia (\$00)}} \\
+\textbf{Desde} & \textbf{Campana} & \textbf{Pilar} & \textbf{San Fernando} & \textbf{San Isidro} & \textbf{Vicente López} \\
+\midrule
+Campana & 0 & 140 & 100 & 90 & 225 \\
+Pilar & 145 & 0 & 111 & 110 & 119 \\
+San Fernando & 105 & 115 & 0 & 113 & 78 \\
+San Isidro & 89 & 109 & 121 & 0 & --- \\
+Vicente López & 210 & 117 & 82 & --- & 0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Campana puede fabricar hasta 1100 autos al mes, mientras que Pilar puede fabricar hasta 2900 al mes. Se sabe que la demanda en San Isidro es de 2500 autos al mes y que en Vicente López es de 1500.
+
+\begin{enumerate}[label=\alph*)]
+    \item \textit{(2.5 pts.) Dibuje un grafo con arcos dirigidos y ponderados que permita visualizar el problema.}
+    \item \textit{(4 pts.) Escriba un programa lineal de transporte balanceado que permita minimizar los costos totales de la operación.}
+    \item \textit{(1.5 pts.) Modifique la tabla y el programa lineal si no se quiere tener envíos entre Campana y Pilar ni entre Pilar y Vicente López.}
+\end{enumerate}
+
+\subsection*{Resolución}
+
+\subsubsection*{Parte a)}
+El problema puede modelarse como un grafo dirigido y ponderado. Los nodos del grafo son las cinco localidades: Campana (C), Pilar (P), San Fernando (SF), San Isidro (SI) y Vicente López (VL).
+
+Existiría un arco dirigido desde un nodo \(i\) a un nodo \(j\) si es posible transportar autos entre esas dos localidades. El peso de cada arco \((i, j)\) sería el costo de transporte \(c_{ij}\) dado en la tabla.
+
+Los nodos de Campana y Pilar son fuentes (nodos de oferta) con una capacidad de 1100 y 2900 autos respectivamente. Los nodos de San Isidro y Vicente López son sumideros (nodos de demanda) de 2500 y 1500 autos. San Fernando es un nodo de transbordo, lo que significa que todo el flujo que entra debe salir.
+
+\subsubsection*{Parte b)}
+Para escribir el programa lineal, definimos las variables de decisión, la función objetivo y las restricciones.
+
+\textbf{Planteo:}
+\begin{itemize}
+    \item \textbf{Variables de decisión:}
+    
+    \(x_{ij}\): cantidad de autos transportados desde la localidad \(i\) hacia la localidad \(j\), donde \(i, j \in \{C, P, SF, SI, VL\}\).
+
+    \item \textbf{Función objetivo:}
+    
+    Se busca minimizar el costo total de transporte. Los costos \(c_{ij}\) están dados por la tabla del enunciado.
+    
+    \begin{align*}
+        \text{min } Z &= 140x_{CP} + 100x_{CSF} + 90x_{CSI} + 225x_{CVL} \\
+        &+ 145x_{PC} + 111x_{PSF} + 110x_{PSI} + 119x_{PVL} \\
+        &+ 105x_{SFC} + 115x_{SFP} + 113x_{SFSI} + 78x_{SFVL} \\
+        &+ 89x_{SIC} + 109x_{SIP} + 121x_{SISF} \\
+        &+ 210x_{VLC} + 117x_{VLP} + 82x_{VLSF}
+    \end{align*}
+
+    \item \textbf{Restricciones:}
+    
+    El problema se describe como un ``programa lineal de transporte balanceado''. Esto se debe a que la oferta total (1100 + 2900 = 4000) es igual a la demanda total (2500 + 1500 = 4000). Las restricciones de balance de flujo para cada nodo son:
+    
+    \begin{align*}
+    % Oferta
+    \text{(Campana)} \quad \sum_{j} x_{Cj} - \sum_{j} x_{jC} &= 1100 \\
+    \text{(Pilar)} \quad \sum_{j} x_{Pj} - \sum_{j} x_{jP} &= 2900 \\
+    % Demanda
+    \text{(San Isidro)} \quad \sum_{i} x_{i,SI} - \sum_{i} x_{SI,i} &= 2500 \\
+    \text{(Vte. López)} \quad \sum_{i} x_{i,VL} - \sum_{i} x_{VL,i} &= 1500 \\
+    % Transbordo
+    \text{(San Fernando)} \quad \sum_{i} x_{i,SF} - \sum_{j} x_{SF,j} &= 0 \\
+    % No negatividad
+    x_{ij} &\geq 0 \quad \forall i, j
+    \end{align*}
+    Donde los índices \(i,j\) recorren el conjunto de todas las localidades \{C, P, SF, SI, VL\}. Las sumatorias representan el flujo total que sale y entra de cada nodo.
+\end{itemize}
+
+\subsubsection*{Parte c)}
+Para modificar el problema de modo que no haya envíos entre Campana y Pilar, ni entre Pilar y Vicente López, debemos hacer dos cosas: actualizar la tabla de costos para reflejar que estas rutas son inviables y luego ajustar el programa lineal.
+
+\textbf{Tabla de costos modificada:}
+Para prohibir los envíos, podemos asignar un costo infinitamente alto (representado por \(M\)) a las rutas correspondientes.
+
+\begin{center}
+\begin{tabular}{l|ccccc}
+\toprule
+ & \multicolumn{5}{c}{\textbf{Hacia (\$00)}} \\
+\textbf{Desde} & \textbf{Campana} & \textbf{Pilar} & \textbf{San Fernando} & \textbf{San Isidro} & \textbf{Vicente López} \\
+\midrule
+Campana & 0 & \textbf{M} & 100 & 90 & 225 \\
+Pilar & \textbf{M} & 0 & 111 & 110 & \textbf{M} \\
+San Fernando & 105 & 115 & 0 & 113 & 78 \\
+San Isidro & 89 & 109 & 121 & 0 & --- \\
+Vicente López & 210 & \textbf{M} & 82 & --- & 0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Programa lineal modificado:}
+
+El planteo se modifica agregando restricciones que fuercen a cero los flujos en las rutas no deseadas.
+
+\begin{itemize}
+    \item \textbf{Variables de decisión:}
+    
+    Las variables de decisión son las mismas que en la parte b).
+
+    \item \textbf{Función objetivo:}
+    
+    La función objetivo es la misma que en la parte b), pero omitiendo los términos correspondientes a las rutas prohibidas.
+    
+    \begin{align*}
+        \text{min } Z &= 100x_{CSF} + 90x_{CSI} + 225x_{CVL} \\
+        &+ 111x_{PSF} + 110x_{PSI} \\
+        &+ 105x_{SFC} + 115x_{SFP} + 113x_{SFSI} + 78x_{SFVL} \\
+        &+ 89x_{SIC} + 109x_{SIP} + 121x_{SISF} \\
+        &+ 210x_{VLC} + 82x_{VLSF}
+    \end{align*}
+
+    \item \textbf{Restricciones:}
+    
+    Se mantienen las restricciones de balance de flujo de la parte b), y se agregan las siguientes restricciones para prohibir los envíos:
+    
+    \begin{align*}
+    % Prohibiciones
+    x_{CP} &= 0 \\
+    x_{PC} &= 0 \\
+    x_{PVL} &= 0 \\
+    x_{VLP} &= 0
+    \end{align*}
+    Adicionalmente, se mantienen las restricciones de balance y no negatividad de la parte b).
+\end{itemize}
+
+\section*{Problema 1 (Tema 2)}
+
+Dead Cow Enterprises debe decidir cómo invertir su dinero durante el próximo año fiscal. Se cuenta con un presupuesto inicial de \$50M para invertir en bonos, créditos hipotecarios, créditos automotores y préstamos personales. La tasa anual de retorno de cada inversión es de 10\% para los bonos, 16\% en los créditos hipotecarios, 13\% en los créditos automotores y 20\% en los créditos personales. Para asegurarse que la cartera no es demasiado riesgosa se pusieron las siguientes restricciones:
+\begin{itemize}
+    \item La cantidad invertida en préstamos personales no puede exceder lo invertido en bonos y la cantidad invertida en créditos hipotecarios no puede exceder lo invertido en préstamos automotores.
+    \item Se quiere invertir el doble en créditos automotores que en bonos.
+    \item No más del 25\% del total se puede invertir en préstamos personales y al menos un 40\% de la cartera deben ser inversiones en bienes durables (automotores e hipotecarios).
+\end{itemize}
+
+\begin{enumerate}[label=\alph*)]
+    \item \textit{(4 pts.) Establezca un programa lineal que permita calcular la cantidad a invertir en cada opción para maximizar el retorno.}
+    \item \textit{(3 pts.) Determine la forma estándar del problema, es decir, convierta todas las inecuaciones en ecuaciones introduciendo las variables necesarias.}
+    \item \textit{(3 pts.) En los últimos 12 meses, el rendimiento de los bonos ha variado según (en \%) \{3, 6, 8, 4, 9, 5, 7, 3, 6, 9, 4, 8\}. Explique en palabras cómo utilizaría estos datos para hacer un análisis de sensibilidad sobre el rendimiento de los bonos.}
+\end{enumerate}
+
+\subsection*{Resolución}
+
+\subsubsection*{Parte a)}
+Para formular el programa lineal, definimos las variables de decisión, la función objetivo y las restricciones. Trabajaremos con las unidades en millones de dólares.
+
+\textbf{Planteo:}
+\begin{itemize}
+    \item \textbf{Variables de decisión:}
+        \begin{itemize}
+            \item \(B\): Cantidad de dinero (en M\$) a invertir en bonos.
+            \item \(H\): Cantidad de dinero (en M\$) a invertir en créditos hipotecarios.
+            \item \(A\): Cantidad de dinero (en M\$) a invertir en créditos automotores.
+            \item \(P\): Cantidad de dinero (en M\$) a invertir en préstamos personales.
+        \end{itemize}
+
+    \item \textbf{Función objetivo:}
+    
+    Maximizar el retorno total de la inversión.
+    \[
+        \text{max } Z = 0.10B + 0.16H + 0.13A + 0.20P
+    \]
+
+    \item \textbf{Restricciones:}
+    
+    \begin{align*}
+    % Presupuesto
+    B + H + A + P &\leq 50 && \text{(Presupuesto total)} \\
+    % Restricciones de riesgo
+    P &\leq B && \text{(Personales vs. Bonos)} \\
+    H &\leq A && \text{(Hipotecarios vs. Automotores)} \\
+    A &= 2B && \text{(Automotores vs. Bonos)} \\
+    P &\leq 0.25(B+H+A+P) && \text{(Tope préstamos personales)} \\
+    A+H &\geq 0.40(B+H+A+P) && \text{(Mínimo bienes durables)} \\
+    % No negatividad
+    B, H, A, P &\geq 0 && \text{(No negatividad)}
+    \end{align*}
+\end{itemize}
+
+\subsubsection*{Parte b)}
+Para convertir el problema a la forma estándar, todas las inecuaciones deben transformarse en ecuaciones mediante la adición de variables de holgura (slack) o la resta de variables de exceso (surplus).
+
+\begin{itemize}
+    \item \textbf{Función objetivo:}
+    \[
+        \text{max } Z = 0.10B + 0.16H + 0.13A + 0.20P + 0s_1 + 0s_2 + 0s_3 + 0s_4 + 0s_5
+    \]
+
+    \item \textbf{Restricciones en forma estándar:}
+    
+    \begin{align*}
+    B + H + A + P + s_1 &= 50 \\
+    -B + P + s_2 &= 0 \\
+    -A + H + s_3 &= 0 \\
+    A - 2B &= 0 \\
+    -0.25B - 0.25H - 0.25A + 0.75P + s_4 &= 0 \\
+    -0.4B + 0.6H + 0.6A - 0.4P - s_5 &= 0 \\
+    B, H, A, P, s_1, s_2, s_3, s_4, s_5 &\geq 0
+    \end{align*}
+\end{itemize}
+
+\subsubsection*{Parte c)}
+El análisis de sensibilidad para un coeficiente de la función objetivo, como el rendimiento de los bonos (\(c_B\)), busca determinar el rango en el cual este coeficiente puede variar sin que cambie la solución óptima (es decir, el conjunto de variables que son básicas en el óptimo).
+
+Los datos históricos del rendimiento de los bonos \(\{3, 6, 8, 4, 9, 5, 7, 3, 6, 9, 4, 8\}\%\) nos dan una idea realista de la variabilidad de este parámetro. El rendimiento promedio histórico es 6\%, con un mínimo de 3\% y un máximo de 9\%. El modelo actual asume un 10\%, que es superior a cualquier valor observado en el último año.
+
+Para utilizar estos datos, seguiría estos pasos:
+\begin{enumerate}
+    \item Resolvería el programa lineal original con el rendimiento de los bonos del 10\% para encontrar la solución óptima.
+    \item Realizaría un análisis de sensibilidad sobre el coeficiente \(c_B = 0.10\). Esto me daría el ``rango de optimalidad'', es decir, el intervalo de valores para el rendimiento de los bonos en el que la actual estrategia de inversión sigue siendo la mejor.
+    \item Compararía este rango de optimalidad con los datos históricos. Por ejemplo, si el rango de optimalidad es [5.5\%, 12\%], podría concluir que la solución es bastante robusta, ya que la mayoría de los rendimientos históricos caen dentro de este intervalo.
+    \item Para los valores históricos que queden fuera del rango de optimalidad (ej. 3\% o 4\%), resolvería nuevamente el problema con esos valores de rendimiento para ver cómo cambia la cartera de inversión óptima. Esto permitiría evaluar estrategias alternativas para escenarios más pesimistas y entender el riesgo asociado a la volatilidad del rendimiento de los bonos.
+\end{enumerate}
+
+\section*{Problema 2}
+Un estudio de abogados previsionales necesita organizar el calendario para atender a un grupo de 7 jubilados en la próxima semana. En términos de la complejidad de los casos, se necesita asignar a los abogados para las entrevistas en función de su eficiencia (puntuado de 1 a 10), como se detalla en la siguiente tabla:
+\begin{center}
+\begin{tabular}{l|ccccccc}
+\toprule
+ & C1 & C2 & C3 & C4 & C5 & C6 & C7 \\
+\midrule
+Santiago & 7 & 8 & 5 & 9 & 7 & 7 & 8 \\
+Sylvia & 10 & 3 & 9 & 4 & 6 & 6 & 10 \\
+Judith & 8 & 9 & 10 & 8 & 8 & 7 & 9 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Los abogados cobran una tarifa fija de \$ 250000 independientemente de cuantos clientes atienda. Por cliente atendido, Santiago cobra \$ 65000, Sylvia cobra \$ 70000 y Judith cobra \$ 75000. Se sabe ademas que Sylvia y Judith no pueden atender juntas, que los pares de clientes C1-C3 y C2-C5 no se llevan bien y que el cliente C7 se siente más cómodo siendo atendido por una mujer. Para evitar sobrecargar a los letrados con muchos casos, cada abogado puede atender como máximo 3 clientes.
+
+\begin{enumerate}[label=\alph*)]
+    \item \textit{(5 pts.) Formule un programa entero que permita decidir la atención óptima de los clientes, maximizando la eficiencia.}
+    \item \textit{(3 pts.) ¿Qué condiciones agregaría a (a) si Judith quiere ganar al menos \$450000, Sylvia al menos \$ 350000 y, por cuestiones impositivas, Santiago no puede facturar más de \$400000?}
+    \item \textit{(2 pts.) Estime, explorando el conjunto factible, al menos una combinación posible y determine el valor de la función objetivo en tal caso.}
+\end{enumerate}
+
+\subsection*{Resolución}
+
+\subsubsection*{Parte a)}
+\textbf{Planteo:}
+\begin{itemize}
+    \item \textbf{Variables de decisión:}
+    
+    Se define una variable binaria \(x_{ij}\) que toma el valor 1 si el abogado \(i\) atiende al cliente \(j\), y 0 en caso contrario.
+    \[
+        x_{ij} \in \{0, 1\} \quad \forall i \in \{S, Y, J\}, \forall j \in \{1, ..., 7\}
+    \]
+    Donde \(S\)=Santiago, \(Y\)=Sylvia, \(J\)=Judith.
+
+    \item \textbf{Función objetivo:}
+    
+    Maximizar la eficiencia total, dada por la suma de las eficiencias de cada asignación. Sea \(E_{ij}\) la eficiencia del abogado \(i\) con el cliente \(j\).
+    \[
+        \text{max } Z = \sum_{i \in \{S, Y, J\}} \sum_{j=1}^{7} E_{ij} x_{ij}
+    \]
+
+    \item \textbf{Restricciones:}
+    
+    \begin{enumerate}
+        \item Cada cliente debe ser atendido por un único abogado:
+        \[
+            \sum_{i \in \{S, Y, J\}} x_{ij} = 1 \quad \forall j \in \{1, ..., 7\}
+        \]
+        \item Sylvia y Judith no pueden atender juntas. Dado que hay 7 clientes y cada abogado puede atender un máximo de 3, es imposible que solo 2 abogados atiendan a todos los clientes (2*3=6 < 7). Por lo tanto, los tres abogados deben trabajar. La restricción ``no pueden atender juntas'' es ambigua, pero en este contexto se interpreta como que no pueden colaborar en un mismo caso, lo cual ya está cubierto por la restricción anterior. No se añaden restricciones adicionales para este punto.
+        
+        \item Los clientes C1 y C3 no pueden ser atendidos por el mismo abogado:
+        \[
+            x_{i1} + x_{i3} \leq 1 \quad \forall i \in \{S, Y, J\}
+        \]
+        \item Los clientes C2 y C5 no pueden ser atendidos por el mismo abogado:
+        \[
+            x_{i2} + x_{i5} \leq 1 \quad \forall i \in \{S, Y, J\}
+        \]
+        \item El cliente C7 debe ser atendido por una mujer (Sylvia o Judith):
+        \[
+            x_{S7} = 0
+        \]
+        \item Cada abogado puede atender como máximo 3 clientes:
+        \[
+            \sum_{j=1}^{7} x_{ij} \leq 3 \quad \forall i \in \{S, Y, J\}
+        \]
+    \end{enumerate}
+\end{itemize}
+
+\subsubsection*{Parte b)}
+Para agregar las condiciones sobre los ingresos, es útil definir una variable binaria \(y_i\) que sea 1 si el abogado \(i\) atiende al menos a un cliente, y 0 si no.
+\begin{align*}
+    \sum_{j=1}^{7} x_{ij} &\leq 3y_i \quad \forall i \in \{S, Y, J\} \\
+    y_i &\leq \sum_{j=1}^{7} x_{ij} \quad \forall i \in \{S, Y, J\}
+\end{align*}
+Las nuevas restricciones de ingresos son:
+\begin{itemize}
+    \item Ganancia de Judith \(\geq\) 450000:
+    \[
+        250000 y_J + 75000 \sum_{j=1}^{7} x_{Jj} \geq 450000
+    \]
+    \item Ganancia de Sylvia \(\geq\) 350000:
+    \[
+        250000 y_Y + 70000 \sum_{j=1}^{7} x_{Yj} \geq 350000
+    \]
+    \item Facturación de Santiago \(\leq\) 400000:
+    \[
+        250000 y_S + 65000 \sum_{j=1}^{7} x_{Sj} \leq 400000
+    \]
+\end{itemize}
+
+\subsubsection*{Parte c)}
+Para encontrar una combinación factible, asignamos los clientes respetando las restricciones de la parte (a).
+\begin{itemize}
+    \item C7 a Sylvia (mujer, eficiencia 10).
+    \item C1 y C3 deben ir a abogados distintos. Asignamos C1 a Sylvia (ef. 10) y C3 a Judith (ef. 10).
+    \item C2 y C5 deben ir a abogados distintos. Asignamos C2 a Judith (ef. 9) y C5 a Santiago (ef. 7).
+    \item Quedan C4 y C6. Asignamos C4 a Santiago (ef. 9) y C6 a Santiago (ef. 7).
+\end{itemize}
+La asignación resultante es:
+\begin{itemize}
+    \item \textbf{Santiago}: \{C4, C5, C6\} (3 clientes)
+    \item \textbf{Sylvia}: \{C1, C7\} (2 clientes)
+    \item \textbf{Judith}: \{C2, C3\} (2 clientes)
+\end{itemize}
+Esta solución es factible: cada abogado tiene 3 clientes o menos, C1/C3 y C2/C5 están con distintos abogados, y C7 es atendida por una mujer.
+
+El valor de la función objetivo (eficiencia total) para esta combinación es:
+\[
+    Z = (E_{S4}+E_{S5}+E_{S6}) + (E_{Y1}+E_{Y7}) + (E_{J2}+E_{J3})
+\]
+\[
+    Z = (9+7+7) + (10+10) + (9+10) = 23 + 20 + 19 = 62
+\]
+
+\end{document}

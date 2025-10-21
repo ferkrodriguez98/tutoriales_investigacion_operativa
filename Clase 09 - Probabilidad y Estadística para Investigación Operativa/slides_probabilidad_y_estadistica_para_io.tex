@@ -47,8 +47,7 @@
 
 
 \title{\Huge\textbf{Probabilidad y Estadística para I.O.}}
-\subtitle{Investigación Operativa}
-\author{Universidad de San Andrés}
+\author{Investigación Operativa}
 \date{}
 
 
@@ -56,6 +55,11 @@
 
 \begin{frame}
     \titlepage
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south west,inner sep=30pt] at (current page.south west) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
 \end{frame}
 
 \begin{frame}{Fundamentos de Probabilidad}
@@ -214,6 +218,44 @@ print(f"Probabilidad de incumplimiento del contrato: {prob_incumplimiento:.4f}")
     \end{lstlisting}
 \end{frame}
 
+\begin{frame}{Fallas - Binomial Negativa}
+    \textbf{Problema:}
+    
+    Una máquina tiene una probabilidad del 5\% de fallar en cada operación. Se necesita que la máquina complete exitosamente 10 operaciones antes de que falle por tercera vez. \textbf{¿Cuál es la probabilidad de que esto ocurra?}
+    
+    \textbf{Modelo:}
+    \begin{itemize}
+        \item $X \sim \text{Binomial Negativa}(10, 0.95)$
+        \item Calcular $P(X \leq 2)$ (máximo 2 fallas antes del éxito 10)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Fallas - Solución}
+    \[P(X = k) = \binom{k + r - 1}{k} p^r (1-p)^k\]
+    
+    Para $r = 10$, $p = 0.95$:
+    \begin{align*}
+        P(X=0) &\approx 0.599 \\
+        P(X=1) &\approx 0.315 \\
+        P(X=2) &\approx 0.074 \\
+        P(X \leq 2) &\approx 0.988
+    \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]{Fallas - Python}
+    \begin{lstlisting}
+from scipy.stats import nbinom
+
+# Parametros
+r = 10       # Numero de exitos requeridos
+p = 0.95     # Probabilidad de exito
+
+# Probabilidad de completar 10 operaciones con maximo 2 fallas
+prob_exito = nbinom.cdf(2, r, p)
+print(f"Probabilidad de completar 10 operaciones con maximo 2 fallas: {prob_exito:.4f}")
+    \end{lstlisting}
+\end{frame}
+
 \begin{frame}{Monte Carlo}
     \textbf{Pasos:}
     \begin{enumerate}
@@ -290,10 +332,15 @@ plt.show()
     \end{center}
 \end{frame}
 
-\begin{frame}{Repaso Probabilidad}
+\begin{frame}{Terminamos}
     \begin{center}
-        \Large{¿Preguntas?}
+        \Large{\textbf{¿Dudas?\\¿Consultas?}}
     \end{center}
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south,inner sep=30pt] at (current page.south) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
 \end{frame}
 
 \end{document} 
