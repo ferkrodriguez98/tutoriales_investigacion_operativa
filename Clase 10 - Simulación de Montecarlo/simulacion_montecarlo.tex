@@ -90,25 +90,79 @@ Las más comunes son:
     \item Si es número de fallas antes del éxito, binomial negativa
 \end{itemize}
 
-\section{Ejemplo: ¿Cuánto inventario pedir?}
+\section{¿Cómo sabemos que está bien?}
 
+Hay que verificar que los resultados se estabilicen. Si simulamos muy pocas veces, el resultado puede ser muy variable. Si simulamos muchas veces, el resultado se estabiliza.
+
+\vspace{1em}
+
+La idea es hacer una ``media móvil'': calculamos el promedio de los primeros 1000 resultados, luego de los primeros 2000, 3000, etc. Si el promedio se estabiliza (no cambia mucho), entonces sabemos que tenemos suficientes simulaciones.
+
+\vspace{1em}
+
+\begin{lstlisting}[language=Python]
+def verificar_convergencia(resultados, ventana=1000):
+    medias_moviles = []
+    for i in range(ventana, len(resultados)):
+        media_movil = np.mean(resultados[i-ventana:i])
+        medias_moviles.append(media_movil)
+    
+    plt.plot(range(ventana, len(resultados)), medias_moviles)
+    plt.xlabel('Numero de iteraciones')
+    plt.ylabel('Media movil')
+    plt.title('Convergencia de la Simulacion')
+    plt.grid(True, alpha=0.3)
+    plt.show()
+    
+    return medias_moviles
+\end{lstlisting}
+
+\section{Análisis de sensibilidad}
+
+Una vez que encontramos la solución óptima de nuestro problema, es importante entender qué tan sensible es esta solución a cambios en los parámetros del modelo. El análisis de sensibilidad consiste en variar sistemáticamente uno o más parámetros del modelo y observar cómo cambia la solución óptima. Esto nos permite:
+\begin{itemize}
+    \item Identificar qué parámetros tienen mayor impacto en la solución
+    \item Evaluar la robustez de nuestra decisión
+    \item Preparar planes de contingencia para diferentes escenarios
+\end{itemize}
+
+\paragraph{Metodología}
+\begin{enumerate}
+    \item \textbf{Seleccionar el parámetro a analizar:} Elegimos una variable que puede cambiar (demanda, costos, tiempos, etc.)
+    \item \textbf{Definir el rango de variación:} Establecemos un rango realista de valores para el parámetro
+    \item \textbf{Simular para cada valor:} Para cada valor del parámetro, ejecutamos la simulación completa
+    \item \textbf{Registrar la solución óptima:} Anotamos la decisión óptima y su costo para cada escenario
+    \item \textbf{Analizar los resultados:} Observamos patrones y tendencias en cómo cambia la solución
+\end{enumerate}
+
+\section{Problemas}
+
+\subsection{Problema 1: Gestión de inventario con demanda incierta}
+
+\paragraph{Enunciado}
 Tenemos que decidir cuántas unidades pedir cada mes. La demanda es incierta: en promedio se venden 100 unidades pero puede variar (desviación estándar de 20). Los costos son:
 \begin{itemize}
     \item Comprar: \$50 por unidad
     \item Guardar inventario: \$5 por unidad por mes
-    \item Quedarse sin stock: \$100 por unidad que no pudimos vender
+    \item Quedarse sin stock: \$100 por unidad no servida
 \end{itemize}
 
-El problema es que si pedimos poco, nos quedamos sin stock y perdemos ventas. Si pedimos mucho, nos sobra inventario y pagamos costos de almacenamiento. Necesitamos encontrar el punto óptimo.
+Si pedimos poco, nos quedamos sin stock y perdemos ventas. Si pedimos mucho, nos sobra inventario y pagamos costos de almacenamiento. Queremos encontrar la cantidad que minimiza el costo esperado.
 
-\vspace{1em}
+\paragraph{Planteo del problema}
+\begin{itemize}
+    \item \textbf{Variable de decisión:} $Q$ = cantidad a pedir
+    \item \textbf{Variable aleatoria:} $D \sim N(100, 20^2)$, truncada en $0$ para evitar demandas negativas
+    \item \textbf{Parámetros:} $c_c=50$ (compra), $c_h=5$ (holding mensual), $c_s=100$ (stockout)
+\end{itemize}
 
-La idea es probar diferentes cantidades (60, 65, 70, ..., 140 unidades) y para cada una simular 10000 meses con demandas aleatorias. Calculamos el costo total de cada escenario y promediamos. La cantidad que nos dé el menor costo promedio es la óptima.
+\paragraph{Función objetivo}
+Para una realización de demanda $D$ y una decisión $Q$:
+\[ C(Q, D) = c_c\,Q + c_h\,\max(Q - D, 0) + c_s\,\max(D - Q, 0) \]
 
-\vspace{1em}
+\textbf{Objetivo:} Encontrar $Q^*$ que minimiza $E[C(Q, D)]$ mediante simulación.
 
-\textbf{Resolución en Python:}
-
+\subsubsection{Simulación base}
 \begin{lstlisting}[language=Python]
 import numpy as np
 import matplotlib.pyplot as plt
@@ -155,135 +209,379 @@ cantidades, costos = simulacion_inventario()
 
 # Encontrar cantidad optima
 indice_optimo = np.argmin(costos)
-cantidad_optima = cantidades[indice_optimo]
+cantidad_optima = list(cantidades)[indice_optimo]
 costo_optimo = costos[indice_optimo]
 
 print(f"Cantidad optima: {cantidad_optima} unidades")
 print(f"Costo promedio optimo: ${costo_optimo:.2f}")
 
 # Graficar resultados
-plt.plot(cantidades, costos, 'b-', linewidth=2)
+plt.plot(list(cantidades), costos, 'b-', linewidth=2)
 plt.axvline(cantidad_optima, color='r', linestyle='--', 
            label=f'Optimo: {cantidad_optima} unidades')
 plt.xlabel('Cantidad a pedir (Q)')
 plt.ylabel('Costo promedio total')
-plt.title('Optimizacion de Inventario - Simulacion Montecarlo')
+plt.title('Problema de Inventario - Simulacion Montecarlo')
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.show()
 \end{lstlisting}
 
-\section{Ejemplo: ¿Vale la pena el proyecto?}
+\subsubsection{Sensibilidad vs. demanda media}
+\begin{lstlisting}[language=Python]
+import numpy as np
 
-Queremos evaluar un proyecto de inversión pero hay mucha incertidumbre:
+sim = 10000
+desvio_demanda = 20
+costo_compra = 50
+costo_almacenamiento = 5
+costo_stockout = 100
+
+# Rango de demandas medias a evaluar
+demandas_medias = np.arange(80, 121, 5)
+Q_vals = np.arange(60, 141, 5)
+Q_opts = []
+C_mins = []
+
+for media_demanda in demandas_medias:
+    costos_promedio = []
+    
+    for Q in Q_vals:
+        costos_totales = []
+        
+        for _ in range(sim):
+            # Generar demanda aleatoria
+            demanda = max(0, np.random.normal(media_demanda, desvio_demanda))
+            
+            # Calcular costos
+            costo_total = Q * costo_compra
+            
+            if demanda <= Q:
+                inventario_sobrante = Q - demanda
+                costo_total += inventario_sobrante * costo_almacenamiento
+            else:
+                stockout = demanda - Q
+                costo_total += stockout * costo_stockout
+            
+            costos_totales.append(costo_total)
+        
+        costos_promedio.append(np.mean(costos_totales))
+    
+    # Encontrar Q optimo para esta demanda media
+    idx_optimo = np.argmin(costos_promedio)
+    Q_opt = Q_vals[idx_optimo]
+    C_min = costos_promedio[idx_optimo]
+    
+    Q_opts.append(Q_opt)
+    C_mins.append(C_min)
+
+# Graficar sensibilidad
+import matplotlib.pyplot as plt
+plt.plot(demandas_medias, Q_opts, 'bo-', linewidth=2, markersize=6)
+plt.xlabel('Demanda media')
+plt.ylabel('Cantidad optima (Q*)')
+plt.title('Sensibilidad: Cantidad optima vs Demanda media')
+plt.grid(True, alpha=0.3)
+plt.show()
+\end{lstlisting}
+
+\subsection{Problema 2: Optimización de reparto}
+
+\paragraph{Enunciado}
+Una empresa de logística busca optimizar la cantidad de repartidores para su servicio de entrega diario. La empresa estima una demanda promedio de 80 pedidos por día. Cada repartidor puede completar 12 entregas diarias, con un costo de contratación de \$120 por día. Adicionalmente, cada pedido que no se logre satisfacer representa un costo de penalización de \$25.
+
+\paragraph{Planteo del problema}
 \begin{itemize}
-    \item Inversión inicial: puede ser \$100000 pero puede variar ±\$10000
-    \item Flujo de caja anual: esperamos \$30000 pero puede variar ±\$5000
-    \item Tasa de descuento: entre 8\% y 12\%
-    \item Duración del proyecto: entre 5 y 10 años (más probable 8 años)
+    \item \textbf{Variable de decisión:} $M$ = número de repartidores a contratar
+    \item \textbf{Variable aleatoria:} $D \sim \text{Poisson}(\lambda=80)$ = demanda diaria
+    \item \textbf{Parámetros:} $c=12$ (capacidad por repartidor), $c_m=120$ (costo por repartidor), $c_p=25$ (costo de penalización)
 \end{itemize}
-El problema es que no sabemos exactamente cuánto va a costar el proyecto, cuánto vamos a ganar cada año, ni cuánto va a durar. Si calculamos el VPN con valores fijos, nos perdemos toda la incertidumbre.
 
-\vspace{1em}
+\paragraph{Función objetivo}
+Para un día dado, con $M$ repartidores y una demanda $D$, el costo total es:
+\[ C(M,D) = \underbrace{c_m \cdot M}_{\text{Costo Fijo}} + \underbrace{c_p \cdot \max(D - c \cdot M, 0)}_{\text{Costo de Desabastecimiento}} \]
 
-La simulación nos permite generar 10000 escenarios diferentes, cada uno con valores aleatorios para todas las variables. Calculamos el VPN de cada escenario y vemos la distribución de resultados. Así sabemos no solo el VPN esperado, sino también qué tan riesgoso es el proyecto.
+\textbf{Objetivo:} Encontrar $M^*$ que minimice $E[C(M,D)]$ mediante simulación.
 
-\vspace{1em}
-
-\textbf{Resolución en Python:}
+\subsubsection{Simulación base}
 
 \begin{lstlisting}[language=Python]
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy.stats import triang
 
-def simulacion_proyecto(n_simulaciones=10000):
-    np.random.seed(42)
-    
-    # Parametros de las distribuciones
-    inv_media, inv_std = 100000, 10000
-    flujo_media, flujo_std = 30000, 5000
-    tasa_min, tasa_max = 0.08, 0.12
-    
-    # Parametros para distribucion triangular (min, moda, max)
-    vida_min, vida_moda, vida_max = 5, 8, 10
-    
-    vpn_resultados = []
-    
-    for _ in range(n_simulaciones):
-        # Generar valores aleatorios
-        inversion_inicial = np.random.normal(inv_media, inv_std)
-        flujo_anual = np.random.normal(flujo_media, flujo_std)
-        tasa_descuento = np.random.uniform(tasa_min, tasa_max)
-        vida_util = triang.rvs(c=(vida_moda-vida_min)/(vida_max-vida_min), 
-                              loc=vida_min, scale=vida_max-vida_min)
-        
-        # Calcular VPN
-        vpn = -inversion_inicial
-        for anio in range(1, int(vida_util) + 1):
-            vpn += flujo_anual / ((1 + tasa_descuento) ** anio)
-        
-        vpn_resultados.append(vpn)
-    
-    return np.array(vpn_resultados)
+# parametros del problema
+lam = 80
+cap_por_repartidor = 12
+costo_repartidor = 120
+costo_penal = 25
+sim = 10000
+np.random.seed(42)
 
-# Ejecutar simulacion
-vpn_simulaciones = simulacion_proyecto()
+# rango de M
+M_vals = np.arange(0, 16)
+costos_prom = []
 
-# Calcular estadisticas
-media_vpn = np.mean(vpn_simulaciones)
-std_vpn = np.std(vpn_simulaciones)
-percentil_5 = np.percentile(vpn_simulaciones, 5)
-percentil_95 = np.percentile(vpn_simulaciones, 95)
-prob_rentable = np.mean(vpn_simulaciones > 0)
+for M in M_vals:
+    # 1) simular demanda
+    demanda = np.random.poisson(lam=lam, size=sim)
+    # 2) calcular demanda insatisfecha
+    capacidad_total = cap_por_repartidor * M
+    pedidos_no_servidos = np.maximum(demanda - capacidad_total, 0)
+    # 3) costo total
+    costo_operativo = costo_repartidor * M
+    costo_penalizacion = costo_penal * pedidos_no_servidos
+    costo_total = costo_operativo + costo_penalizacion
+    costos_prom.append(costo_total.mean())
 
-print(f"VPN promedio: ${media_vpn:,.2f}")
-print(f"Desviacion estandar: ${std_vpn:,.2f}")
-print(f"Percentil 5%: ${percentil_5:,.2f}")
-print(f"Percentil 95%: ${percentil_95:,.2f}")
-print(f"Probabilidad de ser rentable: {prob_rentable:.2%}")
-
-# Graficar distribucion del VPN
-plt.figure(figsize=(10, 6))
-plt.hist(vpn_simulaciones, bins=50, alpha=0.7, color='skyblue', edgecolor='black')
-plt.axvline(media_vpn, color='red', linestyle='--', linewidth=2, label=f'Media: ${media_vpn:,.0f}')
-plt.axvline(0, color='green', linestyle='-', linewidth=2, label='VPN = 0')
-plt.xlabel('Valor Presente Neto ($)')
-plt.ylabel('Frecuencia')
-plt.title('Distribucion del VPN - Simulacion Montecarlo')
-plt.legend()
-plt.grid(True, alpha=0.3)
-plt.show()
+# elegir M optimo
+idx_optimo = np.argmin(costos_prom)
+M_opt, C_min = M_vals[idx_optimo], costos_prom[idx_optimo]
+print(M_opt, C_min)
 \end{lstlisting}
 
-\section{¿Cómo sabemos que está bien?}
-
-Hay que verificar que los resultados se estabilicen. Si simulamos muy pocas veces, el resultado puede ser muy variable. Si simulamos muchas veces, el resultado se estabiliza.
-
-\vspace{1em}
-
-La idea es hacer una ``media móvil'': calculamos el promedio de los primeros 1000 resultados, luego de los primeros 2000, 3000, etc. Si el promedio se estabiliza (no cambia mucho), entonces sabemos que tenemos suficientes simulaciones.
-
-\vspace{1em}
-
+\subsubsection{Sensibilidad vs. $\lambda$}
 \begin{lstlisting}[language=Python]
-def verificar_convergencia(resultados, ventana=1000):
-    medias_moviles = []
-    for i in range(ventana, len(resultados)):
-        media_movil = np.mean(resultados[i-ventana:i])
-        medias_moviles.append(media_movil)
-    
-    plt.plot(range(ventana, len(resultados)), medias_moviles)
-    plt.xlabel('Numero de iteraciones')
-    plt.ylabel('Media movil')
-    plt.title('Convergencia de la Simulacion')
-    plt.grid(True, alpha=0.3)
-    plt.show()
-    
-    return medias_moviles
+import numpy as np
+
+sim = 10000
+cap_por_repartidor = 12
+costo_repartidor = 120
+costo_penal = 25
+
+lambdas = np.arange(60, 121, 5)
+M_vals = np.arange(0, 20)
+M_opts = []
+C_mins = []
+
+for lam in lambdas:
+    costos_prom = []
+    for M in M_vals:
+        demanda = np.random.poisson(lam=lam, size=sim)
+        capacidad_total = cap_por_repartidor * M
+        pedidos_no_servidos = np.maximum(demanda - capacidad_total, 0)
+        costo_operativo = costo_repartidor * M
+        costo_penalizacion_total = costo_penal * pedidos_no_servidos
+        costo_total_promedio = (costo_operativo + costo_penalizacion_total).mean()
+        costos_prom.append(costo_total_promedio)
+    idx_optimo = np.argmin(costos_prom)
+    M_opt, C_min = M_vals[idx_optimo], costos_prom[idx_optimo]
+    M_opts.append(M_opt)
+    C_mins.append(C_min)
 \end{lstlisting}
 
-\section{Código básico}
+\subsection{Problema 3: Optimización de mantenimiento}
+
+\paragraph{Enunciado}
+Una fábrica busca optimizar el programa de mantenimiento para una de sus máquinas críticas. Esta máquina sufre una falla catastrófica después de acumular exactamente 5 fallos menores, cuya probabilidad es del 20\%. Para evitar las paradas costosas asociadas a esta falla, se realizan inspecciones preventivas a intervalos fijos de $T$ días. Los costos asociados son:
+\begin{itemize}
+    \item Costo Falla Catastrófica ($c_f$): \$10,000 (si falla entre inspecciones)
+    \item Costo Inspección ($c_i$): \$400 (por cada visita)
+    \item Costo Mantenimiento Preventivo ($c_p$): \$2,000 (adicional si la inspección coincide con el día de la falla)
+\end{itemize}
+
+\paragraph{Planteo del problema}
+\begin{itemize}
+    \item \textbf{Variable de decisión:} $T$ = intervalo entre inspecciones (días)
+    \item \textbf{Variable aleatoria:} $D$ = duración del ciclo hasta la falla catastrófica
+    \item \textbf{Modelo:} $D = D_{fracasos} + r$ donde $D_{fracasos} \sim \text{NegBin}(r=5, p=0.20)$
+    \item \textbf{Parámetros:} $c_f=10000$, $c_i=400$, $c_p=2000$
+\end{itemize}
+
+\paragraph{Función objetivo}
+Para un ciclo de duración $D$ y un intervalo $T$:
+\[ C(T, D) = \underbrace{C_{\text{mantenimiento}}(T, D)}_{\text{Preventivo o Catastrófico}} + \underbrace{C_{\text{inspección}}(T, D)}_{\text{Visitas}} \]
+
+Donde:
+\begin{itemize}
+    \item $C_{\text{mantenimiento}}(T, D) = \begin{cases} c_p & \text{si } D \pmod T = 0 \\ c_f & \text{si } D \pmod T \neq 0 \end{cases}$
+    \item $C_{\text{inspección}}(T, D) = c_i \cdot \lceil D/T \rceil$
+\end{itemize}
+
+\textbf{Objetivo:} Minimizar el Costo Diario Esperado: $E[C_{\text{diario}}(T)] = \frac{E[C(T, D)]}{E[D]}$
+
+\vspace{1em}
+
+\textbf{Nota:} $E[D] = r/p = 5/0.20 = 25$ días.
+
+\subsubsection{Simulación base}
+\begin{lstlisting}[language=Python]
+import numpy as np
+
+r, p = 5, 0.20
+costo_falla_catastrofica = 10000
+costo_preventivo = 2000
+costo_inspeccion = 400
+sim = 20000
+np.random.seed(42)
+
+T_vals = np.arange(1, 15)
+costos_por_dia = []
+
+for T in T_vals:
+    # 1) simular D
+    D_fracasos = np.random.negative_binomial(r, p, size=sim)
+    D = D_fracasos + r
+    # 2) costos de mantenimiento
+    mantenimiento_catastrofico = (D % T != 0) * costo_falla_catastrofica
+    mantenimiento_preventivo = (D % T == 0) * costo_preventivo
+    costo_mantenimiento = mantenimiento_catastrofico + mantenimiento_preventivo
+    # 3) costos de inspeccion
+    num_inspecciones = np.ceil(D / T)
+    costo_inspeccion_ciclo = num_inspecciones * costo_inspeccion
+    # 4) costo diario esperado
+    costo_total_ciclo = costo_mantenimiento + costo_inspeccion_ciclo
+    costo_diario_promedio = costo_total_ciclo.mean() / D.mean()
+    costos_por_dia.append(costo_diario_promedio)
+
+idx_optimo = np.argmin(costos_por_dia)
+T_opt, C_min = T_vals[idx_optimo], costos_por_dia[idx_optimo]
+print(T_opt, C_min)
+\end{lstlisting}
+
+\subsubsection{Sensibilidad vs. $c_f$}
+\begin{lstlisting}[language=Python]
+import numpy as np
+
+sim = 10000
+r, p = 5, 0.20
+costo_preventivo = 2000
+costo_inspeccion = 400
+
+cf_vals = np.arange(5000, 20001, 2500)
+T_vals = np.arange(1, 15)
+T_opts = []
+C_mins = []
+
+# media teorica de D
+D_mean_fracasos = r * (1 - p) / p
+D_mean = D_mean_fracasos + r
+
+for costo_falla_catastrofica in cf_vals:
+    costos_diarios_prom = []
+    # simular D una sola vez (CRN)
+    D_fracasos_sim = np.random.negative_binomial(r, p, size=sim)
+    D_sim = D_fracasos_sim + r
+    for T in T_vals:
+        mantenimiento_catastrofico = (D_sim % T != 0) * costo_falla_catastrofica
+        mantenimiento_preventivo = (D_sim % T == 0) * costo_preventivo
+        costo_mantenimiento = mantenimiento_catastrofico + mantenimiento_preventivo
+        num_inspecciones = np.ceil(D_sim / T)
+        costo_inspeccion_ciclo = num_inspecciones * costo_inspeccion
+        costo_total_ciclo = costo_mantenimiento + costo_inspeccion_ciclo
+        costo_diario_promedio = costo_total_ciclo.mean() / D_mean
+        costos_diarios_prom.append(costo_diario_promedio)
+    idx_optimo = np.argmin(costos_diarios_prom)
+    T_opt, C_min = T_vals[idx_optimo], costos_diarios_prom[idx_optimo]
+    T_opts.append(T_opt)
+    C_mins.append(C_min)
+\end{lstlisting}
+
+\subsection{Problema 4: Riesgo en proyecto}
+
+\paragraph{Enunciado}
+Una constructora está planificando un proyecto que se desarrolla en tres etapas secuenciales: Diseño, Construcción y Pruebas. Tras consultar con especialistas de cada área, se estima que la duración de cada etapa es incierta pero se dieron estimativos del tiempo mínimo y máximo de cada una. Debido a restricciones de la empresa, el proyecto completo tiene un plazo límite estricto de 25 días. Cada día de retraso más allá de este límite genera un costo de penalización de \$500.
+
+\begin{center}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Tarea} & \textbf{Distribución} & \textbf{Mínimo ($a_i$)} & \textbf{Máximo ($b_i$)} \\
+\hline
+A (Diseño) & $\text{Unif}(a_A, b_A)$ & 5 días & 10 días \\
+B (Construcción) & $\text{Unif}(a_B, b_B)$ & 8 días & 15 días \\
+C (Pruebas) & $\text{Unif}(a_C, b_C)$ & 4 días & 7 días \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{Planteo del problema}
+\begin{itemize}
+    \item \textbf{Variable aleatoria:} $D_{total} = D_A + D_B + D_C$ donde cada $D_i \sim \text{Unif}(a_i, b_i)$
+    \item \textbf{Parámetros:} $L=25$ (límite), $c_p=500$ (penalización por día de retraso)
+    \item \textbf{Objetivos:} 
+    \begin{itemize}
+        \item Estimar $P(D_{total} > 25)$ = probabilidad de retraso
+        \item Estimar $E[c_p \cdot \max(0, D_{total} - L)]$ = costo esperado de penalización
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Simulación base}
+\begin{lstlisting}[language=Python]
+import numpy as np
+
+fecha_limite = 25
+costo_penalizacion = 500
+sim = 100000
+np.random.seed(42)
+
+tareas = {'A': (5, 10), 'B': (8, 15), 'C': (4, 7)}
+
+duracion_A = np.random.uniform(tareas['A'][0], tareas['A'][1], size=sim)
+duracion_B = np.random.uniform(tareas['B'][0], tareas['B'][1], size=sim)
+duracion_C = np.random.uniform(tareas['C'][0], tareas['C'][1], size=sim)
+D_total = duracion_A + duracion_B + duracion_C
+
+retraso = np.maximum(D_total - fecha_limite, 0)
+E_costo = (retraso * costo_penalizacion).mean()
+P_retraso = (D_total > fecha_limite).mean()
+print(P_retraso, E_costo)
+\end{lstlisting}
+
+\subsubsection{Sensibilidad vs. $b_B$}
+\begin{lstlisting}[language=Python]
+import numpy as np
+
+sim = 100000
+fecha_limite = 25
+costo_penalizacion = 500
+
+tareas_fijas = {'A': (5, 10), 'C': (4, 7)}
+a_B = 8
+
+b_B_vals = np.arange(12, 21, 1)
+P_retraso_vals = []
+E_costo_vals = []
+
+for b_B in b_B_vals:
+    duracion_A = np.random.uniform(tareas_fijas['A'][0], tareas_fijas['A'][1], size=sim)
+    duracion_B = np.random.uniform(a_B, b_B, size=sim)
+    duracion_C = np.random.uniform(tareas_fijas['C'][0], tareas_fijas['C'][1], size=sim)
+    D_total = duracion_A + duracion_B + duracion_C
+    retraso = np.maximum(D_total - fecha_limite, 0)
+    E_costo = (retraso * costo_penalizacion).mean()
+    P_retraso = (D_total > fecha_limite).mean()
+    P_retraso_vals.append(P_retraso)
+    E_costo_vals.append(E_costo)
+\end{lstlisting}
+
+\subsubsection{Comparación teórica vs. simulación}
+\begin{lstlisting}[language=Python]
+import numpy as np
+
+tareas = {'A': (5, 10), 'B': (8, 15), 'C': (4, 7)}
+sim = 1000000
+
+# 1) analitico de media y varianza
+E_D_analitica = 0
+Var_D_analitica = 0
+for (a, b) in tareas.values():
+    mu = (a + b) / 2
+    var = (b - a) ** 2 / 12
+    E_D_analitica += mu
+    Var_D_analitica += var
+Std_D_analitica = np.sqrt(Var_D_analitica)
+
+# 2) monte carlo
+duracion_A = np.random.uniform(tareas['A'][0], tareas['A'][1], size=sim)
+duracion_B = np.random.uniform(tareas['B'][0], tareas['B'][1], size=sim)
+duracion_C = np.random.uniform(tareas['C'][0], tareas['C'][1], size=sim)
+D_total = duracion_A + duracion_B + duracion_C
+E_D_mc = D_total.mean()
+Std_D_mc = D_total.std()
+
+print(round(E_D_analitica, 4), round(E_D_mc, 4))
+print(round(Std_D_analitica, 4), round(Std_D_mc, 4))
+\end{lstlisting}
+
+\section{Extra: Código básico}
 
 \begin{lstlisting}[language=Python]
 # Generar numeros aleatorios
