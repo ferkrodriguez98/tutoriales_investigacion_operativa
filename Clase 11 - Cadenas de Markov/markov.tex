@@ -8,6 +8,28 @@
 \usepackage{graphicx}
 \usepackage{tikz}
 \usepackage{enumitem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+\lstset{
+  language=Python,
+  basicstyle=\small\ttfamily,
+  keywordstyle=\color{red},
+  stringstyle=\color{green!50!black},
+  commentstyle=\color{gray}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  frameround=tttt,
+  backgroundcolor=\color{black!5},
+  extendedchars=true,
+  inputencoding=utf8,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'{\i}}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1
+}
+
+\usetikzlibrary{arrows.meta, positioning}
 
 \setlength{\parindent}{0pt}
 
@@ -28,7 +50,9 @@ Una cadena de Markov es un proceso estocástico que cumple con la propiedad de M
 
 Sea $\{X_n, n \geq 0\}$ un proceso estocástico con espacio de estados $S$. Decimos que es una cadena de Markov si para todo $n \geq 0$ y para todos los estados $i_0, i_1, ..., i_n, j \in S$:
 
-\[P(X_{n+1} = j | X_n = i_n, X_{n-1} = i_{n-1}, ..., X_0 = i_0) = P(X_{n+1} = j | X_n = i_n)\]
+\[
+P(X_{n+1} = j | X_n = i_n, X_{n-1} = i_{n-1}, ..., X_0 = i_0) = P(X_{n+1} = j | X_n = i_n)
+\]
 
 \subsection{Matriz de Transición}
 
@@ -39,10 +63,56 @@ La matriz de transición $P = (p_{ij})$ contiene las probabilidades de transici�
 Propiedades importantes:
 \begin{itemize}
     \item $0 \leq p_{ij} \leq 1$ para todo $i,j \in S$
-    \item $\sum_{j \in S} p_{ij} = 1$ para todo $i \in S$
+    \item $\sum_{j \in S} p_{ij} = 1$ para todo $i \in S$ (cada fila suma 1)
 \end{itemize}
 
-\section{Ejercicios Resueltos}
+\subsection{Ejemplo Introductorio}
+
+Consideremos un sistema muy simple con solo dos estados: Funcionando (F) y Roto (R).
+
+\begin{itemize}
+    \item Si el sistema está funcionando hoy, hay 80\% de probabilidad de que siga funcionando mañana y 20\% de que se rompa.
+    \item Si el sistema está roto hoy, hay 60\% de probabilidad de que sea reparado (vuelva a F) y 40\% de que siga roto.
+\end{itemize}
+
+La matriz de transición es:
+
+\[P = \begin{pmatrix}
+0.8 & 0.2 \\
+0.6 & 0.4
+\end{pmatrix}\]
+
+donde las filas representan el estado actual (F, R) y las columnas el estado futuro.
+
+\subsubsection{¿Qué pasa en 2 días?}
+
+Si hoy el sistema está funcionando, ¿cuál es la probabilidad de que esté funcionando en 2 días? Debemos considerar todos los caminos posibles:
+
+\begin{itemize}
+    \item F $\rightarrow$ F $\rightarrow$ F: $(0.8)(0.8) = 0.64$
+    \item F $\rightarrow$ R $\rightarrow$ F: $(0.2)(0.6) = 0.12$
+\end{itemize}
+
+\begin{center}
+    \textbf{Total:} $0.64 + 0.12 = 0.76$
+\end{center}
+
+Esto es equivalente a calcular $P^2$ (multiplicar la matriz por sí misma):
+
+\[P^2 = \begin{pmatrix}
+0.8 & 0.2 \\
+0.6 & 0.4
+\end{pmatrix} \begin{pmatrix}
+0.8 & 0.2 \\
+0.6 & 0.4
+\end{pmatrix} = \begin{pmatrix}
+0.76 & 0.24 \\
+0.72 & 0.28
+\end{pmatrix}\]
+
+El elemento $P^2_{FF} = 0.76$ confirma nuestro cálculo manual.
+
+\section{Ejercicios Básicos}
 
 \subsection{Ejercicio 1: Predicción del Clima}
 
@@ -110,7 +180,7 @@ Por lo tanto, hay un 17\% de probabilidad de que llueva dentro de dos días si h
 
 \subsection{Ejercicio 2: Puntos en Tenis}
 
-Final de Roland Garros 2025. Francisco Cerúndolo está contra Holger Rune con match point. Siendo el analista de tenis de Cerúndolo, se sabe las siguientes probabilidades:
+Final de Roland Garros. Francisco Cerúndolo está contra Holger Rune con match point. Siendo el analista de tenis de Cerúndolo, se sabe las siguientes probabilidades:
 
 \begin{itemize}
     \item Hay un 50\% de chances de ganar el punto de un ace o un saque no devuelto
@@ -257,7 +327,7 @@ b) Para calcular la probabilidad de que esté rota después de dos intervencione
 Posibles caminos, sin considerar que la arregla porque si no sería infinito:
 \begin{itemize}
     \item F $\rightarrow$ M $\rightarrow$ M $\rightarrow$ R
-    \item F $\rightarrow$ R $\rightarrow$ R $\rightarrow$ R  
+    \item F $\rightarrow$ R $\rightarrow$ R $\rightarrow$ R
     \item F $\rightarrow$ R $\rightarrow$ M $\rightarrow$ R
     \item F $\rightarrow$ M $\rightarrow$ R $\rightarrow$ R
 \end{itemize}
@@ -289,5 +359,984 @@ P(\text{F durante 3 horas}) &= 0.80 \cdot 0.80 \cdot 0.80 \\
 &= 0.512
 \end{split}
 \]
+
+\section{Clasificación de Cadenas de Markov}
+
+\subsection{Estados Comunicantes}
+
+Decimos que el estado $i$ \textbf{comunica} con el estado $j$ (denotado $i \rightarrow j$) si existe algún número $n \geq 0$ tal que $P_{ij}^{(n)} > 0$, es decir, si es posible llegar del estado $i$ al estado $j$ en un número finito de pasos.
+
+\vspace{0.5em}
+
+Dos estados $i$ y $j$ se \textbf{intercomunican} si $i \rightarrow j$ y $j \rightarrow i$.
+
+\subsection{Cadenas Irreducibles}
+
+Una cadena de Markov es \textbf{irreducible} si todos sus estados se intercomunican, es decir, desde cualquier estado es posible llegar a cualquier otro estado en un número finito de pasos.
+
+\vspace{0.5em}
+
+\textbf{Ejemplo:} La cadena del clima (Ejercicio 1) es irreducible porque desde cualquier estado (Soleado, Nublado, Lluvioso) se puede llegar a cualquier otro estado.
+
+\subsection{Periodicidad}
+
+El \textbf{período} de un estado $i$ es el máximo común divisor de todos los valores de $n$ para los cuales $P_{ii}^{(n)} > 0$.
+
+\vspace{0.5em}
+
+Un estado con período 1 se llama \textbf{aperiódico}. Una cadena es aperiódica si todos sus estados son aperiódicos.
+
+\vspace{0.5em}
+
+\textbf{Intuición:} Un estado periódico solo puede volver a sí mismo en múltiplos de su período. Por ejemplo, si el período es 2, solo puede volver en 2, 4, 6, etc. pasos.
+
+\subsection{Estados Absorbentes}
+
+Un estado $i$ es \textbf{absorbente} si $p_{ii} = 1$, es decir, una vez que el sistema entra en ese estado, nunca puede salir de él.
+
+\vspace{0.5em}
+
+\textbf{Ejemplo:} En el Ejercicio 2 (Tenis), los estados W (Cerúndolo gana) y L (Cerúndolo pierde) son estados absorbentes, porque una vez terminado el punto, no hay transiciones a otros estados.
+
+\subsection{Cadenas Ergódicas}
+
+Una cadena de Markov es \textbf{ergódica} si es \textbf{irreducible} y \textbf{aperiódica}. Las cadenas ergódicas tienen una propiedad importante: poseen una única distribución estacionaria $\pi$ hacia la cual converge el sistema independientemente del estado inicial.
+
+\section{Conceptos Avanzados}
+
+\subsection{Ecuaciones de Chapman-Kolmogorov}
+
+\textbf{Intuición:} Si queremos saber la probabilidad de ir del estado $i$ al estado $j$ en $n+m$ pasos, podemos pensarlo como: primero damos $n$ pasos (llegamos a algún estado intermedio $k$), y luego desde $k$ damos $m$ pasos más hasta llegar a $j$.
+
+\vspace{0.5em}
+
+Para calcular las probabilidades de transición en $n$ pasos, definimos:
+
+\[P_{ij}^{(n)} = P(X_n = j | X_0 = i)\]
+
+Se cumple la ecuación de Chapman-Kolmogorov:
+
+\[P_{ij}^{(n+m)} = \sum_{k \in S} P_{ik}^{(n)} \cdot P_{kj}^{(m)}\]
+
+En forma matricial:
+
+\[P^{(n+m)} = P^{(n)} \cdot P^{(m)}, \quad P^{(n)} = P^n\]
+
+Esto significa que para calcular probabilidades de transición a $n$ pasos, simplemente elevamos la matriz de transición $P$ a la potencia $n$.
+
+\vspace{0.5em}
+
+\textbf{Conexión con el Ejercicio 1:} Cuando calculamos la probabilidad de lluvia en 2 días partiendo de soleado, estuvimos usando implícitamente Chapman-Kolmogorov: sumamos sobre todos los estados intermedios posibles (soleado, nublado, lluvioso) en el día 1.
+
+\subsection{Distribución en el Tiempo $n$}
+
+\textbf{Intuición:} Si comenzamos con una distribución de probabilidad inicial $q^{(0)}$ (cuánto porcentaje en cada estado al tiempo 0), podemos calcular cómo se distribuye el sistema en cualquier tiempo futuro $n$.
+
+\vspace{0.5em}
+
+Sea $q^{(0)}$ el vector fila inicial con $q^{(0)}_i = P(X_0 = i)$. La distribución de probabilidad en el tiempo $n$ está dada por:
+
+\[q^{(n)} = q^{(0)} \cdot P^n\]
+
+donde $q^{(n)}_j = P(X_n = j)$. Esta fórmula permite predecir la distribución futura del sistema conociendo su distribución inicial.
+
+\vspace{0.5em}
+
+\textbf{Ejemplo:} Si al inicio el clima tiene 50\% de probabilidad de estar soleado, 30\% nublado y 20\% lluvioso, entonces $q^{(0)} = [0.5, 0.3, 0.2]$. Para saber la distribución en 5 días, calculamos $q^{(5)} = q^{(0)} \cdot P^5$.
+
+\subsection{Estado Estacionario}
+
+\textbf{Motivación:} ¿Qué pasa si aplicamos la matriz de transición $P$ infinitas veces? ¿Converge la distribución del sistema a algo fijo?
+
+\vspace{0.5em}
+
+En cadenas de Markov \textbf{ergódicas} (irreducibles y aperiódicas) existe un vector de probabilidades estacionarias $\pi$ tal que:
+
+\[\pi = \pi \cdot P, \quad \sum_{j \in S} \pi_j = 1\]
+
+\textbf{¿Por qué esta ecuación?} Si $\pi$ representa una distribución estacionaria, significa que al aplicar la matriz de transición $P$, la distribución no cambia: sigue siendo $\pi$. Es decir, el sistema está en equilibrio.
+
+\vspace{0.5em}
+
+Para encontrar $\pi$, resolvemos el sistema de ecuaciones:
+
+\[\pi_j = \sum_{i \in S} \pi_i \cdot p_{ij}, \quad \sum_{j \in S} \pi_j = 1\]
+
+\subsubsection{Método práctico para resolver el sistema}
+
+Para resolver el sistema podemos seguir los siguientes pasos:
+
+\begin{enumerate}
+    \item Escribir la ecuación $\pi = \pi \cdot P$ como un sistema de ecuaciones lineales.
+    \item La ecuación es equivalente a $(\pi \cdot P)^T = \pi^T$, o sea $(P^T - I)\pi^T = 0$.
+    \item Este sistema tiene infinitas soluciones (sistema homogéneo). Una de las ecuaciones es redundante.
+    \item Reemplazar una ecuación por $\sum_j \pi_j = 1$ (condición de normalización).
+    \item Resolver el sistema resultante usando Python.
+\end{enumerate}
+
+\vspace{0.5em}
+
+El valor $\pi_j$ representa la fracción de tiempo que el sistema pasa en el estado $j$ a largo plazo.
+
+\subsection{Pasos Prácticos de Cálculo}
+
+Para resolver problemas con cadenas de Markov:
+
+\begin{enumerate}
+    \item Definir el conjunto de estados $S$ y construir la matriz de transición $P$.
+    \item Clasificar la cadena (irreducible, ergódica, con estados absorbentes, etc.).
+    \item Calcular $P^n$ para probabilidades a $n$ pasos, o usar $q^{(n)} = q^{(0)} \cdot P^n$.
+    \item Si la cadena es ergódica, resolver $\pi = \pi \cdot P$ para obtener el estado estacionario.
+    \item Interpretar los resultados en el contexto del problema.
+\end{enumerate}
+
+\subsection{Importancia en Investigación Operativa}
+
+Las cadenas de Markov son fundamentales en Investigación Operativa porque aplican para temas que vemos mas adelante en la materia:
+
+\begin{itemize}
+    \item Modelan sistemas de colas, inventarios, fiabilidad y comportamiento de clientes.
+    \item Permiten predecir el desempeño del sistema y diseñar políticas óptimas.
+    \item Cuantifican tiempos de espera y probabilidades de eventos críticos.
+\end{itemize}
+
+\section{Ejercicios Intermedios}
+
+\subsection{Ejercicio 4: Demanda en Centro de Datos}
+
+Un datacenter de una empresa de cloud computing puede tener tres niveles de demanda diaria:
+
+\begin{itemize}
+    \item Baja demanda (B),
+    \item Media demanda (M),
+    \item Alta demanda (A).
+\end{itemize}
+
+Según los registros históricos:
+
+\begin{itemize}
+    \item Si está en baja demanda:
+    \begin{itemize}
+        \item 0.3 de permanecer en baja,
+        \item 0.5 de pasar a media,
+        \item 0.2 de pasar a alta.
+    \end{itemize}
+    \item Si está en media demanda:
+    \begin{itemize}
+        \item 0.2 de pasar a baja,
+        \item 0.4 de permanecer en media,
+        \item 0.4 de pasar a alta.
+    \end{itemize}
+    \item Si está en alta demanda:
+    \begin{itemize}
+        \item 0.3 de pasar a baja,
+        \item 0.5 de pasar a media,
+        \item 0.2 de permanecer en alta.
+    \end{itemize}
+\end{itemize}
+
+Se modela como una cadena de Markov. Se desea conocer la probabilidad de que en 3 días el sistema esté en demanda alta, si hoy se encuentra en demanda baja.
+
+\subsection*{\underline{Solución:}}
+
+\vspace{0.5em}
+
+\subsubsection{Estados:}
+
+Denotamos los estados como:
+\[
+\text{Baja (0)}, \quad \text{Media (1)}, \quad \text{Alta (2)}
+\]
+
+\subsubsection{Matriz de transición:}
+
+\[P = \begin{pmatrix}
+0.3 & 0.5 & 0.2 \\
+0.2 & 0.4 & 0.4 \\
+0.3 & 0.5 & 0.2
+\end{pmatrix}\]
+
+Cada fila representa el estado actual y cada columna el estado futuro.
+
+\subsubsection{Estado inicial:}
+
+Como el sistema comienza en demanda baja (estado 0), el vector inicial es:
+\[
+\mathbf{e_0} = [1 \quad 0 \quad 0]
+\]
+
+\subsubsection{Cálculo de $P^3$:}
+
+Calculamos la matriz de transición a 3 pasos:
+\[
+\mathbf{e_0} \cdot P^3 = \text{probabilidades de estar en cada estado al día 3}
+\]
+
+\subsubsection{Resultado (usando Python):}
+
+Mediante multiplicación matricial, se obtiene:
+
+\[
+\mathbf{e_0} \cdot P^3 = [0.248, \quad 0.452, \quad \boxed{0.300}]
+\]
+
+\subsubsection{Conclusión:}
+
+La probabilidad de que el sistema esté en \textbf{demanda alta} en 3 días, comenzando en baja demanda, es:
+
+\[
+\boxed{0.300}
+\]
+
+\subsection{Ejercicio 5: Movilidad del Ingeniero Civil}
+
+Un ingeniero civil trabaja en tres ciudades: A, B y C. Cada día permanece en la ciudad o se desplaza a otra, dependiendo de la demanda de trabajo. Las probabilidades de transición entre ciudades son:
+
+\begin{itemize}
+    \item Si trabaja en C:
+    \[
+    P(C \rightarrow C) = 0.4, \quad P(C \rightarrow B) = 0.4, \quad P(C \rightarrow A) = 0.2
+    \]
+
+    \item Si trabaja en B:
+    \[
+    P(B \rightarrow B) = 0.2, \quad P(B \rightarrow C) = 0.6, \quad P(B \rightarrow A) = 0.2
+    \]
+
+    \item Si trabaja en A:
+    \[
+    P(A \rightarrow A) = 0.1, \quad P(A \rightarrow B) = 0.3, \quad P(A \rightarrow C) = 0.6
+    \]
+\end{itemize}
+
+\begin{itemize}
+    \item[a)] ¿Cuál es la probabilidad de que esté en la ciudad C después de 2 días, si hoy está en C?
+    \item[b)] ¿Cuál es la distribución estacionaria a largo plazo?
+\end{itemize}
+
+\subsection*{\underline{Solución:}}
+
+\vspace{0.5em}
+
+\subsubsection{Definición de estados:}
+
+Codificamos las ciudades como:
+\[
+A = 0, \quad B = 1, \quad C = 2
+\]
+
+\subsubsection{Matriz de transición $P$:}
+
+\[P = \begin{pmatrix}
+0.1 & 0.3 & 0.6 \\
+0.2 & 0.2 & 0.6 \\
+0.2 & 0.4 & 0.4
+\end{pmatrix}\]
+
+\textit{(Las filas corresponden al estado actual, las columnas al estado siguiente.)}
+
+\subsubsection{Parte a) Probabilidad de estar en C al cabo de 2 días (partiendo de C):}
+
+\[
+\text{Estado inicial: } \mathbf{e_2} = [0 \quad 0 \quad 1]
+\]
+\[
+\text{Buscamos: } \mathbf{e_2} \cdot P^2
+\]
+
+\subsubsection{Resultado (cálculo con Python):}
+
+\[
+\mathbf{e_2} \cdot P^2 = [0.26 \quad 0.34 \quad \boxed{0.40}]
+\]
+
+La probabilidad de estar en la ciudad C después de 2 días, comenzando en C, es:
+
+\[
+\boxed{0.40}
+\]
+
+\subsubsection{Parte b) Distribución estacionaria (a largo plazo):}
+
+Buscamos el vector $\pi = [\pi_A \quad \pi_B \quad \pi_C]$ tal que:
+
+\[
+\pi \cdot P = \pi, \quad \pi_A + \pi_B + \pi_C = 1
+\]
+
+Resolviendo el sistema lineal, se obtiene:
+
+\[
+\pi = \left[ \frac{12}{71}, \quad \frac{22}{71}, \quad \frac{37}{71} \right]
+\]
+
+En el largo plazo, el ingeniero pasa el:
+\[
+\boxed{\frac{12}{71} \approx 16.9\% \text{ en A}}, \quad
+\boxed{\frac{22}{71} \approx 31.0\% \text{ en B}}, \quad
+\boxed{\frac{37}{71} \approx 52.1\% \text{ en C}}
+\]
+
+\section{Procesos de Decisión de Markov (MDP)}
+
+\subsection{Motivación: De Cadenas Pasivas a Decisiones Activas}
+
+Hasta ahora vimos cadenas de Markov donde el sistema evoluciona según probabilidades fijas. No podemos influir en el comportamiento del sistema: simplemente observamos y calculamos probabilidades.
+
+\vspace{0.5em}
+
+En muchas situaciones reales, podemos \textbf{tomar decisiones} que afectan cómo evoluciona el sistema:
+
+\begin{itemize}
+    \item ¿Cuándo reparar una máquina?
+    \item ¿Cuándo reemplazarla por una nueva?
+    \item ¿Dónde estacionar el auto para minimizar costos?
+    \item ¿Cuándo hacer mantenimiento preventivo?
+\end{itemize}
+
+Los \textbf{Procesos de Decisión de Markov (MDP)} extienden las cadenas de Markov:
+
+\begin{enumerate}
+    \item \textbf{Decisiones}: En cada estado podemos elegir entre varias acciones.
+    \item \textbf{Transiciones dependientes de decisiones}: La probabilidad de ir al siguiente estado depende de la acción elegida.
+    \item \textbf{Costos o recompensas}: Cada decisión tiene un costo (o beneficio) asociado.
+\end{enumerate}
+
+\textbf{Objetivo:} Encontrar la \textit{política óptima} (qué decisión tomar en cada estado) que minimice el costo promedio a largo plazo (o maximice la recompensa).
+
+\subsection{Formulación General}
+
+En un MDP, para cada estado $i = 0, \ldots, M$ y decisión $k = 1, \ldots, K$, definimos:
+
+\begin{itemize}
+    \item $p_{ij}(k)$: probabilidad de transición del estado $i$ al estado $j$ bajo la decisión $k$.
+    \item $c_{ik}$: costo asociado a tomar la decisión $k$ en el estado $i$.
+    \item $y_{ik}$: variable de decisión que representa $P(\text{estado} = i \text{ y decisión } = k)$.
+\end{itemize}
+
+La variable $y_{ik}$ puede interpretarse como:
+
+\[y_{ik} = \pi_i \cdot D_{ik}\]
+
+donde $\pi_i$ es la probabilidad estacionaria de estar en el estado $i$ y $D_{ik}$ es la probabilidad de tomar la decisión $k$ dado que se está en el estado $i$.
+
+\subsection{Formulación por Programación Lineal}
+
+El objetivo es minimizar el costo promedio esperado a largo plazo:
+
+\[\text{Minimizar} \quad E(C) = \sum_{i=0}^{M} \sum_{k=1}^{K} c_{ik} \cdot y_{ik}\]
+
+sujeto a las siguientes restricciones:
+
+\subsubsection{Normalización:}
+\[\sum_{i=0}^{M} \sum_{k=1}^{K} y_{ik} = 1\]
+
+Esto garantiza que las $y_{ik}$ formen una distribución de probabilidad válida.
+
+\subsubsection{Balance de flujo en cada estado $j$:}
+\[\sum_{k=1}^{K} y_{jk} - \sum_{i=0}^{M} \sum_{k=1}^{K} y_{ik} \cdot p_{ij}(k) = 0\]
+
+\vspace{0.5em}
+
+\textbf{Intuición del balance de flujo:} Imaginemos que el sistema es una red de estados por la cual ``fluye'' probabilidad. Para cada estado $j$:
+
+\begin{itemize}
+    \item \textbf{Lado izquierdo} $\sum_{k} y_{jk}$: frecuencia con que se está en estado $j$ y se toma alguna acción (flujo que sale).
+    \item \textbf{Lado derecho} $\sum_{i,k} y_{ik} \cdot p_{ij}(k)$: frecuencia con que se llega al estado $j$ desde otros estados $i$ tomando decisiones $k$ (flujo que entra).
+\end{itemize}
+
+La ecuación dice: \textit{lo que sale del estado $j$ debe ser igual a lo que entra al estado $j$}. Esto garantiza que el sistema esté en equilibrio estacionario.
+
+\vspace{0.5em}
+
+Considere el estado $j$. Las flechas que entran representan flujos desde estados $i$ con decisiones $k$ que tienen probabilidad $p_{ij}(k)$ de llegar a $j$. Las flechas que salen representan las decisiones tomadas en $j$. El balance requiere que la suma de flujos entrantes iguale la suma de flujos salientes.
+
+\subsubsection{No negatividad:}
+\[y_{ik} \geq 0 \quad \forall\, i = 0, \ldots, M, \; k = 1, \ldots, K\]
+
+Una vez resuelto el problema de programación lineal, la probabilidad estacionaria $\pi_i$ y la política óptima se obtienen por:
+
+\[\pi_i = \sum_{k=1}^{K} y_{ik}\]
+
+\[\text{Política óptima en estado } i: \quad D_{ik} = \frac{y_{ik}}{\pi_i}\]
+
+\subsubsection{Interpretación de las Variables de Decisión}
+
+Las variables $y_{ik}$ pueden tomar valores reales entre 0 y 1, lo que permite políticas probabilísticas:
+
+\begin{itemize}
+    \item Si $y_{ik} = 0$: nunca se toma la decisión $k$ en el estado $i$.
+    \item Si $y_{ik} > 0$: existe una probabilidad de tomar la decisión $k$ en el estado $i$.
+    \item La suma $\sum_{k} D_{ik} = 1$ para cada estado $i$, garantizando que se tome alguna decisión.
+\end{itemize}
+
+Esta formulación convierte un problema de decisión secuencial en un problema de programación lineal que puede resolverse como ya sabemos.
+
+\section{Ejercicios de MDP}
+
+\subsection{Ejercicio 6: Reemplazo de Maquinaria (MDP)}
+
+Una empresa utiliza maquinaria que se desgasta con el tiempo. Cada máquina puede estar en uno de cuatro estados:
+
+\begin{itemize}
+    \item Estado 0: máquina nueva.
+    \item Estado 1: máquina con poco desgaste.
+    \item Estado 2: máquina deteriorada.
+    \item Estado 3: máquina rota.
+\end{itemize}
+
+En cada período, la empresa puede tomar una de las siguientes decisiones:
+
+\begin{enumerate}
+    \item No hacer nada ($k=1$).
+    \item Renovar la máquina ($k=2$, solo aplicable en estado 2).
+    \item Comprar una máquina nueva ($k=3$, aplicable en estados 1, 2 o 3).
+\end{enumerate}
+
+El objetivo es encontrar la política óptima (probabilística) que minimice el costo promedio a largo plazo.
+
+\subsubsection*{Matriz de transición sin intervención:}
+
+Cuando no se toma ninguna acción, la máquina evoluciona según:
+
+\begin{center}
+\begin{tabular}{c|cccc}
+\toprule
+Estado $i \to j$ & 0 & 1 & 2 & 3 \\
+\midrule
+0 & 0 & 7/8 & 1/16 & 1/16 \\
+1 & 0 & 3/4 & 1/8 & 1/8 \\
+2 & 0 & 0 & 1/2 & 1/2 \\
+3 & 0 & 0 & 0 & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Efecto de las decisiones:}
+
+\begin{itemize}
+    \item \textbf{Renovar} en el estado 2 (acción $k=2$) lleva con certeza al estado 1.
+    \item \textbf{Comprar nueva} en los estados 1, 2 o 3 (acción $k=3$) lleva con certeza al estado 0.
+\end{itemize}
+
+\textbf{Costos de las decisiones (en miles de dólares):}
+
+\begin{center}
+\begin{tabular}{c|ccc}
+\toprule
+\multirow{2}{*}{Estado $i$} & \multicolumn{3}{c}{$c_{ik}$} \\
+  & Nada ($k=1$) & Renovar ($k=2$) & Nueva ($k=3$) \\
+\midrule
+0 & 0 & --- & --- \\
+1 & 1 & --- & 6 \\
+2 & 3 & 4 & 6 \\
+3 & --- & --- & 6 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{\underline{Solución:}}
+
+\subsubsection{Diagrama de la Cadena de Markov con Decisiones:}
+
+El siguiente diagrama muestra visualmente todas las transiciones posibles y las decisiones que se pueden tomar en cada estado:
+
+\begin{center}
+\shorthandoff{>}
+\begin{tikzpicture}[->, >=stealth, node distance=2.8cm, thick,
+    every node/.style={font=\scriptsize},
+    state/.style={circle, draw, minimum size=1.2cm}]
+
+  % Nodos de estados
+  \node[state] (0) {0};
+  \node[state, right=of 0] (1) {1};
+  \node[state, below left=of 1] (2) {2};
+  \node[state, below right=of 1] (3) {3};
+
+  % --- Decisión 1: No hacer nada (azul) ---
+  \path [draw=blue] (0) edge[bend left=15] (1);
+  \path [draw=blue] (0) edge[bend left=10] (2);
+  \path [draw=blue] (0) edge[bend left=15] (3);
+
+  \path [draw=blue] (1) edge[loop above] (1);
+  \path [draw=blue] (1) edge[bend left=10] (2);
+  \path [draw=blue] (1) edge[bend left=15] (3);
+
+  \path [draw=blue] (2) edge[loop left] (2);
+  \path [draw=blue] (2) edge[bend left=10] (3);
+
+  \path [draw=blue] (3) edge[loop right] (3);
+
+  % --- Decisión 2: Renovar (rojo) ---
+  \path [draw=red] (2) edge[bend right=20] (1);
+
+  % --- Decisión 3: Reemplazar (verde) ---
+  \path [draw=green!50!black] (1) edge[bend left=25] (0);
+  \path [draw=green!50!black] (2) edge[bend right=25] (0);
+  \path [draw=green!50!black] (3) edge[bend left=15] (0);
+
+\end{tikzpicture}
+\shorthandon{>}
+\end{center}
+
+\vspace{0.5em}
+
+\textbf{Interpretación del diagrama:}
+\begin{itemize}
+    \item \textcolor{blue}{Flechas azules}: Decisión 1 (no hacer nada) - el sistema evoluciona naturalmente según la matriz de transición.
+    \item \textcolor{red}{Flecha roja}: Decisión 2 (renovar) - solo disponible en estado 2, lleva al estado 1.
+    \item \textcolor{green!50!black}{Flechas verdes}: Decisión 3 (comprar nueva) - disponible en estados 1, 2, 3, siempre lleva al estado 0.
+\end{itemize}
+
+\vspace{0.5em}
+
+El siguiente diagrama muestra las mismas transiciones pero con las probabilidades específicas en las transiciones azules (evolución natural del sistema):
+
+\begin{center}
+\shorthandoff{>}
+\begin{tikzpicture}[->, >=stealth, node distance=3.5cm, thick,
+    every node/.style={font=\tiny},
+    state/.style={circle, draw, minimum size=1.2cm}]
+
+  \node[state] (0) {0};
+  \node[state, right=of 0] (1) {1};
+  \node[state, below left=of 1] (2) {2};
+  \node[state, below right=of 1] (3) {3};
+
+  \path [draw=blue] (0) edge[bend left=15] node[above] {7/8} (1);
+  \path [draw=blue] (0) edge[bend left=10] node[below left] {1/16} (2);
+  \path [draw=blue] (0) edge[bend left=15] node[below right] {1/16} (3);
+
+  \path [draw=blue] (1) edge[loop above] node[above] {3/4} (1);
+  \path [draw=blue] (1) edge[bend left=10] node[left] {1/8} (2);
+  \path [draw=blue] (1) edge[bend left=15] node[right] {1/8} (3);
+
+  \path [draw=blue] (2) edge[loop left] node[left] {1/2} (2);
+  \path [draw=blue] (2) edge[bend left=10] node[below] {1/2} (3);
+
+  \path [draw=blue] (3) edge[loop right] node[right] {1} (3);
+
+  \path [draw=red] (2) edge[bend right=20] (1);
+
+  \path [draw=green!50!black] (1) edge[bend left=25] (0);
+  \path [draw=green!50!black] (2) edge[bend right=25] (0);
+  \path [draw=green!50!black] (3) edge[bend left=15] (0);
+
+\end{tikzpicture}
+\shorthandon{>}
+\end{center}
+
+\textbf{Nota:} Las flechas rojas y verdes representan decisiones determinísticas (renovar o comprar nueva), por lo que siempre llevan al estado destino con certeza. Solo las flechas azules muestran probabilidades porque representan la evolución natural del sistema cuando no se interviene.
+
+\vspace{0.5em}
+
+Las variables válidas son: $y_{01}, y_{11}, y_{13}, y_{21}, y_{22}, y_{23}, y_{33}$. Cada variable $y_{ik}$ representa la probabilidad de estar en el estado $i$ y tomar la decisión $k$.
+
+\subsubsection{Función objetivo:}
+
+La función objetivo la podemos plantear de la siguiente manera:
+
+\[
+\text{Minimizar} \quad Z = 1000\,y_{11} + 6000\,y_{13} + 3000\,y_{21} + 4000\,y_{22} + 6000\,y_{23} + 6000\,y_{33}
+\]
+
+\subsubsection{Restricción de normalización:}
+
+La restricción de normalización la podemos plantear de la siguiente manera:
+
+\[
+y_{01} + y_{11} + y_{13} + y_{21} + y_{22} + y_{23} + y_{33} = 1
+\]
+
+\subsubsection{Restricciones de balance de flujo:}
+
+Para cada estado $j$, el flujo que sale debe ser igual al flujo que entra.
+
+\vspace{0.5em}
+
+\textit{\underline{Estado 0 (máquina nueva):}}
+
+\vspace{0.5em}
+
+La única forma de salir del estado 0 es mediante $y_{01}$ (no hacer nada). Se puede llegar al estado 0 comprando una máquina nueva desde los estados 1, 2 o 3:
+
+\[
+y_{01} = y_{13} + y_{23} + y_{33}
+\]
+
+\vspace{0.5em}
+
+\textit{\underline{Estado 1 (poco desgaste):}}
+
+\vspace{0.5em}
+
+Se sale del estado 1 mediante $y_{11}$ (no hacer nada) o $y_{13}$ (comprar nueva). Se puede llegar al estado 1 desde:
+\begin{itemize}
+    \item Estado 0 con probabilidad $\frac{7}{8}$ (acción $k=1$)
+    \item Estado 1 con probabilidad $\frac{3}{4}$ (acción $k=1$)
+    \item Estado 2 con probabilidad $1$ (acción $k=2$, renovar)
+\end{itemize}
+
+\[
+y_{11} + y_{13} = \frac{7}{8}\,y_{01} + \frac{3}{4}\,y_{11} + y_{22}
+\]
+
+\vspace{0.5em}
+
+\textit{\underline{Estado 2 (deteriorada):}}
+
+\vspace{0.5em}
+
+Se sale del estado 2 mediante $y_{21}$, $y_{22}$ o $y_{23}$. Se puede llegar al estado 2 desde:
+\begin{itemize}
+    \item Estado 0 con probabilidad $\frac{1}{16}$ (acción $k=1$)
+    \item Estado 1 con probabilidad $\frac{1}{8}$ (acción $k=1$)
+    \item Estado 2 con probabilidad $\frac{1}{2}$ (acción $k=1$)
+\end{itemize}
+
+\[
+y_{21} + y_{22} + y_{23} = \frac{1}{16}\,y_{01} + \frac{1}{8}\,y_{11} + \frac{1}{2}\,y_{21}
+\]
+
+\vspace{0.5em}
+
+\textit{\underline{Estado 3 (rota):}}
+
+\vspace{0.5em}
+
+Se sale del estado 3 mediante $y_{33}$ (comprar nueva). Se puede llegar al estado 3 desde:
+\begin{itemize}
+    \item Estado 0 con probabilidad $\frac{1}{16}$ (acción $k=1$)
+    \item Estado 1 con probabilidad $\frac{1}{8}$ (acción $k=1$)
+    \item Estado 2 con probabilidad $\frac{1}{2}$ (acción $k=1$)
+\end{itemize}
+
+\[
+y_{33} = \frac{1}{16}\,y_{01} + \frac{1}{8}\,y_{11} + \frac{1}{2}\,y_{21}
+\]
+
+\subsubsection{No negatividad:}
+
+\[
+y_{ik} \geq 0 \quad \forall\, i, k
+\]
+
+\subsubsection{Solución óptima:}
+
+Aplicando el método simplex, se obtiene:
+
+\[
+y_{01} = \frac{2}{21}, \quad y_{11} = \frac{5}{7}, \quad y_{13} = 0, \quad y_{21} = 0, \quad y_{22} = \frac{2}{21}, \quad y_{23} = 0, \quad y_{33} = \frac{2}{21}
+\]
+
+\subsubsection{Política óptima:}
+
+La política óptima se obtiene calculando $D_{ik} = \frac{y_{ik}}{\pi_i}$, donde $\pi_i = \sum_k y_{ik}$:
+
+\begin{itemize}
+    \item \textbf{Estado 0}: $D_{01} = 1$ (no hacer nada)
+    \item \textbf{Estado 1}: $D_{11} = 1$, $D_{13} = 0$ (no hacer nada)
+    \item \textbf{Estado 2}: $D_{21} = 0$, $D_{22} = 1$, $D_{23} = 0$ (renovar parcialmente)
+    \item \textbf{Estado 3}: $D_{33} = 1$ (comprar nueva)
+\end{itemize}
+
+\subsubsection{Costo promedio óptimo:}
+
+El costo promedio mínimo a largo plazo es:
+
+\[
+Z^* = 1000 \cdot \frac{5}{7} + 6000 \cdot 0 + 3000 \cdot 0 + 4000 \cdot \frac{2}{21} + 6000 \cdot 0 + 6000 \cdot \frac{2}{21} \approx 1666.67 \text{ dólares/semana}
+\]
+
+\subsubsection{Interpretación de las restricciones de conservación de flujo:}
+
+Las restricciones de balance de flujo garantizan que el sistema esté en equilibrio estacionario. Por ejemplo, para el estado 1:
+
+\[
+\underbrace{y_{11} + y_{13}}_{\text{flujo que sale}} = \underbrace{\frac{7}{8}\,y_{01} + \frac{3}{4}\,y_{11} + y_{22}}_{\text{flujo que entra}}
+\]
+
+\begin{itemize}
+    \item \textbf{Lado izquierdo}: frecuencia con que se está en estado 1 y se actúa.
+    \item \textbf{Lado derecho}: frecuencia con que se llega al estado 1 desde otros estados.
+    \item La igualdad garantiza que el flujo total hacia y desde el estado 1 se equilibra.
+\end{itemize}
+
+Esta formulación convierte el problema de decisión secuencial en un problema de programación lineal que podemos resolver como ya sabemos.
+
+\subsubsection{Simulación en Python:}
+
+El siguiente código muestra cómo simular el comportamiento del sistema con y sin la política de reemplazo:
+
+\begin{lstlisting}
+import numpy as np
+
+# Matriz de transicion si NO se hace nada (accion "normal")
+# Estados: 0->1->2->3 (3 es absorbente)
+P_normal = np.array([
+    [0,   7/8, 1/16, 1/16],
+    [0,   3/4, 1/8,  1/8 ],
+    [0,   0,   1/2,  1/2 ],
+    [0,   0,   0,    1   ]
+])
+
+# Matriz de transicion si REEMPLAZAMOS al llegar a estado 3
+P_reemplazo = np.array([
+    [0,   7/8, 1/16, 1/16],
+    [0,   3/4, 1/8,  1/8 ],
+    [0,   0,   1/2,  1/2 ],
+    [1,   0,   0,    0   ]  # Desde 3 volvemos a 0
+])
+
+# Numero de semanas a simular
+semanas = 10
+
+# Calculamos P^n por multiplicacion sucesiva
+P_normal_n = P_normal.copy()
+P_reemplazo_n = P_reemplazo.copy()
+
+for i in range(1, semanas):
+    P_normal_n = np.dot(P_normal_n, P_normal)
+    P_reemplazo_n = np.dot(P_reemplazo_n, P_reemplazo)
+
+# Vector estado inicial: comenzamos 100% en el estado 0
+e_0 = np.array([1, 0, 0, 0])
+
+# Distribucion tras 10 semanas
+estado_sin_reemplazo = np.dot(e_0, P_normal_n)
+estado_con_reemplazo = np.dot(e_0, P_reemplazo_n)
+
+print(f"Distribucion tras {semanas} semanas (sin reemplazo):")
+print(estado_sin_reemplazo)
+# [0.    0.05  0.02  0.93]
+
+print(f"\nDistribucion tras {semanas} semanas (con reemplazo):")
+print(estado_con_reemplazo)
+# [0.15  0.54  0.15  0.15]
+\end{lstlisting}
+
+\subsubsection{Análisis de resultados:}
+
+\begin{itemize}
+    \item \textbf{Sin reemplazo:} Después de 10 semanas, hay un 93\% de probabilidad de que la máquina esté en estado 3 (rota). El sistema converge hacia el estado absorbente.
+
+    \item \textbf{Con reemplazo:} El sistema alcanza un estado estacionario donde la máquina pasa aproximadamente 54\% del tiempo en estado 1, 15\% en estados 0 y 2, y 15\% en estado 3 (cuando es reemplazada inmediatamente).
+\end{itemize}
+
+La siguiente figura muestra la evolución de las probabilidades a lo largo del tiempo para ambas políticas:
+
+\begin{center}
+    \includegraphics[width=0.95\textwidth]{foto_ejemplo_markov.jpeg}
+\end{center}
+
+Se observa claramente cómo sin reemplazo (izquierda), el sistema inevitablemente converge hacia el estado 3 (rota), mientras que con reemplazo (derecha), el sistema se estabiliza en una distribución estacionaria.
+
+\subsubsection{Implementacion completa con picos:}
+
+Para resolver el problema de optimizacion utilizando programacion lineal, podemos usar la biblioteca \texttt{picos}:
+
+\begin{lstlisting}
+import picos as pc
+
+# Crear el problema
+prob = pc.Problem()
+
+# Crear las variables validas individualmente
+y_vars = {}  # y_vars[(estado, decision)]
+valid = [(0, 0),      # y_01
+         (1, 0), (1, 2),  # y_11, y_13
+         (2, 0), (2, 1), (2, 2),  # y_21, y_22, y_23
+         (3, 2)]       # y_33
+
+for (i, k) in valid:
+    y_vars[(i, k)] = pc.RealVariable(f"y{i}{k}", lower=0)
+
+# Funcion objetivo
+objective = (
+    1000 * y_vars[(0, 0)] +
+    6000 * y_vars[(1, 2)] +
+    3000 * y_vars[(2, 0)] +
+    4000 * y_vars[(2, 1)] +
+    6000 * y_vars[(2, 2)] +
+    6000 * y_vars[(3, 2)]
+)
+prob.set_objective("min", objective)
+
+# Restriccion de suma total
+prob.add_constraint(sum(y_vars.values()) == 1)
+
+# Restriccion 2: estado 0
+prob.add_constraint(y_vars[(0, 0)] -
+    (y_vars.get((1, 2), 0) + y_vars.get((2, 2), 0) +
+     y_vars.get((3, 2), 0)) == 0)
+
+# Restriccion 3: estado 1
+prob.add_constraint(y_vars.get((1, 0), 0) +
+    y_vars.get((1, 2), 0) -
+    (7/8 * y_vars.get((0, 0), 0) +
+     3/4 * y_vars.get((1, 0), 0) +
+     y_vars.get((2, 1), 0)) == 0)
+
+# Restriccion 4: estado 2
+prob.add_constraint(y_vars.get((2, 0), 0) +
+    y_vars.get((2, 1), 0) + y_vars.get((2, 2), 0) -
+    (1/16 * y_vars.get((0, 0), 0) +
+     1/8 * y_vars.get((1, 0), 0) +
+     1/2 * y_vars.get((2, 0), 0)) == 0)
+
+# Restriccion 5: estado 3
+prob.add_constraint(y_vars.get((3, 2), 0) -
+    (1/16 * y_vars.get((0, 0), 0) +
+     1/8 * y_vars.get((1, 0), 0) +
+     1/2 * y_vars.get((2, 0), 0)) == 0)
+
+# Resolver
+solution = prob.solve(solver='cvxopt')
+
+# Mostrar resultados
+print("Solucion optima:")
+for (i, k), var in y_vars.items():
+    print(f"y_{i}{k} = {var.value}")
+
+print(f"\nCosto minimo: ${objective.value:.2f}/semana")
+\end{lstlisting}
+
+\subsection{Ejercicio 7: Problema de Estacionamiento}
+
+Ramiro está preocupado por su Renault Coupé Fuego 1.6 Turbo 1985 y no le gustan las abolladuras. Cuando conduce a la Universidad de San Andrés, tiene las siguientes opciones de estacionamiento:
+
+\begin{enumerate}
+    \item Estacionarlo en la calle ocupando un espacio.
+    \item Estacionarlo en la calle ocupando dos espacios.
+    \item Estacionarlo en el lote.
+\end{enumerate}
+
+Además, si su auto se abolla, puede:
+
+\begin{enumerate}
+    \setcounter{enumi}{3}
+    \item Repararlo (queda fuera de servicio por 1 día).
+    \item Conducir su auto abollado.
+\end{enumerate}
+
+\textbf{Probabilidades y costos asociados:}
+
+\begin{itemize}
+    \item Si estaciona en la calle en un espacio: probabilidad de abolladura $= \frac{1}{10}$, costo $= \$0$.
+    \item Si estaciona en la calle en dos espacios: probabilidad de abolladura $= \frac{1}{50}$, probabilidad de multa $= \frac{3}{10}$, costo promedio $= \$4.5$ (multa de \$15).
+    \item Si estaciona en el lote: probabilidad de abolladura $= 0$, costo $= \$5$.
+    \item Si repara el auto: costo $= \$50$ (incluye tarifas de remis).
+    \item Si conduce abollado: pérdida de valor y orgullo equivalente a $= \$9$ por día.
+\end{itemize}
+
+El objetivo es determinar la política óptima para minimizar el costo promedio esperado a largo plazo por día en la universidad.
+
+\subsection*{\underline{Solución:}}
+
+\subsubsection{Estados del sistema:}
+
+\begin{itemize}
+    \item Estado 0: Auto sin abolladuras.
+    \item Estado 1: Auto con abolladuras.
+\end{itemize}
+
+\subsubsection{Acciones posibles:}
+
+\begin{itemize}
+    \item En estado 0:
+    \begin{itemize}
+        \item Acción 1 ($k=1$): Estacionar en 1 espacio.
+        \item Acción 2 ($k=2$): Estacionar en 2 espacios.
+        \item Acción 3 ($k=3$): Estacionar en lote.
+    \end{itemize}
+    \item En estado 1:
+    \begin{itemize}
+        \item Acción 4 ($k=4$): Reparar el auto.
+        \item Acción 5 ($k=5$): Conducir abollado.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Matriz de costos:}
+
+\begin{center}
+\begin{tabular}{c|ccccc}
+\toprule
+Estado & $k=1$ & $k=2$ & $k=3$ & $k=4$ & $k=5$ \\
+\midrule
+0 & 0 & 4.5 & 5 & --- & --- \\
+1 & --- & --- & --- & 50 & 9 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Probabilidades de transición:}
+
+Desde el estado 0 (auto sano):
+\begin{itemize}
+    \item Acción $k=1$: $p_{00}(1) = \frac{9}{10}$, $p_{01}(1) = \frac{1}{10}$
+    \item Acción $k=2$: $p_{00}(2) = \frac{49}{50}$, $p_{01}(2) = \frac{1}{50}$
+    \item Acción $k=3$: $p_{00}(3) = 1$, $p_{01}(3) = 0$
+\end{itemize}
+
+Desde el estado 1 (auto abollado):
+\begin{itemize}
+    \item Acción $k=4$: $p_{10}(4) = 1$, $p_{11}(4) = 0$ (repara y vuelve a estado 0)
+    \item Acción $k=5$: $p_{10}(5) = 0$, $p_{11}(5) = 1$ (permanece abollado)
+\end{itemize}
+
+\subsubsection{Formulación de programación lineal:}
+
+Variables de decisión: $y_{01}, y_{02}, y_{03}, y_{14}, y_{15}$
+
+\subsubsection{Función objetivo:}
+
+\[
+\text{Minimizar} \quad Z = 4.5\,y_{02} + 5\,y_{03} + 50\,y_{14} + 9\,y_{15}
+\]
+
+\subsubsection{Restricción de normalización:}
+
+\[
+y_{01} + y_{02} + y_{03} + y_{14} + y_{15} = 1
+\]
+
+\subsubsection{Restricciones de balance de flujo:}
+
+\textit{\underline{Estado 0 (auto sano):}}
+
+\[
+y_{01} + y_{02} + y_{03} = \frac{9}{10}\,y_{01} + \frac{49}{50}\,y_{02} + y_{03} + y_{14}
+\]
+
+Interpretación: El flujo que sale del estado 0 (estacionando) debe ser igual al flujo que entra (auto que sobrevive sin abolladuras o es reparado).
+
+\vspace{0.5em}
+
+\textit{\underline{Estado 1 (auto abollado):}}
+
+\[
+y_{14} + y_{15} = \frac{1}{10}\,y_{01} + \frac{1}{50}\,y_{02} + y_{15}
+\]
+
+Interpretación: El flujo que sale del estado 1 (reparar o conducir abollado) debe ser igual al flujo que entra (auto que se abolla o ya estaba abollado).
+
+\subsubsection{No negatividad:}
+
+\[
+y_{ik} \geq 0 \quad \forall\, i, k
+\]
+
+\subsubsection{Interpretación de la conservación de flujo:}
+
+Para el estado 0 (auto sano):
+
+\[
+\underbrace{y_{01} + y_{02} + y_{03}}_{\text{frecuencia de estar sano}} = \underbrace{\frac{9}{10}\,y_{01} + \frac{49}{50}\,y_{02} + y_{03}}_{\text{sobrevive sin abolladuras}} + \underbrace{y_{14}}_{\text{auto reparado}}
+\]
+
+\begin{itemize}
+    \item \textbf{Izquierda}: frecuencia con que el auto está sano y se estaciona.
+    \item \textbf{Derecha}: probabilidad de terminar sano al día siguiente (no se abolla o se repara).
+\end{itemize}
 
 \end{document}
