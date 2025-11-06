@@ -1,0 +1,1444 @@
+\documentclass{beamer}
+\usetheme{metropolis}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{multirow}
+
+\lstset{
+  language=Python,
+  basicstyle=\scriptsize\ttfamily,
+  keywordstyle=\color{red},
+  stringstyle=\color{green!50!black},
+  commentstyle=\color{gray}\itshape,
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  frameround=tttt,
+  backgroundcolor=\color{black!5},
+  extendedchars=true,
+  inputencoding=utf8,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'{\i}}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1
+}
+
+\usetikzlibrary{arrows.meta, positioning}
+
+% Definición de colores personalizados
+\definecolor{primary}{RGB}{46, 204, 113}
+\definecolor{secondary}{RGB}{52, 152, 219}
+\definecolor{accent}{RGB}{231, 76, 60}
+\definecolor{background}{RGB}{236, 240, 241}
+
+% Configuración del tema
+\setbeamercolor{normal text}{fg=black,bg=background}
+\setbeamercolor{structure}{fg=primary}
+\setbeamercolor{alerted text}{fg=accent}
+
+\setbeamertemplate{frame numbering}[fraction]
+
+\title{\Huge\textbf{Teoría de Filas}}
+\author{Investigación Operativa}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south west,inner sep=30pt] at (current page.south west) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Introducción a la Teoría de Filas}
+    \small
+    \textbf{¿Qué es la Teoría de Filas?}
+
+    \vspace{0.5em}
+
+    Rama de la Investigación Operativa que estudia el comportamiento de sistemas en los que entidades (clientes) deben esperar para recibir un servicio.
+
+    \vspace{0.5em}
+
+    \textbf{Ejemplos en la vida real:}
+    \begin{itemize}
+        \item Bancos y supermercados: clientes esperando ser atendidos
+        \item Sistemas de comunicaciones: paquetes de datos esperando ser transmitidos
+        \item Hospitales: pacientes esperando atención médica
+        \item Centros de llamadas: llamadas esperando ser atendidas
+        \item Sistemas de manufactura: trabajos esperando ser procesados
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Componentes de un Sistema de Filas}
+    \small
+    Un sistema de filas típico consta de los siguientes elementos:
+
+    \vspace{0.5em}
+
+    \begin{enumerate}
+        \item \textbf{Proceso de llegada}: Cómo los clientes llegan al sistema (tasa $\lambda$)
+        \item \textbf{Mecanismo de servicio}: Cómo se atienden los clientes (tasa $\mu$)
+        \item \textbf{Disciplina de la cola}: Orden en que se atienden los clientes (FIFO, LIFO, etc.)
+        \item \textbf{Capacidad del sistema}: Número máximo de clientes que puede contener
+        \item \textbf{Número de servidores}: Cantidad de recursos disponibles para atender
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Objetivos del Análisis}
+    \small
+    El análisis de sistemas de filas busca responder preguntas como:
+
+    \vspace{0.5em}
+
+    \begin{itemize}
+        \item <2->¿Cuánto tiempo esperará un cliente en promedio?
+        \item <3->¿Cuántos clientes habrá en el sistema en un momento dado?
+        \item <4->¿Cuál es la probabilidad de que el sistema esté vacío u ocupado?
+        \item <5->¿Cuántos servidores se necesitan para mantener un nivel de servicio aceptable?
+        \item <6->¿Cómo optimizar el balance entre costos de servicio y costos de espera?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Distribución de Poisson}
+    \small
+    \textbf{Uso:} Modelar el número de llegadas en un intervalo de tiempo fijo.
+
+    Si las llegadas ocurren con una tasa $\lambda$, la probabilidad de que ocurran exactamente $n$ llegadas es:
+
+    \[
+    P(N = n) = \frac{e^{-\lambda} \lambda^n}{n!}, \quad n = 0, 1, 2, \ldots
+    \]
+
+    \textbf{Propiedades:}
+    \begin{itemize}
+        \item Media: $E[N] = \lambda$
+        \item Varianza: $\text{Var}(N) = \lambda$
+        \item Las llegadas son independientes entre sí
+        \item El proceso es sin memoria (propiedad markoviana)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Distribución Exponencial}
+    \small
+    \textbf{Uso:} Modelar los tiempos entre llegadas y los tiempos de servicio.
+
+    Función de densidad con parámetro $\lambda$:
+
+    \[
+    f(t) = \lambda e^{-\lambda t}, \quad t \geq 0
+    \]
+
+    Función de distribución acumulada:
+
+    \[
+    F(t) = P(T \leq t) = 1 - e^{-\lambda t}
+    \]
+
+    \textbf{Propiedades:}
+    \begin{itemize}
+        \item Media: $E[T] = \frac{1}{\lambda}$
+        \item Varianza: $\text{Var}(T) = \frac{1}{\lambda^2}$
+        \item $P(T > s + t \mid T > s) = P(T > t)$ (falta de memoria)
+        \item El mínimo de variables exponenciales independientes es exponencial
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Relación entre Poisson y Exponencial}
+    \small
+    Existe una relación fundamental entre ambas distribuciones:
+
+    \vspace{0.5em}
+
+    \begin{itemize}
+        \item Si el número de llegadas sigue una distribución de Poisson con tasa $\lambda$, entonces los tiempos entre llegadas siguen una distribución exponencial con parámetro $\lambda$
+
+        \vspace{0.5em}
+
+        \item Recíprocamente, si los tiempos entre llegadas son exponenciales con parámetro $\lambda$, el número de llegadas sigue una distribución de Poisson con tasa $\lambda$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Distribución General}
+    \small
+    En algunos modelos (como M/G/1), el tiempo de servicio puede seguir una distribución general (no necesariamente exponencial).
+
+    \vspace{0.5em}
+
+    En estos casos se caracteriza por:
+
+    \begin{itemize}
+        \item Media: $E[S] = \frac{1}{\mu}$
+        \item Varianza: $\text{Var}(S) = \sigma^2$
+        \item Segundo momento: $E[S^2]$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Procesos de Nacimiento y Muerte}
+    \small
+    Clase especial de cadenas de Markov en tiempo continuo que modelan sistemas donde la población puede aumentar (nacimientos) o disminuir (muertes) de a una unidad a la vez.
+
+    \vspace{0.5em}
+
+    \textbf{Características:}
+
+    \begin{itemize}
+        \item \textbf{Estados}: $n = 0, 1, 2, \ldots$ (número de clientes en el sistema)
+        \item \textbf{Tasas de nacimiento} $\lambda_n$: tasa a la que el sistema pasa del estado $n$ al estado $n+1$
+        \item \textbf{Tasas de muerte} $\mu_n$: tasa a la que el sistema pasa del estado $n$ al estado $n-1$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Diagrama de Transiciones}
+    \begin{center}
+    \shorthandoff{>}
+    \begin{tikzpicture}[node distance=2.5cm, auto]
+        \node (s0) {$0$};
+        \node (s1) [right of=s0] {$1$};
+        \node (s2) [right of=s1] {$2$};
+        \node (s3) [right of=s2] {$3$};
+        \node (sn) [right of=s3] {$\cdots$};
+
+        % Nacimientos (hacia la derecha)
+        \draw[->, bend left=30] (s0) to node[above] {$\lambda_0$} (s1);
+        \draw[->, bend left=30] (s1) to node[above] {$\lambda_1$} (s2);
+        \draw[->, bend left=30] (s2) to node[above] {$\lambda_2$} (s3);
+        \draw[->, bend left=30] (s3) to node[above] {$\lambda_3$} (sn);
+
+        % Muertes (hacia la izquierda)
+        \draw[->, bend left=30] (s1) to node[below] {$\mu_1$} (s0);
+        \draw[->, bend left=30] (s2) to node[below] {$\mu_2$} (s1);
+        \draw[->, bend left=30] (s3) to node[below] {$\mu_3$} (s2);
+    \end{tikzpicture}
+    \shorthandon{>}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Ecuaciones de Balance}
+    \small
+    En el estado estacionario, la tasa de entrada a cada estado debe igualar la tasa de salida.
+
+    \vspace{0.5em}
+
+    \textbf{Para el estado 0:}
+    \[
+    \lambda_0 \pi_0 = \mu_1 \pi_1
+    \]
+
+    \vspace{0.5em}
+
+    \textbf{Para el estado $n \geq 1$:}
+    \[
+    (\lambda_n + \mu_n) \pi_n = \lambda_{n-1} \pi_{n-1} + \mu_{n+1} \pi_{n+1}
+    \]
+\end{frame}
+
+\begin{frame}{Solución para Distribuciones de Estado Estacionario}
+    \small
+    Resolviendo las ecuaciones de balance, obtenemos:
+
+    \[
+    \pi_n = \pi_0 \prod_{i=0}^{n-1} \frac{\lambda_i}{\mu_{i+1}}, \quad n = 1, 2, 3, \ldots
+    \]
+
+    \vspace{0.5em}
+
+    donde $\pi_0$ se obtiene de la condición de normalización:
+
+    \[
+    \sum_{n=0}^{\infty} \pi_n = 1
+    \]
+\end{frame}
+
+\begin{frame}{Aplicación a Teoría de Filas}
+    \small
+    En teoría de filas, los procesos de nacimiento y muerte modelan:
+
+    \vspace{0.5em}
+
+    \begin{itemize}
+        \item \textbf{Nacimientos}: Llegadas de clientes (tasa $\lambda_n$)
+        \item \textbf{Muertes}: Salidas de clientes después del servicio (tasa $\mu_n$)
+    \end{itemize}
+
+    \vspace{1em}
+
+    Para sistemas M/M/1 y M/M/1/c:
+    \begin{itemize}
+        \item $\lambda_n = \lambda$ (tasa de llegada constante)
+        \item $\mu_n = \mu$ (tasa de servicio constante)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Notación de Kendall}
+    \small
+    Notación estándar para clasificar sistemas de filas:
+
+    \[
+    \boxed{A / B / c / K / N / D}
+    \]
+
+    \vspace{0.5em}
+
+    \begin{itemize}
+        \item \textbf{A}: Distribución de los tiempos entre llegadas
+        \item \textbf{B}: Distribución de los tiempos de servicio
+        \item \textbf{c}: Número de servidores en paralelo
+        \item \textbf{K}: Capacidad máxima del sistema (opcional, por defecto $\infty$)
+        \item \textbf{N}: Tamaño de la población de clientes (opcional, por defecto $\infty$)
+        \item \textbf{D}: Disciplina de la cola (opcional, por defecto FIFO)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Símbolos Comunes para Distribuciones}
+    \small
+    \begin{itemize}
+        \item \textbf{M} (Markoviana): Distribución exponencial (o Poisson para llegadas)
+        \item \textbf{D} (Determinística): Tiempos constantes
+        \item \textbf{G} (General): Distribución arbitraria
+        \item \textbf{$E_k$} (Erlang): Distribución Erlang con $k$ fases
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejemplos Comunes}
+    \small
+    \begin{itemize}
+        \item \textbf{M/M/1}: Llegadas Poisson, servicio exponencial, 1 servidor, capacidad infinita
+
+        \vspace{0.3em}
+
+        \item \textbf{M/M/1/c}: Llegadas Poisson, servicio exponencial, 1 servidor, capacidad máxima $c$
+
+        \vspace{0.3em}
+
+        \item \textbf{M/M/s}: Llegadas Poisson, servicio exponencial, $s$ servidores en paralelo
+
+        \vspace{0.3em}
+
+        \item \textbf{M/G/1}: Llegadas Poisson, servicio con distribución general, 1 servidor
+
+        \vspace{0.3em}
+
+        \item \textbf{M/D/1}: Llegadas Poisson, servicio determinístico, 1 servidor
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Disciplinas de Cola}
+    \small
+    \begin{itemize}
+        \item \textbf{FIFO} (First In First Out): El primero en llegar es el primero en ser atendido
+
+        \vspace{0.5em}
+
+        \item \textbf{LIFO} (Last In First Out): El último en llegar es el primero en ser atendido
+
+        \vspace{0.5em}
+
+        \item \textbf{SIRO} (Service In Random Order): Se atiende en orden aleatorio
+
+        \vspace{0.5em}
+
+        \item \textbf{Priority}: Se atiende según prioridades asignadas
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Parámetros}
+    \small
+    \begin{itemize}
+        \item $\lambda$: Tasa de llegadas
+        \item $\mu$: Tasa de servicio
+        \item $L$: Número de clientes en el sistema
+        \item $L_q$: Número de clientes en la cola
+        \item $L_s$: Número de clientes en servicio
+        \item $W$: Valor medio esperado del tiempo de espera en el sistema
+        \item $W_q$: Valor medio esperado del tiempo de espera en la cola
+        \item $W_s$: Valor medio esperado del tiempo de servicio
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Fórmula para $\rho$}
+    \small
+    Tanto para modelos M/M/1 como M/M/1/c, la fórmula para $\rho$ es la misma:
+
+    \[
+    \rho = \frac{\lambda}{\mu}
+    \]
+
+    \vspace{0.5em}
+
+    \textbf{Interpretación:} $\rho$ representa el factor de utilización del sistema.
+\end{frame}
+
+\begin{frame}{Fórmula para $\pi_0$}
+    \small
+    \textbf{Para modelos M/M/1:}
+
+    \[
+    \pi_0 = 1 - \rho
+    \]
+
+    \vspace{1em}
+
+    \textbf{Para modelos M/M/1/c:}
+
+    \[
+    \pi_0 = \frac{1-\rho}{1-\rho^{c+1}}
+    \]
+\end{frame}
+
+\begin{frame}{Fórmula para $L$}
+    \small
+    \textbf{Para modelos M/M/1:}
+
+    \[
+    L = \frac{\rho}{1-\rho}
+    \]
+
+    \vspace{1em}
+
+    \textbf{Para modelos M/M/1/c:}
+
+    \[
+    L = \frac{\rho \left[1 - (c+1)\rho^c + c\rho^{c+1}\right]}{(1 - \rho^{c+1})(1-\rho)}
+    \]
+\end{frame}
+
+\begin{frame}{Fórmula para $L_q$}
+    \small
+    \textbf{Para modelos M/M/1:}
+
+    \[
+    L_q = \frac{\rho^2}{1-\rho}
+    \]
+
+    \vspace{1em}
+
+    \textbf{Para modelos M/M/1/c:}
+
+    \[
+    L_q = L - (1-\pi_0)
+    \]
+\end{frame}
+
+\begin{frame}{Fórmula para $L_s$}
+    \small
+    \textbf{Para modelos M/M/1:}
+
+    \[
+    L_s = \rho
+    \]
+
+    \vspace{1em}
+
+    \textbf{Para modelos M/M/1/c:}
+
+    \[
+    L_s = 1 - \pi_0
+    \]
+\end{frame}
+
+\begin{frame}{Fórmula para $W$}
+    \small
+    \textbf{Para modelos M/M/1:}
+
+    \[
+    W = \frac{1}{\mu - \lambda}
+    \]
+
+    \vspace{1em}
+
+    \textbf{Para modelos M/M/1/c:}
+
+    \[
+    W = \frac{L}{\lambda(1 - \pi_c)}
+    \]
+\end{frame}
+
+\begin{frame}{Fórmula para $W_q$}
+    \small
+    \textbf{Para modelos M/M/1:}
+
+    \[
+    W_q = \frac{\lambda}{\mu(\mu-\lambda)}
+    \]
+
+    \vspace{1em}
+
+    \textbf{Para modelos M/M/1/c:}
+
+    \[
+    W_q = \frac{L_q}{\lambda(1 - \pi_c)}
+    \]
+\end{frame}
+
+\begin{frame}{Fórmula para $W_s$}
+    \small
+    Tanto para modelos M/M/1 como M/M/1/c:
+
+    \[
+    W_s = \frac{1}{\mu}
+    \]
+\end{frame}
+
+\begin{frame}{Ejercicio 1 - Consigna}
+    \small
+    Suponga que en una estación con un solo servidor llegan en promedio 45 clientes por hora. Se tiene capacidad para atender en promedio a 60 clientes por hora. Se sabe que los clientes esperan en promedio 3 minutos en la cola.
+
+    \vspace{0.5em}
+
+    Se solicita:
+
+    \begin{itemize}
+        \item[a)] Tiempo promedio que un cliente pasa en el sistema
+        \item[b)] Número promedio de clientes en la cola
+        \item[c)] Número promedio de clientes en el sistema en un momento dado
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejercicio 1 - Datos}
+    \small
+    \textbf{Datos:}
+    \begin{itemize}
+        \item $\lambda = 45$ clientes/hora
+        \item $\mu = 60$ clientes/hora
+        \item $W_q = 3$ minutos $= 0.05$ horas
+    \end{itemize}
+
+    \vspace{1em}
+
+    Este es un modelo M/M/1.
+\end{frame}
+
+\begin{frame}{Ejercicio 1 - Solución (a)}
+    \small
+    \textbf{a) Tiempo promedio en el sistema ($W$):}
+
+    \vspace{0.5em}
+
+    Sabemos que $W = W_q + W_s$, donde $W_s = \frac{1}{\mu}$:
+
+    \[
+    W_s = \frac{1}{60} \text{ horas} = 1 \text{ minuto}
+    \]
+
+    Por lo tanto:
+    \[
+    W = W_q + W_s = 3 + 1 = 4 \text{ minutos} = \frac{1}{15} \text{ horas}
+    \]
+
+    Alternativamente, usando la fórmula directa:
+    \[
+    W = \frac{1}{\mu - \lambda} = \frac{1}{60-45} = \frac{1}{15} \text{ horas} = 4 \text{ minutos}
+    \]
+\end{frame}
+
+\begin{frame}{Ejercicio 1 - Solución (b)}
+    \small
+    \textbf{b) Número promedio de clientes en la cola ($L_q$):}
+
+    \vspace{0.5em}
+
+    Usando la Ley de Little: $L_q = \lambda W_q$
+
+    \[
+    L_q = 45 \times 0.05 = 2.25 \text{ clientes}
+    \]
+
+    Alternativamente, usando la fórmula directa:
+    \[
+    \rho = \frac{\lambda}{\mu} = \frac{45}{60} = 0.75
+    \]
+
+    \[
+    L_q = \frac{\rho^2}{1-\rho} = \frac{(0.75)^2}{1-0.75} = \frac{0.5625}{0.25} = 2.25 \text{ clientes}
+    \]
+\end{frame}
+
+\begin{frame}{Ejercicio 1 - Solución (c)}
+    \small
+    \textbf{c) Número promedio de clientes en el sistema ($L$):}
+
+    \vspace{0.5em}
+
+    Usando la Ley de Little: $L = \lambda W$
+
+    \[
+    L = 45 \times \frac{1}{15} = 3 \text{ clientes}
+    \]
+
+    Alternativamente, usando la fórmula directa:
+    \[
+    L = \frac{\rho}{1-\rho} = \frac{0.75}{1-0.75} = \frac{0.75}{0.25} = 3 \text{ clientes}
+    \]
+\end{frame}
+
+\begin{frame}{Ejercicio 2 - Consigna}
+    \small
+    Suponga un restaurante de comidas rápidas al cual llegan en promedio 100 clientes por hora. Se tiene capacidad para atender en promedio a 150 clientes por hora.
+
+    \vspace{0.5em}
+
+    Calcule las medidas de desempeño del sistema:
+
+    \begin{itemize}
+        \item[a)] ¿Cuál es la probabilidad que el sistema esté ocioso?
+        \item[b)] ¿Cuál es la probabilidad que un cliente llegue y tenga que esperar?
+        \item[c)] ¿Cuál es el número promedio de clientes en la cola?
+        \item[d)] ¿Cuál es la probabilidad que hayan 10 clientes en la cola?
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejercicio 2 - Datos}
+    \small
+    \textbf{Datos:}
+    \begin{itemize}
+        \item $\lambda = 100$ clientes/hora
+        \item $\mu = 150$ clientes/hora
+    \end{itemize}
+
+    \vspace{1em}
+
+    Este es un modelo M/M/1.
+
+    \vspace{0.5em}
+
+    Primero calculamos $\rho$:
+    \[
+    \rho = \frac{\lambda}{\mu} = \frac{100}{150} = \frac{2}{3} \approx 0.667
+    \]
+\end{frame}
+
+\begin{frame}{Ejercicio 2 - Solución (a)}
+    \small
+    \textbf{a) Probabilidad de que el sistema esté ocioso ($\pi_0$):}
+
+    \[
+    \pi_0 = 1 - \rho = 1 - \frac{2}{3} = \frac{1}{3} \approx 0.333
+    \]
+
+    \vspace{0.5em}
+
+    La probabilidad de que el sistema esté ocioso es del 33.3\%.
+\end{frame}
+
+\begin{frame}{Ejercicio 2 - Solución (b)}
+    \small
+    \textbf{b) Probabilidad de que un cliente tenga que esperar:}
+
+    \vspace{0.5em}
+
+    Un cliente tiene que esperar cuando el sistema está ocupado, es decir, cuando hay al menos 1 cliente en el sistema. Esta probabilidad es:
+
+    \[
+    P(\text{esperar}) = 1 - \pi_0 = \rho = \frac{2}{3} \approx 0.667
+    \]
+
+    \vspace{0.5em}
+
+    La probabilidad de que un cliente tenga que esperar es del 66.7\%.
+\end{frame}
+
+\begin{frame}{Ejercicio 2 - Solución (c)}
+    \small
+    \textbf{c) Número promedio de clientes en la cola ($L_q$):}
+
+    \vspace{0.5em}
+
+    Usando la fórmula para modelo M/M/1:
+
+    \[
+    L_q = \frac{\rho^2}{1-\rho} = \frac{(2/3)^2}{1-2/3} = \frac{4/9}{1/3} = \frac{4}{3} \approx 1.33 \text{ clientes}
+    \]
+
+    Alternativamente, primero calculamos $W_q$:
+
+    \[
+    W_q = \frac{\lambda}{\mu(\mu-\lambda)} = \frac{100}{150(150-100)} = \frac{100}{7500} = \frac{1}{75} \text{ horas} = 0.8 \text{ minutos}
+    \]
+
+    Y luego aplicamos la Ley de Little:
+
+    \[
+    L_q = \lambda W_q = 100 \times \frac{1}{75} = \frac{4}{3} \approx 1.33 \text{ clientes}
+    \]
+\end{frame}
+
+\begin{frame}{Ejercicio 2 - Solución (d)}
+    \small
+    \textbf{d) Probabilidad de que haya 10 clientes en la cola:}
+
+    \vspace{0.5em}
+
+    En un sistema M/M/1, la probabilidad de que haya exactamente $n$ clientes en el sistema es:
+
+    \[
+    \pi_n = (1-\rho)\rho^n
+    \]
+
+    Si hay 10 clientes en la cola, hay 11 clientes en el sistema (10 esperando + 1 siendo atendido):
+
+    \[
+    \pi_{11} = (1-\rho)\rho^{11} = \frac{1}{3} \times \left(\frac{2}{3}\right)^{11} \approx 0.333 \times 0.00568 \approx 0.00189
+    \]
+
+    La probabilidad de que haya exactamente 10 clientes en la cola es aproximadamente 0.189\%.
+\end{frame}
+
+\begin{frame}{Ejercicio 3 - Consigna}
+    \small
+    Una cabina de peaje tiene una ventanilla y puede atender como máximo a 4 autos. Los autos llegan a razón de 20 por hora, y el tiempo medio de servicio es de 2 minutos por auto.
+
+    \vspace{0.5em}
+
+    Se desea calcular:
+
+    \begin{itemize}
+        \item[a)] La probabilidad de que el sistema esté vacío
+        \item[b)] La probabilidad de que haya 4 autos (sistema lleno)
+        \item[c)] El número promedio de autos en el sistema
+        \item[d)] El número promedio de autos en la cola
+        \item[e)] El tiempo promedio total y en cola que pasa un auto en el sistema
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ejercicio 3 - Datos}
+    \small
+    \textbf{Datos:}
+    \begin{itemize}
+        \item $\lambda = 20$ autos/hora
+        \item Tiempo medio de servicio = 2 minutos $\Rightarrow \mu = 30$ autos/hora
+        \item Capacidad máxima del sistema: $c = 4$ autos
+    \end{itemize}
+
+    \vspace{1em}
+
+    Este es un modelo M/M/1/4.
+
+    \vspace{0.5em}
+
+    Primero calculamos $\rho$:
+    \[
+    \rho = \frac{\lambda}{\mu} = \frac{20}{30} = \frac{2}{3}
+    \]
+\end{frame}
+
+\begin{frame}{Ejercicio 3 - Solución (a)}
+    \small
+    \textbf{a) Probabilidad de que el sistema esté vacío ($\pi_0$):}
+
+    \vspace{0.5em}
+
+    Para un modelo M/M/1/c:
+    \[
+    \pi_0 = \frac{1-\rho}{1-\rho^{c+1}} = \frac{1-\frac{2}{3}}{1-(\frac{2}{3})^5} = \frac{\frac{1}{3}}{1-\frac{32}{243}} = \frac{\frac{1}{3}}{\frac{211}{243}} = \frac{243}{3 \times 211} = \frac{81}{211} \approx 0.384
+    \]
+
+    La probabilidad de que el sistema esté vacío es aproximadamente 38.4\%.
+\end{frame}
+
+\begin{frame}{Ejercicio 3 - Solución (b)}
+    \small
+    \textbf{b) Probabilidad de que el sistema esté lleno ($\pi_4$):}
+
+    \vspace{0.5em}
+
+    Para un modelo M/M/1/c, la probabilidad de estado $n$ es:
+    \[
+    \pi_n = \pi_0 \rho^n
+    \]
+
+    Por lo tanto:
+    \[
+    \pi_4 = \pi_0 \rho^4 = \frac{81}{211} \times \left(\frac{2}{3}\right)^4 = \frac{81}{211} \times \frac{16}{81} = \frac{16}{211} \approx 0.076
+    \]
+
+    La probabilidad de que haya 4 autos (sistema lleno) es aproximadamente 7.6\%.
+\end{frame}
+
+\begin{frame}{Ejercicio 3 - Solución (c) - Parte 1}
+    \small
+    \textbf{c) Número promedio de autos en el sistema ($L$):}
+
+    \vspace{0.5em}
+
+    Para un modelo M/M/1/c:
+    \[
+    L = \frac{\rho \left[1 - (c+1)\rho^c + c\rho^{c+1}\right]}{(1 - \rho^{c+1})(1-\rho)}
+    \]
+
+    Sustituyendo con $\rho = \frac{2}{3}$ y $c = 4$:
+
+    \[
+    L = \frac{\frac{2}{3} \left[1 - 5\left(\frac{2}{3}\right)^4 + 4\left(\frac{2}{3}\right)^5\right]}{\left(1 - \left(\frac{2}{3}\right)^5\right)\left(1-\frac{2}{3}\right)}
+    \]
+\end{frame}
+
+\begin{frame}{Ejercicio 3 - Solución (c) - Parte 2}
+    \small
+    Continuando con el cálculo:
+
+    \[
+    L = \frac{\frac{2}{3} \left[1 - 5 \times \frac{16}{81} + 4 \times \frac{32}{243}\right]}{\frac{211}{243} \times \frac{1}{3}} = \frac{\frac{2}{3} \left[1 - \frac{80}{81} + \frac{128}{243}\right]}{\frac{211}{729}}
+    \]
+
+    \[
+    L = \frac{\frac{2}{3} \left[\frac{243 - 240 + 128}{243}\right]}{\frac{211}{729}} = \frac{\frac{2}{3} \times \frac{131}{243}}{\frac{211}{729}} = \frac{\frac{262}{729}}{\frac{211}{729}} = \frac{262}{211} \approx 1.242
+    \]
+
+    El número promedio de autos en el sistema es aproximadamente 1.24 autos.
+\end{frame}
+
+\begin{frame}{Ejercicio 3 - Solución (d)}
+    \small
+    \textbf{d) Número promedio de autos en la cola ($L_q$):}
+
+    \vspace{0.5em}
+
+    Para un modelo M/M/1/c:
+    \[
+    L_q = L - (1 - \pi_0) = L - L_s
+    \]
+
+    donde $L_s = 1 - \pi_0 = 1 - \frac{81}{211} = \frac{130}{211}$
+
+    \[
+    L_q = \frac{262}{211} - \frac{130}{211} = \frac{132}{211} \approx 0.626
+    \]
+
+    El número promedio de autos en la cola es aproximadamente 0.63 autos.
+\end{frame}
+
+\begin{frame}{Ejercicio 3 - Solución (e)}
+    \small
+    \textbf{e) Tiempo promedio total y en cola:}
+
+    \vspace{0.5em}
+
+    La tasa efectiva de llegadas es:
+    \[
+    \lambda_{ef} = \lambda(1 - \pi_c) = 20 \times \left(1 - \frac{16}{211}\right) = 20 \times \frac{195}{211} \approx 18.48 \text{ autos/hora}
+    \]
+
+    Tiempo promedio en el sistema:
+    \[
+    W = \frac{L}{\lambda_{ef}} = \frac{\frac{262}{211}}{20 \times \frac{195}{211}} = \frac{262}{3900} \approx 0.0672 \text{ horas} \approx 4.03 \text{ minutos}
+    \]
+
+    Tiempo promedio en la cola:
+    \[
+    W_q = \frac{L_q}{\lambda_{ef}} = \frac{\frac{132}{211}}{20 \times \frac{195}{211}} = \frac{132}{3900} \approx 0.0338 \text{ horas} \approx 2.03 \text{ minutos}
+    \]
+\end{frame}
+
+\begin{frame}{M/G/1}
+    \small
+    El modelo M/G/1 es un sistema de filas donde:
+    \begin{itemize}
+        \item \textbf{M}: Las llegadas siguen un proceso de Poisson (distribución Markoviana)
+        \item \textbf{G}: El tiempo de servicio sigue una distribución general (no necesariamente exponencial)
+        \item \textbf{1}: Hay un solo servidor
+    \end{itemize}
+
+    \vspace{0.5em}
+
+    Este modelo generaliza el M/M/1 al permitir cualquier distribución de tiempo de servicio.
+\end{frame}
+
+\begin{frame}{M/G/1 - Parámetros del Sistema}
+    \small
+    \begin{itemize}
+        \item $\lambda$: Tasa de llegadas (llegadas por unidad de tiempo)
+        \item $E[S]$: Tiempo medio de servicio
+        \item $\mu = \frac{1}{E[S]}$: Tasa media de servicio
+        \item $\text{Var}(S)$: Varianza del tiempo de servicio
+        \item $E[S^2]$: Segundo momento del tiempo de servicio
+        \item $\rho = \frac{\lambda}{\mu} = \lambda E[S]$: Factor de utilización
+    \end{itemize}
+
+    \vspace{0.5em}
+
+    Para estabilidad del sistema, se requiere $\rho < 1$.
+\end{frame}
+
+\begin{frame}{Fórmula de Pollaczek-Khinchin}
+    \small
+    La fórmula de Pollaczek-Khinchin proporciona el número promedio de clientes en la cola:
+
+    \[
+    L_q = \frac{\lambda^2 E[S^2]}{2(1-\rho)} = \frac{\rho^2 + \lambda^2 \text{Var}(S)}{2(1-\rho)}
+    \]
+
+    También puede expresarse en términos del coeficiente de variación del tiempo de servicio $C_s^2 = \frac{\text{Var}(S)}{E[S]^2}$:
+
+    \[
+    L_q = \frac{\rho^2(1 + C_s^2)}{2(1-\rho)}
+    \]
+
+    El coeficiente de variación del tiempo de servicio mide la variabilidad relativa del tiempo de servicio respecto de la media.
+\end{frame}
+
+\begin{frame}{M/G/1 - Otras Medidas de Desempeño}
+    \small
+    \textbf{Tiempo promedio en la cola:}
+    \[
+    W_q = \frac{L_q}{\lambda} = \frac{\lambda E[S^2]}{2(1-\rho)}
+    \]
+
+    \vspace{0.5em}
+
+    \textbf{Número promedio de clientes en el sistema:}
+    \[
+    L = L_q + \rho
+    \]
+
+    \vspace{0.5em}
+
+    \textbf{Tiempo promedio en el sistema:}
+    \[
+    W = W_q + E[S] = \frac{L}{\lambda}
+    \]
+\end{frame}
+
+\begin{frame}{M/M/1 (Servicio Exponencial)}
+    \small
+    Si el servicio es exponencial: $E[S^2] = \frac{2}{\mu^2}$ y $C_s^2 = 1$
+
+    \[
+    L_q = \frac{\rho^2}{1-\rho}
+    \]
+
+    que coincide con la fórmula del modelo M/M/1.
+\end{frame}
+
+\begin{frame}{M/D/1 (Servicio Determinístico)}
+    \small
+    Si el servicio es determinístico (constante): $\text{Var}(S) = 0$, $E[S^2] = E[S]^2$ y $C_s^2 = 0$
+
+    \[
+    L_q = \frac{\rho^2}{2(1-\rho)}
+    \]
+
+    \vspace{0.5em}
+
+    Nótese que para el mismo $\rho$, el sistema M/D/1 tiene la mitad de clientes en cola que M/M/1, debido a la ausencia de variabilidad en el servicio.
+\end{frame}
+
+\begin{frame}{Interpretación}
+    \small
+    La fórmula de Pollaczek-Khinchin muestra que:
+    \begin{itemize}
+        \item El número de clientes en cola aumenta con la variabilidad del tiempo de servicio
+
+        \vspace{0.3em}
+
+        \item Reducir la variabilidad del servicio (manteniendo la media constante) reduce la congestión
+
+        \vspace{0.3em}
+
+        \item Cuando $C_s^2 = 0$ (servicio determinístico), se minimiza $L_q$
+
+        \vspace{0.3em}
+
+        \item Cuando $C_s^2 = 1$ (servicio exponencial), se recupera el modelo M/M/1
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Simulación - Ejercicio 1}
+    \small
+    Un banco recibe en promedio $(\lambda = 4)$ clientes por hora (llegadas Poisson) y atiende cada cajero a razón de $(\mu = 2)$ clientes por hora (servicio exponencial). El banco puede contratar $s$ cajeros paralelos.
+
+    \vspace{0.5em}
+
+    \begin{itemize}
+        \item El costo de espera es de \$10 por cliente-hora en cola
+        \item El costo de servicio es de \$15 por cajero-hora
+    \end{itemize}
+
+    \vspace{0.5em}
+
+    Se busca determinar el número óptimo de cajeros $s$ que minimice el costo total:
+
+    \[
+    C(s) = 10\,L_q(s) + 15\,s
+    \]
+
+    donde $L_q(s)$ es el número promedio de clientes en cola en el sistema M/M/s.
+\end{frame}
+
+\begin{frame}[fragile]{Código Python - Parte 1}
+    \scriptsize
+    \begin{lstlisting}
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Parametros
+rate_llegada   = 4    # lambda (llegadas/hora)
+rate_atencion  = 2    # mu (servicios por servidor por hora)
+s              = 2    # numero de servidores
+n_pasos        = 100  # numero de intervalos
+costo_espera   = 10   # costo por cliente en cola
+costo_servidor = 15   # costo por servidor
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Código Python - Parte 2}
+    \scriptsize
+    \begin{lstlisting}
+# Historial
+hist_cola      = []
+hist_atendidos = []
+
+# Estado inicial
+cola = 0
+
+for paso in range(n_pasos):
+    # 1) Llegadas: Poisson(lambda * dt)
+    llegadas = np.random.poisson(rate_llegada)
+    cola += llegadas
+
+    # 2) Atenciones: Poisson(s * mu * dt)
+    capacidad = np.random.poisson(s * rate_atencion)
+    atendidos = min(cola, capacidad)
+    cola -= atendidos
+
+    # 3) Guardar historial
+    hist_cola.append(cola)
+    hist_atendidos.append(atendidos)
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Código Python - Parte 3}
+    \scriptsize
+    \begin{lstlisting}
+# 4) Costo final
+cola_final = hist_cola[-1]
+costo_total = costo_espera * cola_final + costo_servidor * s
+
+print(f"Clientes en cola al final: {cola_final}")
+print(f"Costo total = {costo_total:.2f}")
+
+# 5) Grafica
+plt.figure(figsize=(10,4))
+plt.plot(hist_cola, label="Clientes en cola", marker='o', markersize=3)
+plt.plot(hist_atendidos, label="Atendidos por paso", marker='x', markersize=3)
+plt.xlabel("Paso")
+plt.ylabel("Numero de clientes")
+plt.title(f"Simulacion M/M/{s} para {n_pasos} pasos")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Resultado Simulación 1}
+    \begin{center}
+        \includegraphics[width=0.9\textwidth]{img/output_simulacion_uno.png}
+    \end{center}
+
+    \vspace{0.3em}
+
+    \begin{itemize}
+        \item Clientes en cola al final: 13
+        \item Costo total = 10*13 + 15*2 = 160.00
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y si tengo diferentes S? - Parte 1}
+    \scriptsize
+    \begin{lstlisting}
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Parametros base
+rate_llegada   = 4
+rate_atencion  = 2
+s_max          = 5    # numero maximo de servidores a probar
+n_pasos        = 100
+costo_espera   = 10
+costo_servidor = 15
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y si tengo diferentes S? - Parte 2}
+    \scriptsize
+    \begin{lstlisting}
+def M_M_s(rate_llegada, rate_atencion, s, n_pasos, costo_espera, costo_servidor):
+    hist_cola      = []
+    hist_atendidos = []
+    cola = 0
+
+    for paso in range(n_pasos):
+        # 1) Llegadas: Poisson(rate_llegada)
+        llegadas = np.random.poisson(rate_llegada)
+        cola += llegadas
+
+        # 2) Atenciones: Poisson(s * rate_atencion)
+        capacidad = np.random.poisson(s * rate_atencion)
+        atendidos = min(cola, capacidad)
+        cola -= atendidos
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y si tengo diferentes S? - Parte 3}
+    \scriptsize
+    \begin{lstlisting}
+        # 3) Guardar historial
+        hist_cola.append(cola)
+        hist_atendidos.append(atendidos)
+
+    media_cola   = np.mean(hist_cola)
+    costo_total  = costo_espera * media_cola + costo_servidor * s
+
+    return hist_cola, hist_atendidos, costo_total
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y si tengo diferentes S? - Parte 3}
+    \scriptsize
+    \begin{lstlisting}
+# Simular para s = 1 ... s_max
+costos_totales = []
+for i in range(1, s_max + 1):
+    hist_cola, hist_atendidos, costo_total = M_M_s(
+        rate_llegada, rate_atencion, i, n_pasos, costo_espera, costo_servidor)
+    costos_totales.append(costo_total)
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y si tengo diferentes S? - Parte 4}
+    \scriptsize
+    \begin{lstlisting}
+    # Grafico de evolucion para cada s
+    plt.figure(figsize=(10,4))
+    plt.plot(hist_cola, label="Clientes en cola", marker='o', markersize=3)
+    plt.axhline(np.mean(hist_cola), color='r', linestyle='--',
+                label=f"Media cola = {np.mean(hist_cola):.2f}")
+    plt.plot(hist_atendidos, label="Atendidos por paso", marker='x', markersize=3)
+    plt.axhline(np.mean(hist_atendidos), color='g', linestyle='--',
+                label=f"Media atendidos = {np.mean(hist_atendidos):.2f}")
+    plt.xlabel("Paso")
+    plt.ylabel("Numero de clientes")
+    plt.title(f"Simulacion M/M/{i} para {n_pasos} pasos")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y si tengo diferentes S? - Parte 4}
+    \scriptsize
+    \begin{lstlisting}
+# Grafico de costos totales vs numero de servidores
+plt.figure(figsize=(8,4))
+plt.plot(range(1, s_max+1), costos_totales, '-o')
+plt.xlabel("Numero de servidores $s$")
+plt.ylabel("Costo total por intervalo")
+plt.title("Costo total vs. numero de servidores")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Resultado Simulación 2 - s=1}
+    \begin{center}
+        \includegraphics[width=0.9\textwidth]{img/output_simulacion_dos_1.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Resultado Simulación 2 - s=2}
+    \begin{center}
+        \includegraphics[width=0.9\textwidth]{img/output_simulacion_dos_2.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Resultado Simulación 2 - s=3}
+    \begin{center}
+        \includegraphics[width=0.9\textwidth]{img/output_simulacion_dos_3.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Resultado Simulación 2 - s=4}
+    \begin{center}
+        \includegraphics[width=0.9\textwidth]{img/output_simulacion_dos_4.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Resultado Simulación 2 - s=5}
+    \begin{center}
+        \includegraphics[width=0.9\textwidth]{img/output_simulacion_dos_5.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Resultado Simulación 2 - Costos}
+    \begin{center}
+        \includegraphics[width=0.9\textwidth]{img/output_simulacion_dos_6.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y si hacemos Montecarlo? - Parte 1}
+    \scriptsize
+    \begin{lstlisting}
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Parametros base
+rate_llegada   = 4
+rate_atencion  = 2
+s              = 3     # fijamos s=3
+n_pasos        = 100
+costo_espera   = 10
+costo_servidor = 15
+n_rep          = 1000  # numero de replicas Monte Carlo
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y si hacemos Montecarlo? - Parte 2}
+    \scriptsize
+    \begin{lstlisting}
+def M_M_s(rate_llegada, rate_atencion, s, n_pasos, costo_espera, costo_servidor):
+    hist_cola = []
+    hist_atendidos = []
+    cola = 0
+
+    for _ in range(n_pasos):
+        llegadas  = np.random.poisson(rate_llegada)
+        capacidad = np.random.poisson(s * rate_atencion)
+        cola += llegadas
+        atendidos = min(cola, capacidad)
+        cola -= atendidos
+
+        hist_cola.append(cola)
+        hist_atendidos.append(atendidos)
+
+    media_cola  = np.mean(hist_cola)
+    costo_total = costo_espera * media_cola + costo_servidor * s
+    return np.array(hist_cola), np.array(hist_atendidos), costo_total
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y si hacemos Montecarlo? - Parte 3}
+    \scriptsize
+    \begin{lstlisting}
+# Almacenar todos los historicos
+all_colas      = np.zeros((n_rep, n_pasos))
+all_atendidos  = np.zeros((n_rep, n_pasos))
+all_costos     = np.zeros(n_rep)
+
+for i in range(n_rep):
+    hc, ha, ctot = M_M_s(rate_llegada, rate_atencion, s, n_pasos, costo_espera, costo_servidor)
+    all_colas[i]     = hc
+    all_atendidos[i] = ha
+    all_costos[i]    = ctot
+
+# Calcular estadisticos
+mean_cola     = all_colas.mean(axis=0)
+p5_cola, p95_cola = np.percentile(all_colas, [5,95], axis=0)
+
+mean_atendidos    = all_atendidos.mean(axis=0)
+p5_att, p95_att   = np.percentile(all_atendidos, [5,95], axis=0)
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Trayectorias promedio con bandas 5-95\%}
+    \scriptsize
+    \begin{lstlisting}
+fig, axes = plt.subplots(2,1, figsize=(10,8), sharex=True)
+
+axes[0].plot(mean_cola, color='C0', label='Media cola')
+axes[0].fill_between(range(n_pasos), p5_cola, p95_cola, color='C0', alpha=0.2, label='5-95\%')
+axes[0].set_ylabel('Clientes en cola')
+axes[0].legend()
+axes[0].grid(True) # Cola
+
+axes[1].plot(mean_atendidos, color='C1', label='Media atendidos')
+axes[1].fill_between(range(n_pasos), p5_att, p95_att, color='C1', alpha=0.2, label='5-95\%')
+axes[1].set_xlabel('Paso')
+axes[1].set_ylabel('Clientes atendidos')
+axes[1].legend()
+axes[1].grid(True) # Atendidos
+
+plt.suptitle(f'Simulacion Monte Carlo M/M/{s} ({n_rep} replicas)')
+plt.tight_layout(rect=[0,0,1,0.95])
+plt.show()
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y si hacemos Montecarlo? - Parte 5}
+    \scriptsize
+    \begin{lstlisting}
+# 2) Histograma de costos
+plt.figure(figsize=(8,4))
+plt.hist(all_costos, bins=30, edgecolor='k', alpha=0.7)
+plt.axvline(all_costos.mean(), color='r', linestyle='--', label=f'Media = {all_costos.mean():.2f}')
+plt.xlabel('Costo total')
+plt.ylabel('Frecuencia')
+plt.title('Distribucion de costos totales (Monte Carlo)')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Resultado Montecarlo 1 - Evolución}
+    \begin{center}
+        \includegraphics[width=0.9\textwidth]{img/output_montecarlo_uno_1.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Resultado Montecarlo 1 - Costos}
+    \begin{center}
+        \includegraphics[width=0.9\textwidth]{img/output_montecarlo_uno_2.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y con diferentes S? - Parte 1}
+    \scriptsize
+    \begin{lstlisting}
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Parametros base
+rate_llegada   = 4
+rate_atencion  = 2
+s_max          = 5
+n_pasos        = 100
+costo_espera   = 10
+costo_servidor = 15
+n_rep          = 1000
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y con diferentes S? - Parte 2}
+    \scriptsize
+    \begin{lstlisting}
+def M_M_s(rate_llegada, rate_atencion, s, n_pasos, costo_espera, costo_servidor):
+    hist_cola = np.zeros(n_pasos)
+    hist_att  = np.zeros(n_pasos)
+    cola = 0
+    for t in range(n_pasos):
+        cola += np.random.poisson(rate_llegada)
+        atend = min(cola, np.random.poisson(s * rate_atencion))
+        cola -= atend
+        hist_cola[t] = cola
+        hist_att[t]  = atend
+    media_cola = hist_cola.mean()
+    costo_total = costo_espera * media_cola + costo_servidor * s
+    return hist_cola, hist_att, costo_total
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y con diferentes S? - Parte 3}
+    \scriptsize
+    \begin{lstlisting}
+# Arrays para almacenar resultados
+cola_means   = np.zeros((s_max, n_pasos))
+att_means    = np.zeros((s_max, n_pasos))
+costos_means = np.zeros(s_max)
+
+# Bucle sobre s
+for s in range(1, s_max + 1):
+    all_colas = np.zeros((n_rep, n_pasos))
+    all_atts  = np.zeros((n_rep, n_pasos))
+    all_costs = np.zeros(n_rep)
+
+    for i in range(n_rep):
+        hc, ha, ctot = M_M_s(rate_llegada, rate_atencion, s, n_pasos, costo_espera, costo_servidor)
+        all_colas[i] = hc
+        all_atts[i]  = ha
+        all_costs[i] = ctot
+
+    cola_means[s-1]   = all_colas.mean(axis=0)
+    att_means[s-1]    = all_atts.mean(axis=0)
+    costos_means[s-1] = all_costs.mean()
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y con diferentes S? - Parte 4}
+    \scriptsize
+    \begin{lstlisting}
+# 1) Plot de medias de cola
+plt.figure(figsize=(8,4))
+for idx in range(s_max):
+    plt.plot(cola_means[idx], label=f's={idx+1}')
+plt.xlabel('Paso')
+plt.ylabel('Media clientes en cola')
+plt.title('Evolucion media de la cola para distintos s')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y con diferentes S? - Parte 5}
+    \scriptsize
+    \begin{lstlisting}
+# 2) Plot de medias de atendidos
+plt.figure(figsize=(8,4))
+for idx in range(s_max):
+    plt.plot(att_means[idx], label=f's={idx+1}')
+plt.xlabel('Paso')
+plt.ylabel('Media clientes atendidos')
+plt.title('Evolucion media de atendidos para distintos s')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{¿Y con diferentes S? - Parte 6}
+    \scriptsize
+    \begin{lstlisting}
+# 3) Plot del costo medio final vs s
+plt.figure(figsize=(6,4))
+plt.plot(range(1, s_max+1), costos_means, '-o')
+plt.xlabel('Numero de servidores $s$')
+plt.ylabel('Costo medio por intervalo')
+plt.title('Costo medio vs numero de servidores')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+    \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Resultado Montecarlo 2 - Cola}
+    \begin{center}
+        \includegraphics[width=0.9\textwidth]{img/output_montecarlo_dos_1.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Resultado Montecarlo 2 - Atendidos}
+    \begin{center}
+        \includegraphics[width=0.9\textwidth]{img/output_montecarlo_dos_2.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Resultado Montecarlo 2 - Costos}
+    \begin{center}
+        \includegraphics[width=0.9\textwidth]{img/output_montecarlo_dos_3.png}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Terminamos}
+    \begin{center}
+        \Large{\textbf{¿Dudas?\\¿Consultas?}}
+    \end{center}
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south,inner sep=30pt] at (current page.south) {
+            \includegraphics[height=1cm]{../misc/UdeSA.png}
+        };
+    \end{tikzpicture}
+\end{frame}
+
+\end{document}
