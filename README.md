@@ -23,25 +23,22 @@ Este repositorio contiene los materiales, notebooks, apuntes y recursos de las c
 
 Las guías de ejercicios se encuentran en [esta](/Guías%20de%20Ejercicios/) carpeta.
 
-## Tabla de clases y temas
+## Cronograma
 
-Ambas tutoriales (Benégas y Rodríguez del Castillo) de la cátedra Severino son los Jueves 9am.
-
-| # Clase | Fecha   | Temas |
-|:------:|:-------:|:------|
-|   1    | 07/08   | Python para Investigación Operativa |
-|   2    | 14/08   | Programación Lineal (Parte 1) |
-|   3    | 21/08   | Programación Lineal (Parte 2) |
-|   4    | 28/08   | Algoritmos de Búsqueda |
-|   5    | 04/09   | Programación Entera (Parte 1) |
-|   6    | 11/09   | Programación Entera (Parte 2) |
-|   7    | 18/09   | Programación No Lineal (Parte 1) |
-|   8    | 25/09   | Repaso Pre Parcial |
-|   -    | --/--   | Parciales |
-|   9    | 16/10   | Probabilidad y Estadística para I. O. |
-|   10   | 23/10   | Simulación de Montecarlo |
-|   11   | 30/10   | Cadenas de Markov |
-|   12   | 06/11   | Teoría de Filas |
-|   13   | 13/11   | Teoría de Inventarios |
-|   -    | 20/11   | Feriado |
-|   -    | 27/11   | Recuperatorios Primer y Segundo Parcialito |
+| # Clase | Rodríguez del Castillo (Martes) | Benégas (Martes) | Armaleo (Jueves) | Bordakevich (Jueves) |
+|:------:|:-----------:|:-----------:|:-----------:|:-----------:|
+|   X    | **SIN** | **TUTORIALES** | **LA PRIMERA** | **SEMANA** |
+|   1    | 10/03 | 10/03 | 12/03 | 12/03 |
+|   2    | 17/03 | 17/03 | 19/03 | 19/03 |
+|   3    | 24/03 (Feriado) | 24/03 (Feriado) | 26/03 | 26/03 |
+|   4    | 31/03 | 31/03 | 02/04 (Feriado) | 02/04 (Feriado) |
+|   5    | 07/04 | 07/04 | 09/04 | 09/04 |
+|   6    | 14/04 | 14/04 | 16/04 | 16/04 |
+|   7    | 21/04 | 21/04 | 23/04 | 23/04 |
+|   8    | 28/04 | 28/04 | 30/04 | 30/04 |
+|   -    | **PARCIALES** | **PARCIALES** | **PARCIALES** | **PARCIALES** |
+|   9    | 12/05 | 12/05 | 14/05 | 14/05 |
+|   10   | 19/05 | 19/05 | 21/05 | 21/05 |
+|   11   | 26/05 | 26/05 | 28/05 | 28/05 |
+|   12   | 02/06 | 02/06 | 04/06 | 04/06 |
+|   13   | 09/06 | 09/06 | 11/06 | 11/06 |
