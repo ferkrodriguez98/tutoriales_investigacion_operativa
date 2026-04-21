@@ -1,0 +1,1326 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish]{babel}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{forest}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+\usepackage{siunitx}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\sloppy
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+% Título y materia
+\begin{center}
+  {\LARGE \textbf{Lagrange y KKT}}\\[0.5em]
+  {Investigación Operativa, Universidad de San Andrés}
+\end{center}
+
+Si encuentran algún error en el documento o hay alguna duda, mandenmé un mail a rodriguezf@udesa.edu.ar y lo revisamos.
+
+\section{Introducción}
+
+En la clase anterior vimos programación no lineal de manera general y la resolvimos siempre con Python usando \texttt{scipy.optimize.minimize}. Pero la computadora es una caja negra: le tiramos la función y las restricciones, y nos devuelve un número. En esta clase vamos a abrir esa caja y ver \textbf{cómo se resuelven analíticamente} los problemas de optimización no lineal con restricciones.
+
+\vspace{0.5em}
+
+Vamos a ver dos métodos:
+
+\begin{itemize}
+    \item \textbf{Multiplicadores de Lagrange:} para problemas con restricciones de \textbf{igualdad} (por ejemplo, ``gastá exactamente \$1000'').
+    \item \textbf{Condiciones KKT (Karush-Kuhn-Tucker):} generalización de Lagrange para problemas con restricciones de \textbf{desigualdad} (por ejemplo, ``gastá como mucho \$1000''). Es una extensión que también incluye el caso de igualdad como caso particular.
+\end{itemize}
+
+\vspace{0.5em}
+
+\textbf{¿Por qué nos importa saber hacerlo a mano si la compu lo hace sola?} Hay tres razones:
+
+\begin{enumerate}
+    \item Entender \textit{por qué} funcionan los métodos numéricos que usamos.
+    \item Obtener \textbf{precios sombra} ($\lambda$), que tienen una interpretación económica muy potente (ya vamos a ver qué son).
+    \item En algunos casos, la solución analítica es más rápida y exacta que la numérica.
+\end{enumerate}
+
+\section{Repaso: derivadas parciales y gradientes}
+
+Antes de arrancar con Lagrange conviene tener claro qué es una derivada parcial y qué es el gradiente, porque todo el método se basa en eso. Si ya te los sabés, podés saltearlo.
+
+\subsection{Derivada parcial}
+
+Cuando tenemos una función de varias variables $f(x, y)$, la \textbf{derivada parcial respecto a $x$} (escrita $\partial f / \partial x$) es la derivada que sale de \textit{tratar a todas las demás variables como constantes} y derivar solo respecto a $x$.
+
+\vspace{0.5em}
+
+\textbf{Ejemplo:} si $f(x, y) = 3x^2 y + 5y^3$:
+
+\begin{itemize}
+    \item $\dfrac{\partial f}{\partial x} = 6xy$ (tratamos a $y$ como constante, derivamos $3x^2 y$ respecto a $x$ y $5y^3$ como constante desaparece)
+    \item $\dfrac{\partial f}{\partial y} = 3x^2 + 15y^2$ (ahora tratamos a $x$ como constante)
+\end{itemize}
+
+\vspace{0.5em}
+
+\textbf{Truco mental:} tapá con la mano todas las variables excepto una y derivás como siempre.
+
+\subsection{Gradiente}
+
+El \textbf{gradiente} de $f$ es el vector que tiene todas las derivadas parciales:
+
+\[
+\nabla f(x, y) = \left( \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right)
+\]
+
+\vspace{0.5em}
+
+\textbf{Interpretación geométrica:} el gradiente apunta en la dirección donde $f$ \textbf{crece más rápido}. Y su longitud dice qué tan rápido crece.
+
+\vspace{0.5em}
+
+\textbf{Ejemplo:} si $f(x, y) = x^2 + y^2$ (un cuenco parabólico centrado en el origen):
+
+\[
+\nabla f = (2x, 2y)
+\]
+
+En el punto $(3, 4)$: $\nabla f = (6, 8)$. Este vector apunta desde $(3,4)$ hacia afuera del origen (alejándose), que es donde $f$ crece más.
+
+\subsection{Dos reglas que vamos a usar mucho}
+
+\textbf{1. Derivada de $x^n$:}
+
+\[
+\frac{d}{dx} x^n = n \cdot x^{n-1}
+\]
+
+Esto incluye exponentes fraccionarios: $\frac{d}{dx} x^{0.5} = 0.5 \cdot x^{-0.5} = \dfrac{1}{2\sqrt{x}}$.
+
+\vspace{0.5em}
+
+\textbf{2. Derivada de un producto:} si $f(x, y) = x \cdot y$, entonces $\partial f / \partial x = y$ y $\partial f / \partial y = x$. Las variables se ``cruzan''.
+
+\vspace{0.5em}
+
+\textbf{3. Derivada de una constante por una función:} la constante sale afuera y se mantiene.
+
+\[
+\frac{d}{dx} (5 x^2) = 5 \cdot 2x = 10x
+\]
+
+\subsection{¿Para qué nos sirve todo esto?}
+
+En los próximos métodos:
+
+\begin{itemize}
+    \item Vamos a construir una función llamada \textbf{Lagrangiano} $\mathcal{L}(x, y, \lambda)$.
+    \item Vamos a calcular sus derivadas parciales respecto a $x$, $y$ y $\lambda$.
+    \item Las vamos a igualar a cero: $\nabla \mathcal{L} = 0$.
+    \item Eso nos va a dar un sistema de ecuaciones para resolver.
+\end{itemize}
+
+\vspace{0.5em}
+
+Entonces todo se reduce a: \textit{construir la función correcta, derivar, igualar a cero, resolver.}
+
+\section{Multiplicadores de Lagrange}
+
+\subsection{La idea intuitiva}
+
+Imaginate que querés encontrar el mínimo de una función $f(x, y)$, pero con la condición de que los valores que elegís caigan sobre una curva específica $g(x, y) = 0$ (la restricción). Sin la restricción, el mínimo podría estar en cualquier lado. Con la restricción, nos tenemos que quedar \textit{solo} sobre esa curva.
+
+\vspace{0.5em}
+
+La pregunta entonces es: \textit{caminando sobre la curva de restricción, ¿dónde está el punto más bajo de la función}?
+
+\vspace{1em}
+
+\textbf{La observación clave} es esta: en el punto óptimo, la curva de nivel de $f$ (los puntos donde $f$ vale lo mismo) es \textbf{tangente} a la curva de la restricción. Si no fueran tangentes (si se cruzaran), podríamos movernos un poquito sobre la restricción y mejorar $f$. Entonces el óptimo es donde se tocan sin cruzarse.
+
+\vspace{0.5em}
+
+Y si dos curvas son tangentes en un punto, sus \textbf{gradientes son paralelos} en ese punto. O sea, uno es múltiplo del otro:
+
+\[
+\nabla f(x^*, y^*) = \lambda \cdot \nabla g(x^*, y^*)
+\]
+
+Ese número $\lambda$ (lambda) es el \textbf{multiplicador de Lagrange}, y es el factor que dice ``cuántas veces más grande es el gradiente del objetivo comparado con el de la restricción''.
+
+\subsection{Visualización: ¿por qué tangente implica gradientes paralelos?}
+
+Esta es la intuición más importante de toda la clase. Veámoslo con dibujos.
+
+\vspace{0.5em}
+
+Supongamos que queremos minimizar $f(x, y) = x^2 + y^2$ (círculos concéntricos centrados en el origen son las curvas de nivel) sujeto a $x + y = 4$ (una recta). En el punto óptimo, la recta toca al círculo más chico \textit{sin cruzarlo}:
+
+\vspace{0.5em}
+
+\begin{center}
+\shorthandoff{>}
+\begin{tikzpicture}[scale=0.9]
+    % curvas de nivel (circulos)
+    \draw[blue!30, thick] (0,0) circle (1);
+    \draw[blue!50, thick] (0,0) circle (2);
+    \draw[blue, thick] (0,0) circle (2.83);
+    % etiquetas de los circulos en el cuadrante sup-izq (despejado)
+    \node[blue!30, fill=white, inner sep=1pt] at (-0.7,0.7) {\small $f=1$};
+    \node[blue!50, fill=white, inner sep=1pt] at (-1.4,1.4) {\small $f=4$};
+    \node[blue, fill=white, inner sep=1pt] at (-2,2) {\small $f=8$};
+    % recta restriccion
+    \draw[red, thick] (-0.5,4.5) -- (4.5,-0.5);
+    \node[red] at (4.5,-1) {\small $x+y=4$};
+    % punto optimo
+    \fill[black] (2,2) circle (2.5pt);
+    \node[below left] at (2,2) {\small $(2,2)$};
+    % gradiente de f en (2,2) = (4,4) -- apunta arriba-derecha, etiqueta bien separada
+    \draw[->, very thick, blue, >=latex] (2,2) -- (4,4);
+    \node[blue, right] at (4,4) {\small $\nabla f = (4,4)$};
+    % gradiente de g en (2,2) = (1,1) -- sale mas corto desde un offset minimo
+    \draw[->, very thick, red, >=latex] (2.1,1.9) -- (2.8,2.6);
+    \node[red, right] at (2.85,2.5) {\small $\nabla g = (1,1)$};
+    % ejes
+    \draw[->] (-3.5,0) -- (5.5,0) node[right] {$x$};
+    \draw[->] (0,-1.5) -- (0,5) node[above] {$y$};
+\end{tikzpicture}
+\shorthandon{>}
+\end{center}
+
+\vspace{0.5em}
+
+\textbf{Observaciones clave:}
+
+\begin{enumerate}
+    \item Los gradientes $\nabla f$ y $\nabla g$ en el punto óptimo $(2,2)$ \textbf{apuntan en la misma dirección}. No tienen la misma longitud, pero sí la misma dirección.
+    \item $\nabla f = (4, 4)$ es exactamente 4 veces $\nabla g = (1, 1)$. Ese ``4'' es justamente $\lambda$.
+    \item La recta roja (restricción) es perpendicular a $\nabla g$, y tangente al círculo (curva de nivel de $f$).
+\end{enumerate}
+
+\subsection{¿Por qué siempre son paralelos en el óptimo?}
+
+\textbf{Razonamiento por contradicción.} Suponé que en el óptimo los gradientes \textbf{no} son paralelos. Entonces existe una dirección de movimiento, a lo largo de la restricción (perpendicular a $\nabla g$), que tenga componente no nula en la dirección de $\nabla f$. Moviéndote en esa dirección:
+
+\begin{itemize}
+    \item Seguís cumpliendo la restricción (te movés sobre la curva $g = 0$).
+    \item Cambiás el valor de $f$ (porque hay componente en la dirección de $\nabla f$).
+\end{itemize}
+
+\vspace{0.3em}
+
+Si $f$ cambia, podés mejorarla. Pero si podés mejorarla, \textbf{no estabas en el óptimo}. Contradicción.
+
+\vspace{0.5em}
+
+La única forma de estar realmente en el óptimo es que $\nabla f$ sea paralelo a $\nabla g$: ninguna dirección sobre la curva cambia $f$.
+
+\subsection{El Lagrangiano}
+
+En vez de trabajar con la ecuación $\nabla f = \lambda \nabla g$ por separado, se define una nueva función llamada \textbf{Lagrangiano}:
+
+\[
+\mathcal{L}(x, y, \lambda) = f(x, y) - \lambda \cdot g(x, y)
+\]
+
+La gracia es que si calculamos las derivadas parciales del Lagrangiano respecto a $x$, $y$ y $\lambda$, y las igualamos a cero, obtenemos exactamente:
+
+\begin{itemize}
+    \item $\dfrac{\partial \mathcal{L}}{\partial x} = 0 \quad \Rightarrow \quad \dfrac{\partial f}{\partial x} = \lambda \dfrac{\partial g}{\partial x}$
+    \item $\dfrac{\partial \mathcal{L}}{\partial y} = 0 \quad \Rightarrow \quad \dfrac{\partial f}{\partial y} = \lambda \dfrac{\partial g}{\partial y}$
+    \item $\dfrac{\partial \mathcal{L}}{\partial \lambda} = 0 \quad \Rightarrow \quad g(x, y) = 0$ (la restricción se cumple)
+\end{itemize}
+
+\vspace{0.5em}
+
+O sea, pedirle que el gradiente del Lagrangiano sea cero es equivalente a pedirle las dos cosas juntas: que los gradientes sean paralelos \textbf{y} que la restricción se cumpla. Por eso es tan cómodo trabajar con el Lagrangiano en vez de con las ecuaciones sueltas.
+
+\subsection{El precio sombra ($\lambda$)}
+
+El multiplicador $\lambda$ no es solo un número auxiliar que aparece en el camino: tiene una interpretación muy concreta en términos de negocio. Se llama \textbf{precio sombra} (\textit{shadow price} en inglés) y representa \textbf{cuánto cambiaría el valor óptimo de la función objetivo si relajamos la restricción en una unidad}.
+
+\vspace{0.5em}
+
+Por ejemplo, si estamos maximizando ganancias con un presupuesto de \$1000 y obtenemos $\lambda = 5$, eso significa que si el presupuesto fuera \$1001, nuestras ganancias aumentarían aproximadamente en \$5. Es el valor marginal del recurso.
+
+\vspace{0.5em}
+
+\textbf{¿Por qué nos sirve saber esto?} Porque nos dice si vale la pena conseguir más del recurso limitado. Si el precio sombra del presupuesto es \$5 por unidad y conseguir una unidad más cuesta \$2 (por ejemplo, pedir un préstamo), entonces conviene. Si cuesta \$10, no conviene.
+
+\subsection{Algoritmo paso a paso}
+
+Para resolver un problema de Lagrange seguimos estos pasos:
+
+\begin{enumerate}
+    \item \textbf{Identificar} la función objetivo $f(x, y)$ y la restricción $g(x, y) = 0$.
+    \item \textbf{Construir} el Lagrangiano: $\mathcal{L} = f - \lambda \cdot g$.
+    \item \textbf{Derivar} el Lagrangiano respecto a cada variable ($x$, $y$, $\lambda$) e igualar a cero.
+    \item \textbf{Resolver} el sistema de ecuaciones resultante.
+    \item \textbf{Interpretar} el valor de $\lambda$ como precio sombra.
+\end{enumerate}
+
+\vspace{0.5em}
+
+\textbf{Aclaración importante:} el método de Lagrange nos da \textit{candidatos} a óptimo (puntos críticos). Si tenemos varios, hay que evaluar $f$ en cada uno para ver cuál es máximo y cuál es mínimo. Si el problema es convexo, el punto crítico es directamente el óptimo global.
+
+\section{Ejemplo 1: Círculo más chico que toca la recta}
+
+Queremos encontrar el punto $(x, y)$ que minimice $x^2 + y^2$ (o sea, el punto más cercano al origen) sujeto a que $x + y = 4$.
+
+\vspace{0.5em}
+
+\textbf{Interpretación geométrica:} $x^2 + y^2$ es el cuadrado de la distancia al origen. Minimizar eso sujeto a la recta $x + y = 4$ es encontrar el punto de la recta más cercano al $(0,0)$. Lo podríamos resolver por geometría directamente (la perpendicular desde el origen a la recta), pero lo vamos a hacer con Lagrange para ver cómo funciona.
+
+\subsection{Paso 0: Identificar componentes}
+
+\begin{itemize}
+    \item \textbf{Función objetivo:} $f(x, y) = x^2 + y^2$
+    \item \textbf{Restricción:} $x + y = 4 \implies g(x, y) = x + y - 4 = 0$
+\end{itemize}
+
+\subsection{Paso 1: Construir el Lagrangiano}
+
+\[
+\mathcal{L}(x, y, \lambda) = (x^2 + y^2) - \lambda(x + y - 4)
+\]
+
+\subsection{Paso 2: Derivar e igualar a cero}
+
+\begin{enumerate}
+    \item $\dfrac{\partial \mathcal{L}}{\partial x} = 2x - \lambda = 0 \implies \lambda = 2x$
+    \item $\dfrac{\partial \mathcal{L}}{\partial y} = 2y - \lambda = 0 \implies \lambda = 2y$
+    \item $\dfrac{\partial \mathcal{L}}{\partial \lambda} = -(x + y - 4) = 0 \implies x + y = 4$
+\end{enumerate}
+
+\subsection{Paso 3: Resolver el sistema}
+
+De (1) y (2): como $\lambda = 2x$ y $\lambda = 2y$, entonces $2x = 2y \implies x = y$.
+
+\vspace{0.5em}
+
+Reemplazando en (3): $x + x = 4 \implies 2x = 4 \implies x = 2$. Entonces $y = 2$ también.
+
+\subsection{Paso 4: Calcular $\lambda$}
+
+\[
+\lambda = 2x = 2 \cdot 2 = 4
+\]
+
+\[
+\boxed{x^* = 2, \quad y^* = 2, \quad \lambda^* = 4}
+\]
+
+\subsection{Interpretación}
+
+\begin{itemize}
+    \item \textbf{Geométrica:} el punto $(2, 2)$ es donde la recta $x + y = 4$ es tangente al círculo $x^2 + y^2 = 8$ (el círculo más chico centrado en el origen que toca la recta). El gradiente de $f$ en ese punto es $(4, 4)$ y el de $g$ es $(1, 1)$: efectivamente uno es 4 veces el otro, por eso $\lambda = 4$.
+    \item \textbf{Económica (precio sombra):} si la restricción fuera $x + y = 5$ en vez de 4, el valor óptimo de $f$ aumentaría aproximadamente en 4 unidades. Efectivamente, el óptimo nuevo sería $(2.5, 2.5)$ con $f = 12.5$, que es aproximadamente $8 + 4 \cdot 1 = 12$ (la aproximación es muy buena para cambios chicos).
+\end{itemize}
+
+\subsection{Resolución en Python}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+from scipy.optimize import minimize
+
+def objetivo(x):
+    return x[0]**2 + x[1]**2
+
+restricciones = [
+    {'type': 'eq', 'fun': lambda x: x[0] + x[1] - 4}
+]
+
+x0 = [0, 0]
+
+res = minimize(objetivo, x0, method='SLSQP', constraints=restricciones)
+
+if res.success:
+    x_opt, y_opt = res.x
+    print(f'x optimo: {x_opt:.4f}')
+    print(f'y optimo: {y_opt:.4f}')
+    print(f'Valor objetivo: {res.fun:.4f}')
+else:
+    print('Error:', res.message)
+\end{lstlisting}
+
+\section{Ejemplo 2: Sinergia perfecta (reloj inteligente)}
+
+El Director de Producto de una empresa tecnológica está por lanzar un nuevo reloj inteligente de alta gama. El éxito depende de dos características:
+
+\begin{itemize}
+    \item $x$: nivel de innovación en la \textbf{duración de la batería}
+    \item $y$: nivel de innovación en la \textbf{calidad de la pantalla}
+\end{itemize}
+
+El consumidor no valora estas características por separado sino de forma multiplicativa (si la pantalla es increíble pero la batería dura una hora, el producto fracasa). Por eso se modela el valor percibido como:
+
+\[
+f(x, y) = xy
+\]
+
+El costo de desarrollar cada característica crece de forma cuadrática (mejorar de ``bueno'' a ``excelente'' requiere materiales experimentales carísimos). El presupuesto total está normalizado en 1, así que la restricción es:
+
+\[
+x^2 + y^2 = 1
+\]
+
+\subsection{Paso 0: Identificar componentes}
+
+\begin{itemize}
+    \item \textbf{Función objetivo:} $f(x, y) = xy$ (queremos maximizarla)
+    \item \textbf{Restricción:} $g(x, y) = x^2 + y^2 - 1 = 0$
+\end{itemize}
+
+\subsection{Paso 1: Construir el Lagrangiano}
+
+\[
+\mathcal{L}(x, y, \lambda) = xy - \lambda(x^2 + y^2 - 1)
+\]
+
+\subsection{Paso 2: Derivar e igualar a cero}
+
+\begin{enumerate}
+    \item $\dfrac{\partial \mathcal{L}}{\partial x} = y - 2\lambda x = 0 \implies y = 2\lambda x$
+    \item $\dfrac{\partial \mathcal{L}}{\partial y} = x - 2\lambda y = 0 \implies x = 2\lambda y$
+    \item $\dfrac{\partial \mathcal{L}}{\partial \lambda} = -(x^2 + y^2 - 1) = 0 \implies x^2 + y^2 = 1$
+\end{enumerate}
+
+\subsection{Paso 3: Resolver el sistema}
+
+De (1) y (2) despejamos $\lambda$:
+
+\[
+\lambda = \frac{y}{2x} \quad \text{y} \quad \lambda = \frac{x}{2y}
+\]
+
+Igualando:
+
+\[
+\frac{y}{2x} = \frac{x}{2y} \implies 2y^2 = 2x^2 \implies y^2 = x^2
+\]
+
+Reemplazando en la restricción (3):
+
+\[
+x^2 + x^2 = 1 \implies 2x^2 = 1 \implies x = \pm \frac{\sqrt{2}}{2}
+\]
+
+Como $y^2 = x^2$, también $y = \pm \frac{\sqrt{2}}{2}$. Tenemos 4 puntos críticos:
+
+\begin{itemize}
+    \item $(\frac{\sqrt{2}}{2}, \frac{\sqrt{2}}{2})$ y $(-\frac{\sqrt{2}}{2}, -\frac{\sqrt{2}}{2})$: mismo signo $\Rightarrow f = 0.5$ (máximos).
+    \item $(\frac{\sqrt{2}}{2}, -\frac{\sqrt{2}}{2})$ y $(-\frac{\sqrt{2}}{2}, \frac{\sqrt{2}}{2})$: signos opuestos $\Rightarrow f = -0.5$ (mínimos).
+\end{itemize}
+
+\subsection{Paso 4: Calcular $\lambda$}
+
+Para los máximos:
+
+\[
+\lambda = \frac{y}{2x} = \frac{\sqrt{2}/2}{2 \cdot \sqrt{2}/2} = \frac{1}{2}
+\]
+
+\[
+\boxed{x^* = y^* = \frac{\sqrt{2}}{2}, \quad \lambda^* = 0.5, \quad f^* = 0.5}
+\]
+
+\subsection{Interpretación}
+
+\begin{itemize}
+    \item \textbf{Geométrica:} en el óptimo, el gradiente de $f$ es la mitad del gradiente de $g$. La hipérbola $xy = 0.5$ es tangente al círculo $x^2 + y^2 = 1$.
+    \item \textbf{Precio sombra:} si conseguimos ampliar el presupuesto (pasar la restricción a $x^2 + y^2 = 1.1$), la sinergia máxima crece a una tasa de 0.5 por unidad de presupuesto adicional.
+\end{itemize}
+
+\subsection{Resolución en Python}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+from scipy.optimize import minimize
+
+# Minimizamos el negativo para maximizar
+def objetivo_neg(x):
+    return -x[0] * x[1]
+
+restricciones = [
+    {'type': 'eq', 'fun': lambda x: x[0]**2 + x[1]**2 - 1}
+]
+
+# Probamos varios puntos iniciales porque hay multiples optimos
+x0 = [0.5, 0.5]
+
+res = minimize(objetivo_neg, x0, method='SLSQP', constraints=restricciones)
+
+if res.success:
+    x_opt, y_opt = res.x
+    f_opt = -res.fun
+    print(f'x optimo: {x_opt:.4f}')
+    print(f'y optimo: {y_opt:.4f}')
+    print(f'Sinergia maxima: {f_opt:.4f}')
+\end{lstlisting}
+
+\section{Ejemplo 3: Producción Cobb-Douglas}
+
+Una fábrica quiere maximizar la producción de juguetes, modelada como una función Cobb-Douglas clásica:
+
+\[
+P(L, K) = 10 L^{0.5} K^{0.5}
+\]
+
+donde $L$ es la cantidad de horas de trabajo y $K$ es la cantidad de horas de máquina. Tenemos un presupuesto diario de \$1000 y los costos son $\$20$ por hora laboral y $\$50$ por hora de máquina:
+
+\[
+20L + 50K = 1000
+\]
+
+\subsection{Paso 0: Identificar componentes}
+
+\begin{itemize}
+    \item \textbf{Función objetivo:} $P(L, K) = 10 L^{0.5} K^{0.5}$ (maximizar)
+    \item \textbf{Restricción:} $g(L, K) = 20L + 50K - 1000 = 0$
+\end{itemize}
+
+\subsection{Paso 1: Construir el Lagrangiano}
+
+\[
+\mathcal{L}(L, K, \lambda) = 10 L^{0.5} K^{0.5} - \lambda(20L + 50K - 1000)
+\]
+
+\subsection{Paso 2: Derivar e igualar a cero}
+
+\begin{enumerate}
+    \item $\dfrac{\partial \mathcal{L}}{\partial L} = 5 L^{-0.5} K^{0.5} - 20\lambda = 0 \implies \lambda = \dfrac{5 K^{0.5}}{20 L^{0.5}} = \dfrac{K^{0.5}}{4 L^{0.5}}$
+    \item $\dfrac{\partial \mathcal{L}}{\partial K} = 5 L^{0.5} K^{-0.5} - 50\lambda = 0 \implies \lambda = \dfrac{5 L^{0.5}}{50 K^{0.5}} = \dfrac{L^{0.5}}{10 K^{0.5}}$
+    \item $\dfrac{\partial \mathcal{L}}{\partial \lambda} = -(20L + 50K - 1000) = 0 \implies 20L + 50K = 1000$
+\end{enumerate}
+
+\subsection{Paso 3: Resolver el sistema}
+
+Igualamos las dos expresiones de $\lambda$:
+
+\[
+\frac{K^{0.5}}{4 L^{0.5}} = \frac{L^{0.5}}{10 K^{0.5}}
+\]
+
+Multiplicando cruzado:
+
+\[
+10 K = 4 L \implies L = 2.5 K
+\]
+
+Reemplazando en la restricción (3):
+
+\[
+20(2.5K) + 50K = 1000 \implies 50K + 50K = 1000 \implies 100K = 1000 \implies K = 10
+\]
+
+Y entonces $L = 2.5 \cdot 10 = 25$.
+
+\subsection{Paso 4: Calcular $\lambda$}
+
+\[
+\lambda = \frac{K^{0.5}}{4 L^{0.5}} = \frac{\sqrt{10}}{4 \sqrt{25}} = \frac{\sqrt{10}}{20} \approx 0.158
+\]
+
+\[
+\boxed{L^* = 25, \quad K^* = 10, \quad \lambda^* \approx 0.158}
+\]
+
+Y la producción óptima es $P(25, 10) = 10 \cdot \sqrt{25} \cdot \sqrt{10} = 10 \cdot 5 \cdot \sqrt{10} \approx 158.11$ juguetes.
+
+\subsection{Interpretación}
+
+\begin{itemize}
+    \item La relación óptima entre los factores es $L = 2.5 K$: por cada hora de máquina conviene tener 2.5 horas de trabajo. Esta regla \textbf{no depende del presupuesto total}: si mañana nos dan \$2000, seguirá siendo óptimo mantener esa proporción.
+    \item \textbf{Precio sombra:} $\lambda \approx 0.158$ juguetes por dólar. Si nos aumentan el presupuesto a \$1001, la producción aumentará en aproximadamente 0.158 juguetes.
+\end{itemize}
+
+\subsection{Una segunda forma de leer el precio sombra}
+
+El número $\lambda = 0.158$ \textit{juguetes por dólar} es medio chico y difícil de interpretar. Pero mirando el inverso:
+
+\[
+\frac{1}{\lambda} = \frac{1}{0.158} \approx 6.33 \quad \text{dólares por juguete}
+\]
+
+\vspace{0.3em}
+
+Esto nos dice que, en el margen, \textbf{producir un juguete adicional nos cuesta \$6.33}. Ese es el \textit{costo marginal} de producción en el punto óptimo.
+
+\vspace{0.5em}
+
+\textbf{Uso práctico:} si el juguete se vende a \$10, cada juguete adicional genera \$10 - \$6.33 = \$3.67 de margen. Si se vende a \$5, producir más pierde plata.
+
+\vspace{0.5em}
+
+\textbf{Regla general:} cuando $\lambda$ sale chico y con unidades extrañas (tipo ``juguetes por dólar''), mirar $1/\lambda$ suele dar una interpretación más intuitiva (``dólares por juguete'', o sea, costo marginal).
+
+\subsection{Resolución en Python}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+from scipy.optimize import minimize
+
+def produccion_neg(x):
+    L, K = x
+    return -10 * np.sqrt(L) * np.sqrt(K)
+
+restricciones = [
+    {'type': 'eq', 'fun': lambda x: 20*x[0] + 50*x[1] - 1000}
+]
+
+bounds = [(0.01, None), (0.01, None)]  # evitar sqrt(0)
+
+x0 = [10, 10]
+
+res = minimize(produccion_neg, x0, method='SLSQP', bounds=bounds, constraints=restricciones)
+
+if res.success:
+    L_opt, K_opt = res.x
+    P_opt = -res.fun
+    print(f'L optimo: {L_opt:.2f} horas de trabajo')
+    print(f'K optimo: {K_opt:.2f} horas de maquina')
+    print(f'Produccion maxima: {P_opt:.2f} juguetes')
+\end{lstlisting}
+
+\section{Ejemplo 4: Hardware y Software con sinergia}
+
+Una empresa tecnológica desarrolla Hardware ($x$) y Software ($y$). La función de beneficios proyectada (en miles de dólares) es:
+
+\[
+B(x, y) = 50x - 0.5x^2 + 40y - y^2 + xy
+\]
+
+Desglosemos qué significa cada término:
+
+\begin{itemize}
+    \item \textbf{Términos lineales} ($50x$, $40y$): beneficio base por unidad de inversión.
+    \item \textbf{Términos cuadráticos negativos} ($-0.5x^2$, $-y^2$): saturación del mercado (rendimientos decrecientes).
+    \item \textbf{Término cruzado} ($+xy$): sinergia. Un buen software hace que el hardware sea más valioso, y viceversa.
+\end{itemize}
+
+\vspace{0.5em}
+
+El presupuesto total es de \$80 mil. Invertir una unidad de hardware cuesta \$1k y una de software cuesta \$2k. Entonces la restricción es:
+
+\[
+x + 2y = 80
+\]
+
+\subsection{Paso 0: Identificar componentes}
+
+\begin{itemize}
+    \item \textbf{Función objetivo:} $B(x, y) = 50x - 0.5x^2 + 40y - y^2 + xy$ (maximizar)
+    \item \textbf{Restricción:} $g(x, y) = x + 2y - 80 = 0$
+\end{itemize}
+
+\subsection{Paso 1: Construir el Lagrangiano}
+
+\[
+\mathcal{L}(x, y, \lambda) = (50x - 0.5x^2 + 40y - y^2 + xy) - \lambda(x + 2y - 80)
+\]
+
+\subsection{Paso 2: Derivar e igualar a cero}
+
+\begin{enumerate}
+    \item $\dfrac{\partial \mathcal{L}}{\partial x} = 50 - x + y - \lambda = 0 \implies \lambda = 50 - x + y$
+    \item $\dfrac{\partial \mathcal{L}}{\partial y} = 40 - 2y + x - 2\lambda = 0 \implies 2\lambda = 40 + x - 2y$
+    \item $\dfrac{\partial \mathcal{L}}{\partial \lambda} = -(x + 2y - 80) = 0 \implies x + 2y = 80$
+\end{enumerate}
+
+\subsection{Paso 3: Resolver el sistema}
+
+Multiplicamos la ecuación (1) por 2 para igualarla con la (2):
+
+\[
+2(50 - x + y) = 40 + x - 2y
+\]
+\[
+100 - 2x + 2y = 40 + x - 2y
+\]
+
+Pasando todo lo que tiene variables a un lado y los números al otro:
+
+\[
+100 - 40 = x + 2x - 2y - 2y \implies 60 = 3x - 4y
+\]
+
+Ahora tenemos un sistema de 2 ecuaciones lineales con la restricción:
+
+\[
+\begin{cases}
+3x - 4y = 60 \\
+x + 2y = 80
+\end{cases}
+\]
+
+Multiplicamos la segunda por 2 para eliminar la $y$ al sumar:
+
+\[
+\begin{cases}
+3x - 4y = 60 \\
+2x + 4y = 160
+\end{cases}
+\]
+
+Sumando ambas ecuaciones verticalmente:
+
+\[
+5x = 220 \implies x = 44
+\]
+
+Y reemplazando en la restricción original: $44 + 2y = 80 \implies y = 18$.
+
+\subsection{Paso 4: Calcular $\lambda$}
+
+\[
+\lambda = 50 - x + y = 50 - 44 + 18 = 24
+\]
+
+\[
+\boxed{x^* = 44, \quad y^* = 18, \quad \lambda^* = 24}
+\]
+
+\subsection{Interpretación}
+
+\begin{itemize}
+    \item \textbf{Estrategia:} la empresa invierte 44 unidades en hardware y 18 en software. Aunque el hardware se satura más rápido (tiene el término $-0.5x^2$ que crece menos rápido que el $-y^2$ del software), el software cuesta el doble por unidad, entonces la optimización equilibra costo con sinergia.
+    \item \textbf{Precio sombra $\lambda = 24$:} si finanzas aprueba subir el presupuesto de \$80k a \$81k, el beneficio total subiría aproximadamente \$24k. Es un retorno marginal altísimo, justificando pedir más presupuesto.
+\end{itemize}
+
+\subsection{Resolución en Python}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+from scipy.optimize import minimize
+
+def beneficio_neg(v):
+    x, y = v
+    return -(50*x - 0.5*x**2 + 40*y - y**2 + x*y)
+
+restricciones = [
+    {'type': 'eq', 'fun': lambda v: v[0] + 2*v[1] - 80}
+]
+
+bounds = [(0, None), (0, None)]
+x0 = [20, 20]
+
+res = minimize(beneficio_neg, x0, method='SLSQP', bounds=bounds, constraints=restricciones)
+
+if res.success:
+    x_opt, y_opt = res.x
+    B_opt = -res.fun
+    print(f'Inversion en Hardware: {x_opt:.2f}')
+    print(f'Inversion en Software: {y_opt:.2f}')
+    print(f'Beneficio maximo: ${B_opt:.2f}k')
+\end{lstlisting}
+
+\section{Ejemplo 5: Influencers vs TV (ecuación cuadrática)}
+
+En muchos casos de negocios las inversiones tienen fases: empiezan lentas, aceleran por viralidad y terminan saturándose. Esto se modela con funciones cúbicas, cuyas derivadas son cuadráticas (y entonces vamos a tener que resolver una ecuación con la resolvente).
+
+\vspace{0.5em}
+
+Una marca tiene un presupuesto de \$10 millones para publicidad. Debe dividirlo entre TV ($y$) e Influencers ($x$):
+
+\begin{itemize}
+    \item \textbf{Retorno en TV} ($5y$): lineal y seguro. Cada millón devuelve 5 millones en ventas.
+    \item \textbf{Retorno en Influencers} ($-\frac{1}{3}x^3 + 5x^2 - 11x$): volátil. Costo de entrada alto, fase de viralidad, y saturación.
+\end{itemize}
+
+\vspace{0.5em}
+
+\textbf{Objetivo:} maximizar $V(x, y) = -\frac{1}{3}x^3 + 5x^2 - 11x + 5y$
+
+\textbf{Restricción:} $x + y = 10$
+
+\subsection{Paso 0 al 2: Lagrangiano y derivadas}
+
+\[
+\mathcal{L}(x, y, \lambda) = \left(-\tfrac{1}{3}x^3 + 5x^2 - 11x + 5y\right) - \lambda(x + y - 10)
+\]
+
+\begin{enumerate}
+    \item $\dfrac{\partial \mathcal{L}}{\partial x} = -x^2 + 10x - 11 - \lambda = 0$
+    \item $\dfrac{\partial \mathcal{L}}{\partial y} = 5 - \lambda = 0 \implies \lambda = 5$
+    \item $\dfrac{\partial \mathcal{L}}{\partial \lambda} = -(x + y - 10) = 0 \implies x + y = 10$
+\end{enumerate}
+
+\subsection{Paso 3: Resolver la cuadrática}
+
+Reemplazamos $\lambda = 5$ en la ecuación (1):
+
+\[
+-x^2 + 10x - 11 - 5 = 0 \implies -x^2 + 10x - 16 = 0
+\]
+
+Multiplicamos por $(-1)$ para tener el coeficiente principal positivo:
+
+\[
+x^2 - 10x + 16 = 0
+\]
+
+Aplicamos la resolvente de Bhaskara con $a=1$, $b=-10$, $c=16$:
+
+\[
+x = \frac{10 \pm \sqrt{100 - 64}}{2} = \frac{10 \pm 6}{2}
+\]
+
+Tenemos \textbf{dos puntos críticos}:
+
+\begin{itemize}
+    \item $x_1 = 8 \implies y_1 = 2$ (Punto A)
+    \item $x_2 = 2 \implies y_2 = 8$ (Punto B)
+\end{itemize}
+
+\subsection{Paso 4: Evaluar cuál es el máximo}
+
+Lagrange nos da \textit{candidatos}, pero es ``ciego'': no sabe cuál es máximo y cuál es mínimo. Hay que evaluar $V$ en cada punto.
+
+\vspace{0.5em}
+
+\textbf{Punto B} $(x=2, y=8)$:
+\[
+V(2, 8) = -\tfrac{1}{3}(8) + 5(4) - 22 + 40 = -2.67 + 20 - 22 + 40 = 35.33
+\]
+
+\textbf{Punto A} $(x=8, y=2)$:
+\[
+V(8, 2) = -\tfrac{1}{3}(512) + 5(64) - 88 + 10 = -170.67 + 320 - 88 + 10 = 71.33
+\]
+
+\[
+\boxed{x^* = 8, \quad y^* = 2, \quad V^* \approx 71.33, \quad \lambda^* = 5}
+\]
+
+\subsection{Interpretación}
+
+\begin{itemize}
+    \item El Punto B es un \textbf{mínimo local}: con solo \$2M en influencers pagamos el costo de entrada pero no logramos viralidad.
+    \item El Punto A es el \textbf{máximo local}: con \$8M cruzamos el umbral de viralidad y maximizamos el retorno antes de la saturación total.
+    \item \textbf{Precio sombra $\lambda = 5$:} un millón más de presupuesto aumenta las ventas totales en \$5M.
+\end{itemize}
+
+\vspace{0.5em}
+
+\textbf{Moraleja importante:} cuando la función objetivo no es convexa (como acá, por el término cúbico), Lagrange puede darnos varios candidatos y \textbf{tenemos que evaluar cada uno} para saber cuál es el real. Si hubiéramos confiado ciegamente en el primero que nos salió, podríamos haber terminado en el valle de la muerte en vez de la cima.
+
+\subsection{Resolución en Python}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+from scipy.optimize import minimize
+
+def ventas_neg(v):
+    x, y = v
+    return -(-1/3 * x**3 + 5*x**2 - 11*x + 5*y)
+
+restricciones = [
+    {'type': 'eq', 'fun': lambda v: v[0] + v[1] - 10}
+]
+
+bounds = [(0, None), (0, None)]
+
+# Probamos varios puntos iniciales porque hay multiples optimos locales
+puntos_iniciales = [[1, 9], [3, 7], [5, 5], [7, 3], [9, 1]]
+mejores = []
+
+for x0 in puntos_iniciales:
+    res = minimize(ventas_neg, x0, method='SLSQP', bounds=bounds, constraints=restricciones)
+    if res.success:
+        mejores.append((-res.fun, res.x))
+
+mejores.sort(reverse=True)
+ventas_max, mejor_x = mejores[0]
+print(f'Mejor solucion: x = {mejor_x[0]:.2f}, y = {mejor_x[1]:.2f}')
+print(f'Ventas maximas: ${ventas_max:.2f}M')
+\end{lstlisting}
+
+\section{Condiciones KKT}
+
+\subsection{Motivación}
+
+Hasta ahora trabajamos con restricciones de \textbf{igualdad} ($g(x) = 0$). Pero en la vida real, las restricciones suelen ser \textbf{desigualdades}: ``gastá \textbf{como mucho} \$1000'', ``producí \textbf{al menos} 50 unidades''.
+
+\vspace{0.5em}
+
+Cuando tenemos desigualdades pasa algo nuevo: no sabemos de antemano \textbf{si la restricción va a ser relevante o no} en el óptimo. Pensalo así: si te digo que tenés un presupuesto de \$1000 pero el óptimo sin restricciones usaba \$300, entonces el presupuesto no importa. Si el óptimo sin restricciones quería usar \$5000, entonces la restricción va a estar \textbf{activa} (lo empuja hasta el límite de \$1000).
+
+\vspace{0.5em}
+
+Las \textbf{condiciones KKT} (Karush-Kuhn-Tucker) son la generalización de Lagrange que maneja este tema. Son cuatro condiciones que tiene que cumplir cualquier óptimo (siempre que el problema sea ``razonable'', o sea, convexo o cumpliendo ciertas condiciones técnicas llamadas \textit{constraint qualifications}).
+
+\subsection{Planteo general}
+
+Consideremos el siguiente problema:
+
+\[
+\min f(x) \quad \text{sujeto a} \quad g_i(x) \leq 0, \quad i = 1, \ldots, m
+\]
+
+A cada restricción $g_i$ le asignamos un multiplicador $\mu_i$. El Lagrangiano queda:
+
+\[
+\mathcal{L}(x, \mu) = f(x) + \sum_{i=1}^{m} \mu_i \cdot g_i(x)
+\]
+
+\vspace{0.5em}
+
+\textbf{Ojo con el signo:} acá usamos $+ \mu_i \cdot g_i$ en vez de $- \lambda_i \cdot g_i$ como antes. Esto es convención: así nos quedan los $\mu_i \geq 0$, que es más natural cuando hablamos de precios sombra. (Si prefiriésemos, podríamos mantener la convención con el signo menos; lo importante es ser consistentes).
+
+\subsection{¿Cuándo son necesarias las condiciones KKT? (constraint qualifications)}
+
+Una aclaración importante: las condiciones KKT son \textbf{necesarias} para que un punto sea óptimo, \textit{siempre que} el problema cumpla alguna condición técnica llamada \textbf{constraint qualification}. Sin esas condiciones, puede existir un óptimo que no satisfaga KKT.
+
+\vspace{0.5em}
+
+Las más usadas son:
+
+\begin{itemize}
+    \item \textbf{Condición de Slater (para problemas convexos):} si existe un punto $\bar{x}$ que cumple \textit{estrictamente} las desigualdades ($g_i(\bar{x}) < 0$ para todo $i$ con desigualdad), entonces KKT es necesaria y suficiente. Para problemas convexos, Slater es la condición más fácil de chequear.
+    \item \textbf{LICQ (Linear Independence Constraint Qualification):} en el óptimo, los gradientes de las restricciones \textit{activas} son linealmente independientes. Es la condición más común en problemas generales (no necesariamente convexos).
+\end{itemize}
+
+\vspace{0.5em}
+
+\textbf{En la práctica:} la gran mayoría de los problemas bien planteados cumplen alguna constraint qualification, así que asumimos que se cumple y aplicamos KKT. Solo conviene preocuparse cuando los resultados no cuadran o cuando el problema tiene restricciones raras (por ejemplo, un punto donde varias restricciones se cruzan tangencialmente).
+
+\vspace{0.5em}
+
+\textbf{Caso especial convexo:} si el problema es convexo (objetivo convexo, restricciones $g_i$ convexas, restricciones de igualdad lineales) y cumple Slater, entonces KKT es \textbf{necesaria y suficiente}. O sea: cualquier punto que cumpla las 4 condiciones es el óptimo global.
+
+\subsection{Las cuatro condiciones KKT}
+
+Para que un punto $x^*$ sea óptimo, debe cumplir las siguientes cuatro condiciones:
+
+\begin{enumerate}
+    \item \textbf{Estacionariedad:} el gradiente del Lagrangiano respecto a $x$ se anula.
+    \[
+    \nabla f(x^*) + \sum_{i=1}^{m} \mu_i \nabla g_i(x^*) = 0
+    \]
+
+    \vspace{0.3em}
+
+    \textit{Intuición: en el óptimo, la ``fuerza'' del objetivo se equilibra con la ``fuerza'' de las restricciones activas.}
+
+    \item \textbf{Factibilidad primal:} el punto debe cumplir todas las restricciones.
+    \[
+    g_i(x^*) \leq 0 \quad \forall i
+    \]
+
+    \vspace{0.3em}
+
+    \textit{Intuición: obvio, si no cumplimos las restricciones no es una solución válida.}
+
+    \item \textbf{Factibilidad dual:} los multiplicadores son no negativos.
+    \[
+    \mu_i \geq 0 \quad \forall i
+    \]
+
+    \vspace{0.3em}
+
+    \textit{Intuición: un precio sombra negativo no tiene sentido económico. Si relajar la restricción empeorase el objetivo, entonces la restricción estaría ``ayudando'' y no sería realmente una restricción.}
+
+    \item \textbf{Holgura complementaria:} para cada restricción, o bien el multiplicador es cero, o bien la restricción está activa.
+    \[
+    \mu_i \cdot g_i(x^*) = 0 \quad \forall i
+    \]
+
+    \vspace{0.3em}
+
+    \textit{Intuición: si la restricción no está activa (o sea, $g_i(x^*) < 0$ estrictamente), entonces no está limitando nada, y su precio sombra es cero ($\mu_i = 0$). Si el multiplicador es positivo ($\mu_i > 0$), entonces la restricción está pegada al borde ($g_i(x^*) = 0$).}
+\end{enumerate}
+
+\subsection{Restricciones activas e inactivas}
+
+Este concepto es clave para resolver KKT a mano. Dada una restricción $g_i(x) \leq 0$ y un punto $x^*$:
+
+\begin{itemize}
+    \item Si $g_i(x^*) = 0$: la restricción está \textbf{activa} (el óptimo está pegado al borde).
+    \item Si $g_i(x^*) < 0$: la restricción está \textbf{inactiva} (el óptimo está en el interior, lejos del borde).
+\end{itemize}
+
+\vspace{0.5em}
+
+Por la holgura complementaria, si una restricción está inactiva su multiplicador es cero, y si tiene multiplicador positivo está activa. O sea: \textbf{las restricciones activas son las que ``duelen'', y las inactivas son las que sobran}.
+
+\subsection{El caso degenerado: $\mu_i = 0$ y $g_i = 0$ a la vez}
+
+Hay un caso raro donde la holgura complementaria se cumple de manera ``degenerada'': cuando \textbf{tanto $\mu_i = 0$ como $g_i(x^*) = 0$} al mismo tiempo. O sea, la restricción está pegada al borde pero su multiplicador es cero.
+
+\vspace{0.5em}
+
+\textbf{Interpretación:} la restricción \textit{toca} el óptimo (está activa geométricamente), pero el óptimo se habría alcanzado exactamente en el mismo lugar aun sin ella. En ese caso la restricción es ``redundante'' en el punto: estar pegada no está aportando presión.
+
+\vspace{0.5em}
+
+\textbf{Cuando pasa esto:} la llamada \textit{holgura complementaria estricta} exige que para cada restricción, \textit{o} $\mu_i > 0$ \textit{o} $g_i(x^*) < 0$ (nunca los dos cero). En problemas bien condicionados, la holgura estricta se cumple y no hay que preocuparse. En problemas raros puede fallar y eso complica la interpretación del precio sombra en ese punto.
+
+\vspace{0.5em}
+
+\textbf{En la práctica:} este caso casi nunca aparece en problemas de negocios bien planteados. Mencionarlo sirve para que sepan que existe si alguna vez lo ven en un paper o en un ejercicio más avanzado.
+
+\subsection{Estrategia para resolver KKT a mano}
+
+La estrategia general es \textbf{probar casos}: como no sabemos a priori cuáles restricciones están activas, probamos las combinaciones posibles.
+
+\begin{enumerate}
+    \item \textbf{Asumir} qué restricciones están activas (convertirlas en igualdades) y cuáles no (descartarlas).
+    \item \textbf{Resolver} el sistema resultante (como si fuera Lagrange con solo las activas).
+    \item \textbf{Verificar} las condiciones KKT: que el punto sea factible y que los $\mu_i$ sean no negativos.
+    \item Si no cumple, probar otra combinación de restricciones activas.
+\end{enumerate}
+
+\vspace{0.5em}
+
+\textbf{Trick práctico:} en la mayoría de los ejercicios, o bien se activan todas las restricciones (la solución está en una esquina) o solo algunas. Arrancá probando ``todas activas'' y si los $\mu_i$ te dan positivos, listo. Si alguno da negativo, descartá esa restricción y probá de nuevo.
+
+\section{Ejemplo 6: Capital y Trabajo con dos restricciones (KKT)}
+
+Una empresa produce dos artículos ($x$ e $y$). Su función de beneficio, con rendimientos decrecientes, es:
+
+\[
+B(x, y) = 10x - x^2 + 10y - y^2
+\]
+
+La producción está sujeta a dos cuellos de botella:
+
+\begin{itemize}
+    \item \textbf{Restricción 1 (Presupuesto):} $x + 2y \leq 14$
+    \item \textbf{Restricción 2 (Horas Hombre):} $2x + y \leq 14$
+\end{itemize}
+
+Queremos maximizar $B$. Para convertir a la forma estándar de KKT (minimización con $g_i \leq 0$), minimizamos $-B$:
+
+\[
+\min \; f(x, y) = -(10x - x^2 + 10y - y^2)
+\]
+\[
+\text{sujeto a:} \quad g_1(x, y) = x + 2y - 14 \leq 0, \quad g_2(x, y) = 2x + y - 14 \leq 0
+\]
+
+\subsection{Paso 1: Construir el Lagrangiano}
+
+Con dos restricciones, necesitamos dos multiplicadores $\mu_1$ y $\mu_2$:
+
+\[
+\mathcal{L}(x, y, \mu_1, \mu_2) = -(10x - x^2 + 10y - y^2) + \mu_1(x + 2y - 14) + \mu_2(2x + y - 14)
+\]
+
+\subsection{Paso 2: Estacionariedad (derivadas)}
+
+\begin{enumerate}
+    \item $\dfrac{\partial \mathcal{L}}{\partial x} = -10 + 2x + \mu_1 + 2\mu_2 = 0$
+    \item $\dfrac{\partial \mathcal{L}}{\partial y} = -10 + 2y + 2\mu_1 + \mu_2 = 0$
+\end{enumerate}
+
+\subsection{Paso 3: Probar casos}
+
+Tenemos 4 casos posibles según qué restricciones están activas:
+
+\begin{itemize}
+    \item \textbf{Caso A:} ninguna activa ($\mu_1 = \mu_2 = 0$)
+    \item \textbf{Caso B:} solo la 1 activa ($\mu_2 = 0$, $g_1 = 0$)
+    \item \textbf{Caso C:} solo la 2 activa ($\mu_1 = 0$, $g_2 = 0$)
+    \item \textbf{Caso D:} ambas activas ($g_1 = 0$ y $g_2 = 0$)
+\end{itemize}
+
+\vspace{0.5em}
+
+\textbf{Caso A (ninguna activa):} reemplazando $\mu_1 = \mu_2 = 0$ en las ecuaciones (1) y (2):
+
+\[
+2x = 10 \implies x = 5, \quad 2y = 10 \implies y = 5
+\]
+
+¿Cumple las restricciones? $5 + 2(5) = 15 > 14$. \textbf{No cumple la restricción 1}. Descartamos este caso.
+
+\vspace{0.5em}
+
+\textbf{Caso D (ambas activas):} resolvemos el sistema $g_1 = 0$ y $g_2 = 0$:
+
+\[
+\begin{cases}
+x + 2y = 14 \\
+2x + y = 14
+\end{cases}
+\]
+
+Multiplicamos la segunda por 2 y restamos la primera:
+
+\[
+(4x + 2y) - (x + 2y) = 28 - 14 \implies 3x = 14 \implies x = \frac{14}{3} \approx 4.67
+\]
+
+Y reemplazando: $y = 14 - 2(14/3) = 14/3 \approx 4.67$.
+
+\vspace{0.5em}
+
+Ahora verificamos con las ecuaciones (1) y (2):
+
+\[
+-10 + 2 \cdot \tfrac{14}{3} + \mu_1 + 2\mu_2 = 0 \implies \mu_1 + 2\mu_2 = 10 - \tfrac{28}{3} = \tfrac{2}{3}
+\]
+\[
+-10 + 2 \cdot \tfrac{14}{3} + 2\mu_1 + \mu_2 = 0 \implies 2\mu_1 + \mu_2 = \tfrac{2}{3}
+\]
+
+Restando la primera de la segunda:
+
+\[
+\mu_1 - \mu_2 = 0 \implies \mu_1 = \mu_2
+\]
+
+Reemplazando: $\mu_1 + 2\mu_1 = 2/3 \implies 3\mu_1 = 2/3 \implies \mu_1 = \mu_2 = \frac{2}{9} \approx 0.22$.
+
+\vspace{0.5em}
+
+\textbf{Chequeo de KKT:}
+\begin{itemize}
+    \item Factibilidad primal: $x, y = 14/3 > 0$, restricciones cumplidas con igualdad. \checkmark
+    \item Factibilidad dual: $\mu_1 = \mu_2 = 2/9 > 0$. \checkmark
+    \item Holgura complementaria: las dos restricciones están activas y los $\mu$ son positivos. \checkmark
+\end{itemize}
+
+\[
+\boxed{x^* = y^* = \tfrac{14}{3} \approx 4.67, \quad \mu_1^* = \mu_2^* = \tfrac{2}{9} \approx 0.22}
+\]
+
+\subsection{Interpretación}
+
+\begin{itemize}
+    \item \textbf{Estrategia:} la empresa produce $\approx 4.67$ unidades de cada artículo, agotando completamente tanto el presupuesto como las horas hombre. Chocó contra una \textit{esquina} de la región factible.
+    \item \textbf{Precios sombra iguales:} $\mu_1 = \mu_2 \approx 0.22$ significa que una unidad extra de presupuesto produce el mismo impacto que una unidad extra de horas hombre (ambos aumentan el beneficio en $\$0.22k$). Esto tiene sentido por la simetría del problema.
+    \item \textbf{Implicancia gerencial:} si tuviéramos que elegir en qué invertir para aflojar un recurso, nos da exactamente lo mismo. Si uno fuera más caro que el otro, iría con el más barato.
+\end{itemize}
+
+\subsection{Resolución en Python}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+from scipy.optimize import minimize
+
+def beneficio_neg(v):
+    x, y = v
+    return -(10*x - x**2 + 10*y - y**2)
+
+restricciones = [
+    {'type': 'ineq', 'fun': lambda v: 14 - (v[0] + 2*v[1])},
+    {'type': 'ineq', 'fun': lambda v: 14 - (2*v[0] + v[1])}
+]
+
+bounds = [(0, None), (0, None)]
+x0 = [1, 1]
+
+res = minimize(beneficio_neg, x0, method='SLSQP', bounds=bounds, constraints=restricciones)
+
+if res.success:
+    x_opt, y_opt = res.x
+    B_opt = -res.fun
+    print(f'x optimo: {x_opt:.4f}')
+    print(f'y optimo: {y_opt:.4f}')
+    print(f'Beneficio maximo: {B_opt:.4f}')
+    # Los multiplicadores de Lagrange salen del atributo `res`
+    # Para SLSQP no estan expuestos directamente, pero se pueden
+    # extraer con metodos como 'trust-constr'.
+\end{lstlisting}
+
+\section{Ejemplo 7: cuando una restricción sobra ($\mu$ negativo)}
+
+En el ejemplo anterior, el Caso D (ambas activas) funcionó de una. Pero no siempre pasa: a veces asumimos que una restricción está activa, resolvemos, y nos da un $\mu$ negativo. Ese es el caso clásico donde la restricción \textbf{no está haciendo nada} y tenemos que descartarla. Veamos un ejemplo simple para ver cómo se detecta.
+
+\subsection{Problema}
+
+Minimizar la distancia al origen sujeto a un presupuesto máximo:
+
+\[
+\min f(x, y) = x^2 + y^2 \quad \text{sujeto a} \quad x + y \leq 2
+\]
+
+En forma estándar: $g(x, y) = x + y - 2 \leq 0$.
+
+\subsection{¿Qué pasa si asumimos que está activa?}
+
+Si asumimos $g = 0$ (restricción activa), el problema se convierte en uno de Lagrange puro:
+
+\[
+\mathcal{L}(x, y, \mu) = x^2 + y^2 + \mu(x + y - 2)
+\]
+
+\vspace{0.3em}
+
+\textbf{Derivadas:}
+
+\begin{itemize}
+    \item $\dfrac{\partial \mathcal{L}}{\partial x} = 2x + \mu = 0 \implies \mu = -2x$
+    \item $\dfrac{\partial \mathcal{L}}{\partial y} = 2y + \mu = 0 \implies \mu = -2y$
+    \item $x + y = 2$
+\end{itemize}
+
+\vspace{0.3em}
+
+De las dos primeras: $-2x = -2y \implies x = y$. Reemplazando: $x + x = 2 \implies x = 1, y = 1$.
+
+Y entonces:
+
+\[
+\mu = -2x = -2 \cdot 1 = -2
+\]
+
+\subsection{¡$\mu$ salió negativo!}
+
+La condición de \textbf{factibilidad dual} de KKT exige $\mu \geq 0$. Acá nos dio $\mu = -2 < 0$, entonces este caso \textbf{no es válido}. Hay que \textbf{descartarlo} y probar otra combinación.
+
+\vspace{0.5em}
+
+\textbf{Interpretación:} un $\mu$ negativo significaría que relajar la restricción (subir el presupuesto de 2 a 3) \textit{empeora} el objetivo. En un problema donde la restricción realmente limita, eso es absurdo. Lo que nos está diciendo el álgebra es: \textbf{la restricción no te estaba limitando en primer lugar}.
+
+\subsection{Probamos el caso inactivo}
+
+Si la restricción está inactiva, entonces $\mu = 0$ y el problema queda sin restricciones:
+
+\[
+\min x^2 + y^2
+\]
+
+\vspace{0.3em}
+
+El mínimo de esto es trivialmente $(x, y) = (0, 0)$ con $f = 0$.
+
+\vspace{0.3em}
+
+\textbf{Verificamos factibilidad primal:}
+
+\[
+0 + 0 = 0 \leq 2 \quad \checkmark
+\]
+
+\vspace{0.3em}
+
+La restricción se cumple con \textbf{holgura} ($g = 0 - 2 = -2 < 0$). Holgura complementaria: $\mu \cdot g = 0 \cdot (-2) = 0$. \checkmark
+
+\[
+\boxed{x^* = 0, \quad y^* = 0, \quad \mu^* = 0, \quad f^* = 0}
+\]
+
+\subsection{Moraleja}
+
+Este ejemplo muestra el procedimiento típico de KKT cuando hay desigualdades:
+
+\begin{enumerate}
+    \item Probás una combinación de activas/inactivas.
+    \item Resolvés el sistema resultante.
+    \item Si algún $\mu_i$ da negativo $\Rightarrow$ \textbf{descartar}, esa restricción no debería estar activa.
+    \item Probás con esa restricción inactiva (la sacás del sistema).
+    \item Verificás factibilidad primal (el nuevo óptimo tiene que cumplir la restricción).
+\end{enumerate}
+
+\vspace{0.5em}
+
+\textbf{Geométricamente:} el óptimo libre (sin restricción) ya está dentro de la región factible. No hay por qué empujarlo al borde. La recta $x + y = 2$ está ``ahí'' pero no toca al círculo más chico que contiene al óptimo (que es un único punto, el origen).
+
+\subsection{Resolución en Python}
+
+\begin{lstlisting}[language=Python]
+import numpy as np
+from scipy.optimize import minimize
+
+def objetivo(v):
+    return v[0]**2 + v[1]**2
+
+restricciones = [
+    {'type': 'ineq', 'fun': lambda v: 2 - (v[0] + v[1])}
+]
+
+bounds = [(None, None), (None, None)]
+x0 = [1, 1]
+
+res = minimize(objetivo, x0, method='SLSQP', bounds=bounds, constraints=restricciones)
+
+if res.success:
+    x_opt, y_opt = res.x
+    print(f'x optimo: {x_opt:.4f}')
+    print(f'y optimo: {y_opt:.4f}')
+    print(f'Valor objetivo: {res.fun:.4f}')
+    # Resultado esperado: (0, 0) con f = 0
+\end{lstlisting}
+
+\section{Resumen y conexiones}
+
+\subsection{Lagrange vs KKT}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Aspecto} & \textbf{Lagrange} & \textbf{KKT} \\
+\midrule
+Restricciones & Igualdades ($g = 0$) & Desigualdades ($g \leq 0$) e igualdades \\
+Multiplicadores & $\lambda$ (signo libre) & $\mu \geq 0$ \\
+Condiciones & $\nabla \mathcal{L} = 0$ & Las 4 condiciones KKT \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Diccionario geometría - negocio}
+
+\begin{center}
+\begin{tabular}{@{}p{3cm}p{4.5cm}p{4.5cm}@{}}
+\toprule
+\textbf{Matemática} & \textbf{Geometría} & \textbf{Negocio} \\
+\midrule
+$\nabla f$ & Dirección de mayor crecimiento & Hacia dónde mover la inversión \\
+$\lambda$ o $\mu$ & Factor de escala entre gradientes & Precio sombra del recurso \\
+Tangencia & Curvas que se tocan sin cruzarse & Equilibrio entre beneficio y costo \\
+Holgura complementaria & El óptimo está en el borde o en el interior & El recurso es cuello de botella o sobra \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Cuándo usar qué}
+
+\begin{itemize}
+    \item Si el problema es chico y analítico: Lagrange o KKT a mano para ganar intuición.
+    \item Si el problema es grande o no tiene forma cerrada: Python con \texttt{scipy.optimize.minimize}.
+    \item Si querés precios sombra: resolverlo con solvers que los devuelvan (\texttt{cvxpy}, \texttt{pulp}, o manualmente con Lagrange/KKT).
+\end{itemize}
+
+\end{document}
