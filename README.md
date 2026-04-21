@@ -11,7 +11,7 @@ Este repositorio contiene los materiales, notebooks, apuntes y recursos de las c
 - [Clase 5 - Programación Entera (Parte 1)](Clase%2005%20-%20Programación%20Entera%20(Parte%201)/): Introducción a Programación Entera, formulación de problemas y método de ramificación y acotamiento.
 - [Clase 6 - Programación Entera (Parte 2)](Clase%2006%20-%20Programación%20Entera%20(Parte%202)/): Algoritmos de planos cortantes y aplicaciones prácticas.
 - [Clase 7 - Programación No Lineal](./Clase%2007%20-%20Programación%20No%20Lineal/): Optimización no lineal, condiciones de optimalidad y métodos de gradiente.
-- [Clase 8 - Repaso Pre Parcial](./Clase%2008%20-%20Repaso%20Pre%20Parcial/): Clase de resolución de problemas como repaso pre parcial.
+- [Clase 8 - Lagrange & KKT](./Clase%2008%20-%20Lagrange%20&%20KKT/): Resolución de problemas por multiplicadores de Lagrange y KKT
 - [Clase 9 - Estadística para Investigación Operativa](Clase%2009%20-%20Probabilidad%20y%20Estadística%20para%20Investigación%20Operativa/): Distribuciones de probabilidad, inferencia estadística y análisis de datos. Introducción a simulación de Montecarlo.
 - [Clase 10 - Simulación de Montecarlo](./Clase%2010%20-%20Simulación%20de%20Montecarlo/): Técnicas de simulación tipo Montecarlo: generación de variables aleatorias, modelos y ejemplos prácticos en operaciones.
 - [Clase 11 - Cadenas de Markov](Clase%2011%20-%20Cadenas%20de%20Markov/): Procesos estocásticos, cadenas de Markov y aplicaciones.
