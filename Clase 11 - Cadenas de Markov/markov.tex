@@ -97,7 +97,22 @@ Si hoy el sistema está funcionando, ¿cuál es la probabilidad de que esté fun
     \textbf{Total:} $0.64 + 0.12 = 0.76$
 \end{center}
 
-Esto es equivalente a calcular $P^2$ (multiplicar la matriz por sí misma):
+Esto es equivalente a calcular $P^2$. Acá viene la primera trampa: $P^2$ \textbf{no} significa elevar cada número al cuadrado (eso daría $0.8^2 = 0.64$, $0.2^2 = 0.04$, y estaría mal), sino \textbf{multiplicar la matriz por sí misma}: $P^2 = P \cdot P$.
+
+\paragraph{Cómo se multiplican dos matrices.} La regla es \emph{fila por columna}: cada casillero del resultado se obtiene tomando una fila de la matriz de la izquierda y una columna de la de la derecha, multiplicando entrada a entrada y sumando. En fórmula, el casillero $(i,j)$ es:
+
+\[P^2_{ij} = \sum_{k} P_{ik}\, P_{kj}\]
+
+Hagamos los cuatro casilleros uno por uno (recordá que el orden de filas/columnas es F, R):
+
+\begin{itemize}
+    \item \textbf{Casillero $(F,F)$} $\rightarrow$ fila F $\times$ columna F:\quad $0.8 \cdot 0.8 + 0.2 \cdot 0.6 = 0.64 + 0.12 = 0.76$
+    \item \textbf{Casillero $(F,R)$} $\rightarrow$ fila F $\times$ columna R:\quad $0.8 \cdot 0.2 + 0.2 \cdot 0.4 = 0.16 + 0.08 = 0.24$
+    \item \textbf{Casillero $(R,F)$} $\rightarrow$ fila R $\times$ columna F:\quad $0.6 \cdot 0.8 + 0.4 \cdot 0.6 = 0.48 + 0.24 = 0.72$
+    \item \textbf{Casillero $(R,R)$} $\rightarrow$ fila R $\times$ columna R:\quad $0.6 \cdot 0.2 + 0.4 \cdot 0.4 = 0.12 + 0.16 = 0.28$
+\end{itemize}
+
+Armando la matriz con esos cuatro números:
 
 \[P^2 = \begin{pmatrix}
 0.8 & 0.2 \\
@@ -106,11 +121,22 @@ Esto es equivalente a calcular $P^2$ (multiplicar la matriz por sí misma):
 0.8 & 0.2 \\
 0.6 & 0.4
 \end{pmatrix} = \begin{pmatrix}
+0.8 \cdot 0.8 + 0.2 \cdot 0.6 & 0.8 \cdot 0.2 + 0.2 \cdot 0.4 \\
+0.6 \cdot 0.8 + 0.4 \cdot 0.6 & 0.6 \cdot 0.2 + 0.4 \cdot 0.4
+\end{pmatrix} = \begin{pmatrix}
 0.76 & 0.24 \\
 0.72 & 0.28
 \end{pmatrix}\]
 
+\paragraph{La intuición.} Mirá la cuenta del casillero $(F,F)$ y compará con los dos caminos de arriba:
+
+\[P^2_{FF} = \underbrace{0.8 \cdot 0.8}_{F\to F\to F} + \underbrace{0.2 \cdot 0.6}_{F\to R\to F} = 0.76\]
+
+¡Es exactamente la misma cuenta! La suma $\sum_k$ de la regla de multiplicación está \textbf{recorriendo todos los estados intermedios posibles}: salgo de F, paso por F o por R (los únicos dos estados), y termino en F. Por eso ``multiplicar matrices'' y ``contar todos los caminos de 2 pasos'' son la misma operación escrita de dos formas. Esta idea es justamente lo que después generalizamos con las ecuaciones de Chapman-Kolmogorov.
+
 El elemento $P^2_{FF} = 0.76$ confirma nuestro cálculo manual.
+
+\paragraph{En Python.} Ojo con el error clásico: en \texttt{numpy}, \texttt{P**2} eleva cada elemento por separado (mal), mientras que \texttt{P @ P} hace la multiplicación matricial (bien). Para $P^n$ en general conviene \texttt{np.linalg.matrix\_power(P, n)}.
 
 \section{Ejercicios Básicos}
 
@@ -428,6 +454,17 @@ Esto significa que para calcular probabilidades de transición a $n$ pasos, simp
 
 \textbf{Conexión con el Ejercicio 1:} Cuando calculamos la probabilidad de lluvia en 2 días partiendo de soleado, estuvimos usando implícitamente Chapman-Kolmogorov: sumamos sobre todos los estados intermedios posibles (soleado, nublado, lluvioso) en el día 1.
 
+\paragraph{Ejemplo numérico de la suma sobre estados intermedios.} Tomemos la cadena del clima del Ejercicio 1, con $P = \begin{pmatrix} 0.7 & 0.2 & 0.1 \\ 0.3 & 0.4 & 0.3 \\ 0.2 & 0.4 & 0.4 \end{pmatrix}$ en orden (S, N, L). Queremos $P_{SL}^{(2)}$: ir de Soleado a Lluvia en 2 pasos. Chapman-Kolmogorov dice que sumemos sobre el estado intermedio $k$ del día 1:
+
+\[
+P_{SL}^{(2)} = \sum_{k} P_{Sk}\, P_{kL} = \underbrace{P_{SS}\,P_{SL}}_{S\to S\to L} + \underbrace{P_{SN}\,P_{NL}}_{S\to N\to L} + \underbrace{P_{SL}\,P_{LL}}_{S\to L\to L}
+\]
+\[
+= 0.7 \cdot 0.1 + 0.2 \cdot 0.3 + 0.1 \cdot 0.4 = 0.07 + 0.06 + 0.04 = 0.17
+\]
+
+Cada término es un camino de 2 pasos: salgo de S, paso por algún estado ($S$, $N$ o $L$) y termino en $L$. Esto es \emph{exactamente} el casillero $(S,L)$ de $P^2$, y es la misma cuenta que aparece resuelta en el Ejercicio 1. Calcular $P^2$ es hacer esta suma para \emph{todos} los pares de estados de golpe.
+
 \subsection{Distribución en el Tiempo $n$}
 
 \textbf{Intuición:} Si comenzamos con una distribución de probabilidad inicial $q^{(0)}$ (cuánto porcentaje en cada estado al tiempo 0), podemos calcular cómo se distribuye el sistema en cualquier tiempo futuro $n$.
@@ -565,27 +602,50 @@ Como el sistema comienza en demanda baja (estado 0), el vector inicial es:
 \mathbf{e_0} = [1 \quad 0 \quad 0]
 \]
 
-\subsubsection{Cálculo de $P^3$:}
+\subsubsection{Cálculo de $P^3$ paso a paso:}
 
-Calculamos la matriz de transición a 3 pasos:
+Queremos $\mathbf{e_0} \cdot P^3$. Como $\mathbf{e_0} = [1, 0, 0]$, multiplicar por $\mathbf{e_0}$ simplemente \emph{selecciona la primera fila} de $P^3$. Así que en realidad lo que buscamos es la primera fila de $P^3$. Vamos por partes: primero $P^2 = P \cdot P$, después $P^3 = P^2 \cdot P$.
+
+\paragraph{Paso 1: $P^2 = P \cdot P$.} Usamos la regla fila $\times$ columna (cada casillero es una fila de la izquierda por una columna de la derecha, multiplicando entrada a entrada y sumando). El orden de estados es (B, M, A). Calculemos la \textbf{primera fila} de $P^2$, que es la que vamos a necesitar (fila B):
+
+\begin{itemize}
+    \item $(B,B)$: $0.3 \cdot 0.3 + 0.5 \cdot 0.2 + 0.2 \cdot 0.3 = 0.09 + 0.10 + 0.06 = 0.25$
+    \item $(B,M)$: $0.3 \cdot 0.5 + 0.5 \cdot 0.4 + 0.2 \cdot 0.5 = 0.15 + 0.20 + 0.10 = 0.45$
+    \item $(B,A)$: $0.3 \cdot 0.2 + 0.5 \cdot 0.4 + 0.2 \cdot 0.2 = 0.06 + 0.20 + 0.04 = 0.30$
+\end{itemize}
+
+La matriz completa $P^2$ (haciendo lo mismo para las filas M y A) queda:
+
+\[P^2 = \begin{pmatrix}
+0.25 & 0.45 & 0.30 \\
+0.26 & 0.46 & 0.28 \\
+0.25 & 0.45 & 0.30
+\end{pmatrix}\]
+
+\textbf{Observación al pasar:} en 2 días la probabilidad de estar en alta partiendo de baja es el casillero $(B,A) = 0.30$. ¡Ojo!, esto es a 2 pasos, no es lo que nos piden.
+
+\paragraph{Paso 2: $P^3 = P^2 \cdot P$.} Ahora multiplicamos $P^2$ por $P$. De nuevo solo necesitamos la \textbf{primera fila} (fila B de $P^2$, que es $[0.25, 0.45, 0.30]$) por las columnas de $P$:
+
+\begin{itemize}
+    \item $(B,B)$: $0.25 \cdot 0.3 + 0.45 \cdot 0.2 + 0.30 \cdot 0.3 = 0.075 + 0.090 + 0.090 = 0.255$
+    \item $(B,M)$: $0.25 \cdot 0.5 + 0.45 \cdot 0.4 + 0.30 \cdot 0.5 = 0.125 + 0.180 + 0.150 = 0.455$
+    \item $(B,A)$: $0.25 \cdot 0.2 + 0.45 \cdot 0.4 + 0.30 \cdot 0.2 = 0.050 + 0.180 + 0.060 = 0.290$
+\end{itemize}
+
+Entonces:
+
 \[
-\mathbf{e_0} \cdot P^3 = \text{probabilidades de estar en cada estado al día 3}
+\mathbf{e_0} \cdot P^3 = [0.255, \quad 0.455, \quad \boxed{0.290}]
 \]
 
-\subsubsection{Resultado (usando Python):}
-
-Mediante multiplicación matricial, se obtiene:
-
-\[
-\mathbf{e_0} \cdot P^3 = [0.248, \quad 0.452, \quad \boxed{0.300}]
-\]
+\textbf{Chequeo rápido:} las tres componentes suman $0.255 + 0.455 + 0.290 = 1$. \checkmark\ Siempre tiene que dar 1, porque es una distribución de probabilidad sobre los tres estados.
 
 \subsubsection{Conclusión:}
 
 La probabilidad de que el sistema esté en \textbf{demanda alta} en 3 días, comenzando en baja demanda, es:
 
 \[
-\boxed{0.300}
+\boxed{0.290}
 \]
 
 \subsection{Ejercicio 5: Movilidad del Ingeniero Civil}
@@ -644,16 +704,30 @@ A = 0, \quad B = 1, \quad C = 2
 \text{Buscamos: } \mathbf{e_2} \cdot P^2
 \]
 
-\subsubsection{Resultado (cálculo con Python):}
+Como $\mathbf{e_2} = [0, 0, 1]$, multiplicar por $\mathbf{e_2}$ \emph{selecciona la tercera fila} de $P^2$ (la fila C). Así que alcanza con calcular la fila C de $P^2 = P \cdot P$.
+
+\subsubsection{Cálculo de la fila C de $P^2$ paso a paso:}
+
+La fila C de $P$ es $[0.2, 0.4, 0.4]$. La multiplicamos por cada columna de $P$ (regla fila $\times$ columna). El orden de estados es (A, B, C):
+
+\begin{itemize}
+    \item $(C,A)$: fila C $\times$ col. A $= 0.2 \cdot 0.1 + 0.4 \cdot 0.2 + 0.4 \cdot 0.2 = 0.02 + 0.08 + 0.08 = 0.18$
+    \item $(C,B)$: fila C $\times$ col. B $= 0.2 \cdot 0.3 + 0.4 \cdot 0.2 + 0.4 \cdot 0.4 = 0.06 + 0.08 + 0.16 = 0.30$
+    \item $(C,C)$: fila C $\times$ col. C $= 0.2 \cdot 0.6 + 0.4 \cdot 0.6 + 0.4 \cdot 0.4 = 0.12 + 0.24 + 0.16 = 0.52$
+\end{itemize}
+
+Entonces:
 
 \[
-\mathbf{e_2} \cdot P^2 = [0.26 \quad 0.34 \quad \boxed{0.40}]
+\mathbf{e_2} \cdot P^2 = [0.18 \quad 0.30 \quad \boxed{0.52}]
 \]
+
+\textbf{Chequeo:} $0.18 + 0.30 + 0.52 = 1$. \checkmark
 
 La probabilidad de estar en la ciudad C después de 2 días, comenzando en C, es:
 
 \[
-\boxed{0.40}
+\boxed{0.52}
 \]
 
 \subsubsection{Parte b) Distribución estacionaria (a largo plazo):}
@@ -664,17 +738,60 @@ Buscamos el vector $\pi = [\pi_A \quad \pi_B \quad \pi_C]$ tal que:
 \pi \cdot P = \pi, \quad \pi_A + \pi_B + \pi_C = 1
 \]
 
-Resolviendo el sistema lineal, se obtiene:
+\paragraph{Paso 1: escribir las ecuaciones.} La condición $\pi \cdot P = \pi$ dice que la componente $j$ de $\pi \cdot P$ es igual a $\pi_j$. Componente a componente, esto se lee \emph{por columnas} de $P$ (la columna $j$ dice quién ``aporta'' al estado $j$):
 
 \[
-\pi = \left[ \frac{12}{71}, \quad \frac{22}{71}, \quad \frac{37}{71} \right]
+\begin{cases}
+\pi_A = 0.1\,\pi_A + 0.2\,\pi_B + 0.2\,\pi_C & \text{(columna A)} \\
+\pi_B = 0.3\,\pi_A + 0.2\,\pi_B + 0.4\,\pi_C & \text{(columna B)} \\
+\pi_C = 0.6\,\pi_A + 0.6\,\pi_B + 0.4\,\pi_C & \text{(columna C)}
+\end{cases}
 \]
+
+\paragraph{Paso 2: limpiar cada ecuación.} Pasamos todo de un lado y multiplicamos por 10 para sacar los decimales.
+
+\emph{Columna A:} $\pi_A = 0.1\pi_A + 0.2\pi_B + 0.2\pi_C \Rightarrow 10\pi_A = \pi_A + 2\pi_B + 2\pi_C \Rightarrow 9\pi_A = 2\pi_B + 2\pi_C$.
+
+\emph{Columna B:} $\pi_B = 0.3\pi_A + 0.2\pi_B + 0.4\pi_C \Rightarrow 10\pi_B = 3\pi_A + 2\pi_B + 4\pi_C \Rightarrow 8\pi_B = 3\pi_A + 4\pi_C$.
+
+\paragraph{Paso 3: una ecuación sobra.} Las tres ecuaciones de columnas no son independientes (las tres juntas dan $0=0$: cada columna de $P$ suma 1). Por eso \textbf{descartamos una} (la de columna C) y la reemplazamos por la normalización $\pi_A + \pi_B + \pi_C = 1$. Nos quedan tres ecuaciones de verdad:
+
+\[
+\begin{cases}
+9\pi_A = 2\pi_B + 2\pi_C & (1) \\
+8\pi_B = 3\pi_A + 4\pi_C & (2) \\
+\pi_A + \pi_B + \pi_C = 1 & (3)
+\end{cases}
+\]
+
+\paragraph{Paso 4: despejar todo en función de $\pi_C$.} De $(1)$ y $(2)$ ponemos $\pi_A$ y $\pi_B$ en términos de $\pi_C$.
+
+De $(1)$: $\pi_A = \dfrac{2\pi_B + 2\pi_C}{9}$. Reemplazo en $(2)$:
+\[
+8\pi_B = 3 \cdot \frac{2\pi_B + 2\pi_C}{9} + 4\pi_C = \frac{6\pi_B + 6\pi_C}{9} + 4\pi_C
+\]
+Multiplico todo por 9: $72\pi_B = 6\pi_B + 6\pi_C + 36\pi_C \Rightarrow 66\pi_B = 42\pi_C \Rightarrow \pi_B = \dfrac{42}{66}\pi_C = \dfrac{7}{11}\pi_C$.
+
+Y entonces $\pi_A = \dfrac{2\pi_B + 2\pi_C}{9} = \dfrac{2 \cdot \frac{7}{11}\pi_C + 2\pi_C}{9} = \dfrac{\frac{14}{11}\pi_C + \frac{22}{11}\pi_C}{9} = \dfrac{\frac{36}{11}\pi_C}{9} = \dfrac{4}{11}\pi_C$.
+
+\paragraph{Paso 5: usar la normalización.} Metemos $\pi_A = \frac{4}{11}\pi_C$ y $\pi_B = \frac{7}{11}\pi_C$ en $(3)$:
+\[
+\frac{4}{11}\pi_C + \frac{7}{11}\pi_C + \pi_C = 1 \;\Rightarrow\; \frac{4 + 7 + 11}{11}\pi_C = 1 \;\Rightarrow\; \frac{22}{11}\pi_C = 1 \;\Rightarrow\; \pi_C = \frac{11}{22} = \frac{1}{2}
+\]
+
+Y de ahí: $\pi_A = \frac{4}{11} \cdot \frac{1}{2} = \frac{4}{22} = \frac{2}{11}$, y $\pi_B = \frac{7}{11} \cdot \frac{1}{2} = \frac{7}{22}$.
+
+\[
+\pi = \left[ \frac{2}{11}, \quad \frac{7}{22}, \quad \frac{1}{2} \right]
+\]
+
+\textbf{Chequeo:} $\frac{2}{11} + \frac{7}{22} + \frac{1}{2} = \frac{4}{22} + \frac{7}{22} + \frac{11}{22} = \frac{22}{22} = 1$. \checkmark
 
 En el largo plazo, el ingeniero pasa el:
 \[
-\boxed{\frac{12}{71} \approx 16.9\% \text{ en A}}, \quad
-\boxed{\frac{22}{71} \approx 31.0\% \text{ en B}}, \quad
-\boxed{\frac{37}{71} \approx 52.1\% \text{ en C}}
+\boxed{\frac{2}{11} \approx 18.2\% \text{ en A}}, \quad
+\boxed{\frac{7}{22} \approx 31.8\% \text{ en B}}, \quad
+\boxed{\frac{1}{2} = 50\% \text{ en C}}
 \]
 
 \section{Procesos de Decisión de Markov (MDP)}

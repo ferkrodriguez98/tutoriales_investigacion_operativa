@@ -67,9 +67,10 @@
     \vspace{0.5em}
 
     \textbf{Intuición:} El sistema "no tiene memoria" del pasado. Solo le importa dónde está ahora para decidir dónde estará después.
+\end{frame}
 
-    \vspace{0.5em}
-
+\begin{frame}{Introducción a las Cadenas de Markov}
+    \small
     \textbf{Ejemplos en la vida real:}
     \begin{itemize}
         \item El clima de mañana depende del clima de hoy (no del de la semana pasada)
@@ -107,16 +108,17 @@
     \[p_{ij} = P(X_{n+1} = j | X_n = i)\]
 
     \textbf{Interpretación:} $p_{ij}$ es la probabilidad de pasar del estado $i$ al estado $j$ en un paso.
+\end{frame}
 
-    \vspace{0.5em}
-
+\begin{frame}{Matriz de Transición: propiedades}
+    \small
     \textbf{Propiedades importantes:}
     \begin{itemize}
         \item $0 \leq p_{ij} \leq 1$ para todo $i,j \in S$ (son probabilidades)
         \item $\sum_{j \in S} p_{ij} = 1$ para todo $i \in S$ (cada fila suma 1)
     \end{itemize}
 
-    \vspace{0.5em}
+    \vspace{1em}
 
     \textbf{¿Por qué cada fila suma 1?} Porque desde el estado $i$, el sistema debe ir a algún estado (incluyendo quedarse en $i$).
 \end{frame}
@@ -158,18 +160,41 @@
 
     \textbf{Total:} $0.64 + 0.12 = 0.76$
 
-    \vspace{1em}
+    \vspace{0.8em}
 
-    Esto equivale a calcular $P^2$:
+    Esto equivale a calcular $P^2 = P \cdot P$: \textbf{no} es elevar cada número al cuadrado, sino \emph{multiplicar la matriz por sí misma}. Veamos la cuenta en la próxima slide.
+\end{frame}
+
+\begin{frame}{Ejemplo Introductorio: La cuenta de $P^2$ paso a paso}
+    \small
+    Para multiplicar dos matrices, cada casillero del resultado es \textbf{fila $\times$ columna}: se multiplica entrada a entrada y se suma. El orden de filas/columnas es (F, R).
+
+    \vspace{0.5em}
+
+    \textbf{Casillero por casillero:}
+    \begin{itemize}
+        \item $(F,F)$: fila F $\times$ col. F $= 0.8 \cdot 0.8 + 0.2 \cdot 0.6 = 0.64 + 0.12 = \mathbf{0.76}$
+        \item $(F,R)$: fila F $\times$ col. R $= 0.8 \cdot 0.2 + 0.2 \cdot 0.4 = 0.16 + 0.08 = 0.24$
+        \item $(R,F)$: fila R $\times$ col. F $= 0.6 \cdot 0.8 + 0.4 \cdot 0.6 = 0.48 + 0.24 = 0.72$
+        \item $(R,R)$: fila R $\times$ col. R $= 0.6 \cdot 0.2 + 0.4 \cdot 0.4 = 0.12 + 0.16 = 0.28$
+    \end{itemize}
+
+    \vspace{0.3em}
+
     \[P^2 = \begin{pmatrix}
     0.8 & 0.2 \\
     0.6 & 0.4
-    \end{pmatrix}^2 = \begin{pmatrix}
-    0.76 & 0.24 \\
+    \end{pmatrix} \begin{pmatrix}
+    0.8 & 0.2 \\
+    0.6 & 0.4
+    \end{pmatrix} = \begin{pmatrix}
+    \mathbf{0.76} & 0.24 \\
     0.72 & 0.28
     \end{pmatrix}\]
 
-    El elemento $P^2_{FF} = 0.76$ confirma nuestro cálculo.
+    \vspace{0.2em}
+
+    El casillero $(F,F)$ es \emph{exactamente} la suma de los caminos $F\to F\to F$ y $F\to R\to F$.
 \end{frame}
 
 % --- EJERCICIOS BÁSICOS ---
@@ -264,13 +289,14 @@
         \item 2\% de ganar directo con el segundo saque
         \item 55\% de ganar cualquier peloteo (sea con primer o segundo saque)
     \end{itemize}
-
-    \vspace{0.5em}
-
-    \textbf{Objetivo:} Modelar el punto como una cadena de Markov para calcular la probabilidad de que Cerúndolo se consagre campeón.
 \end{frame}
 
 \begin{frame}{Ejercicio 2: Puntos en Tenis - Preguntas}
+    \small
+    \textbf{Objetivo:} Modelar el punto como una cadena de Markov para calcular la probabilidad de que Cerúndolo se consagre campeón.
+
+    \vspace{1em}
+
     \begin{enumerate}[a)]
         \item Identificar estados
         \item ¿Cuál es la probabilidad de que Cerúndolo gane el punto?
@@ -329,10 +355,15 @@
     \[
     P(\text{Cerú Gana}) = 0.50 + 0.165 + 0.099 + 0.004 = 0.768
     \]
+\end{frame}
 
-    \vspace{0.5em}
+\begin{frame}{Ejercicio 2: Conclusión}
+    \small
+    \textbf{Conclusión:} Cerúndolo tiene un 76.8\% de probabilidad de ganar el punto y consagrarse campeón.
 
-    \textbf{Conclusión:} Cerúndolo tiene un 76.8\% de probabilidad de ganar el punto y consagrarse campeón. \textit{A largo plazo:} Si jugaran infinitos puntos con estas probabilidades, Cerúndolo ganaría el 76.8\% y Rune el 23.2\%.
+    \vspace{1em}
+
+    \textit{A largo plazo:} Si jugaran infinitos puntos con estas probabilidades, Cerúndolo ganaría el 76.8\% y Rune el 23.2\%.
 \end{frame}
 
 \begin{frame}{Ejercicio 3: Máquina de Juguetes - Consigna}
@@ -532,6 +563,25 @@
     Para calcular probabilidades a $n$ pasos, simplemente elevamos $P$ a la potencia $n$.
 \end{frame}
 
+\begin{frame}{Chapman-Kolmogorov: ejemplo numérico}
+    \small
+    Con la cadena del clima (Ej. 1), $P = \begin{pmatrix} 0.7 & 0.2 & 0.1 \\ 0.3 & 0.4 & 0.3 \\ 0.2 & 0.4 & 0.4 \end{pmatrix}$, orden (S, N, L).
+
+    \vspace{0.5em}
+
+    Queremos $P_{SL}^{(2)}$: ir de Soleado a Lluvia en 2 pasos. Sumamos sobre el estado intermedio $k$ del día 1:
+    \[
+    P_{SL}^{(2)} = \underbrace{P_{SS}\,P_{SL}}_{S\to S\to L} + \underbrace{P_{SN}\,P_{NL}}_{S\to N\to L} + \underbrace{P_{SL}\,P_{LL}}_{S\to L\to L}
+    \]
+    \[
+    = 0.7 \cdot 0.1 + 0.2 \cdot 0.3 + 0.1 \cdot 0.4 = 0.07 + 0.06 + 0.04 = 0.17
+    \]
+
+    \vspace{0.3em}
+
+    Cada término es un camino de 2 pasos. Esto es justo el casillero $(S,L)$ de $P^2$: calcular $P^2$ es hacer esta suma para todos los pares de estados.
+\end{frame}
+
 \begin{frame}{Distribucion en Tiempo $n$}
     \small
     \textbf{Intuición:} Si comenzamos con una distribución inicial $q^{(0)}$ (porcentaje en cada estado al tiempo 0), podemos calcular cómo se distribuye el sistema en cualquier tiempo futuro $n$.
@@ -562,7 +612,7 @@
 
     \textbf{¿Por qué esta ecuación?} Si $\pi$ es estacionaria, al aplicar $P$ la distribución no cambia: sigue siendo $\pi$. El sistema está en equilibrio.
 
-    \vspace{0.5em}
+    \vspace{0.3em}
 
     Para encontrar $\pi$, resolvemos:
     \[
@@ -627,9 +677,9 @@
     \textbf{Pregunta:} Si hoy el sistema está en baja demanda, ¿cuál es la probabilidad de que en 3 días esté en alta demanda?
 \end{frame}
 
-\begin{frame}{Ejercicio 4: Solución}
+\begin{frame}{Ejercicio 4: Solución - Planteo}
     \small
-    \textbf{Paso 1:} Construir la matriz de transición
+    \textbf{Paso 1:} Matriz de transición (orden B, M, A)
 
     \[P = \begin{pmatrix}
     0.3 & 0.5 & 0.2 \\
@@ -637,23 +687,42 @@
     0.3 & 0.5 & 0.2
     \end{pmatrix}\]
 
-    Filas/columnas en orden: B, M, A
+    \textbf{Paso 2:} Estado inicial $\mathbf{e_0} = [1\ 0\ 0]$ (100\% en baja).
 
     \vspace{0.5em}
 
-    \textbf{Paso 2:} Definir estado inicial
+    Como $\mathbf{e_0} = [1,0,0]$, multiplicar por $\mathbf{e_0}$ \textbf{selecciona la primera fila}. Buscamos entonces la \textbf{primera fila de $P^3$}. Vamos por etapas: $P^2 = P\cdot P$, luego $P^3 = P^2 \cdot P$.
+\end{frame}
 
-    $\mathbf{e_0} = [1\ 0\ 0]$ (100\% en baja demanda)
+\begin{frame}{Ejercicio 4: Solución - Paso a paso}
+    \small
+    \textbf{Fila B de $P^2$} (fila B de $P$ por cada columna):
+    \begin{itemize}
+        \item $(B,B)$: $0.3 \cdot 0.3 + 0.5 \cdot 0.2 + 0.2 \cdot 0.3 = 0.25$
+        \item $(B,M)$: $0.3 \cdot 0.5 + 0.5 \cdot 0.4 + 0.2 \cdot 0.5 = 0.45$
+        \item $(B,A)$: $0.3 \cdot 0.2 + 0.5 \cdot 0.4 + 0.2 \cdot 0.2 = 0.30$
+    \end{itemize}
+    $\Rightarrow$ Fila B de $P^2 = [0.25,\ 0.45,\ 0.30]$ \emph{(el $0.30$ es a 2 días, no es lo pedido).}
+\end{frame}
 
-    \vspace{0.5em}
+\begin{frame}{Ejercicio 4: Solución - Paso a paso (cont.)}
+    \small
+    Ya tenemos la fila B de $P^2 = [0.25,\ 0.45,\ 0.30]$. Ahora $P^3 = P^2 \cdot P$.
 
-    \textbf{Paso 3:} Calcular distribución en 3 días
+    \vspace{0.4em}
 
-    $\mathbf{e_0} \cdot P^3 = [0.248,\ 0.452,\ \boxed{0.300}]$
+    \textbf{Fila B de $P^3$} ($[0.25, 0.45, 0.30]$ por cada columna de $P$):
+    \begin{itemize}
+        \item $(B,B)$: $0.25 \cdot 0.3 + 0.45 \cdot 0.2 + 0.30 \cdot 0.3 = 0.255$
+        \item $(B,M)$: $0.25 \cdot 0.5 + 0.45 \cdot 0.4 + 0.30 \cdot 0.5 = 0.455$
+        \item $(B,A)$: $0.25 \cdot 0.2 + 0.45 \cdot 0.4 + 0.30 \cdot 0.2 = 0.290$
+    \end{itemize}
 
-    \vspace{0.5em}
+    \vspace{0.4em}
 
-    \textbf{Respuesta:} Hay 30\% de probabilidad de estar en alta demanda en 3 días.
+    $\mathbf{e_0}\cdot P^3 = [0.255,\ 0.455,\ \boxed{0.290}]$ \quad (suman 1 \checkmark)
+
+    \textbf{Respuesta:} hay 29\% de probabilidad de estar en alta demanda en 3 días.
 \end{frame}
 
 \begin{frame}{Ejercicio 5: Movilidad del Ingeniero Civil - Consigna}
@@ -680,55 +749,70 @@
 
 \begin{frame}{Ejercicio 5: Solución Parte a)}
     \small
-    \textbf{Construir matriz de transición:}
+    Matriz $P = \begin{pmatrix} 0.1 & 0.3 & 0.6 \\ 0.2 & 0.2 & 0.6 \\ 0.2 & 0.4 & 0.4 \end{pmatrix}$ (orden A, B, C).
 
-    \[P = \begin{pmatrix}
-    0.1 & 0.3 & 0.6 \\
-    0.2 & 0.2 & 0.6 \\
-    0.2 & 0.4 & 0.4
-    \end{pmatrix}\]
+    \vspace{0.4em}
 
-    Filas/columnas en orden: A, B, C
+    \textbf{Estado inicial:} $\mathbf{e_2} = [0\ 0\ 1]$ (hoy está en C). Multiplicar por $\mathbf{e_2}$ \textbf{selecciona la tercera fila}: buscamos la fila C de $P^2$.
 
-    \vspace{0.5em}
+    \vspace{0.4em}
 
-    \textbf{Estado inicial:} $\mathbf{e_2} = [0\ 0\ 1]$ (hoy está en C)
+    \textbf{Fila C de $P^2$} (fila C $= [0.2, 0.4, 0.4]$ por cada columna):
+    \begin{itemize}
+        \item $(C,A)$: $0.2 \cdot 0.1 + 0.4 \cdot 0.2 + 0.4 \cdot 0.2 = 0.18$
+        \item $(C,B)$: $0.2 \cdot 0.3 + 0.4 \cdot 0.2 + 0.4 \cdot 0.4 = 0.30$
+        \item $(C,C)$: $0.2 \cdot 0.6 + 0.4 \cdot 0.6 + 0.4 \cdot 0.4 = 0.52$
+    \end{itemize}
 
-    \vspace{0.5em}
+    \vspace{0.3em}
 
-    \textbf{Calcular:} $\mathbf{e_2} \cdot P^2 = [0.26\ 0.34\ \boxed{0.40}]$
+    $\mathbf{e_2} \cdot P^2 = [0.18\ 0.30\ \boxed{0.52}]$ \quad (suman 1 \checkmark)
 
-    \vspace{0.5em}
-
-    \textbf{Respuesta a):} Hay 40\% de probabilidad de estar en C después de 2 días.
+    \textbf{Respuesta a):} Hay 52\% de probabilidad de estar en C después de 2 días.
 \end{frame}
 
-\begin{frame}{Ejercicio 5: Solución Parte b)}
+\begin{frame}{Ejercicio 5: Solución Parte b) - Planteo}
     \small
-    \textbf{Encontrar distribución estacionaria:} Resolver $\pi P = \pi$ con $\sum \pi_i = 1$
-
-    \vspace{0.5em}
-
-    Sistema de ecuaciones:
+    \textbf{Distribución estacionaria:} resolver $\pi P = \pi$ con $\sum \pi_i = 1$. Leyendo $\pi P = \pi$ \textbf{por columnas} de $P$:
     \[
     \begin{cases}
-    0.1\pi_A + 0.2\pi_B + 0.2\pi_C = \pi_A \\
-    0.3\pi_A + 0.2\pi_B + 0.4\pi_C = \pi_B \\
-    0.6\pi_A + 0.6\pi_B + 0.4\pi_C = \pi_C \\
-    \pi_A + \pi_B + \pi_C = 1
+    \pi_A = 0.1\pi_A + 0.2\pi_B + 0.2\pi_C & \text{(col. A)} \\
+    \pi_B = 0.3\pi_A + 0.2\pi_B + 0.4\pi_C & \text{(col. B)} \\
+    \pi_C = 0.6\pi_A + 0.6\pi_B + 0.4\pi_C & \text{(col. C)}
     \end{cases}
     \]
 
-    \vspace{0.5em}
+    \vspace{0.3em}
 
-    \textbf{Solución:}
+    Limpiamos (pasamos términos y $\times 10$). La columna C es redundante (las tres suman $0=0$), así que la descartamos y usamos la normalización:
     \[
-    \pi = \left[ \frac{12}{71} \approx 0.169,\ \frac{22}{71} \approx 0.310,\ \frac{37}{71} \approx 0.521 \right]
+    \begin{cases}
+    9\pi_A = 2\pi_B + 2\pi_C & (1) \\
+    8\pi_B = 3\pi_A + 4\pi_C & (2) \\
+    \pi_A + \pi_B + \pi_C = 1 & (3)
+    \end{cases}
+    \]
+\end{frame}
+
+\begin{frame}{Ejercicio 5: Solución Parte b) - Despeje}
+    \small
+    \textbf{Todo en función de $\pi_C$.} De $(1)$: $\pi_A = \dfrac{2\pi_B + 2\pi_C}{9}$. Lo meto en $(2)$:
+    \[
+    8\pi_B = \frac{6\pi_B + 6\pi_C}{9} + 4\pi_C \;\overset{\times 9}{\Longrightarrow}\; 72\pi_B = 6\pi_B + 42\pi_C \;\Rightarrow\; \pi_B = \frac{7}{11}\pi_C
+    \]
+    Y entonces $\pi_A = \dfrac{2\cdot\frac{7}{11}\pi_C + 2\pi_C}{9} = \dfrac{\frac{36}{11}\pi_C}{9} = \dfrac{4}{11}\pi_C$.
+
+    \vspace{0.4em}
+
+    \textbf{Normalización $(3)$:} $\dfrac{4}{11}\pi_C + \dfrac{7}{11}\pi_C + \pi_C = 1 \Rightarrow \dfrac{22}{11}\pi_C = 1 \Rightarrow \pi_C = \dfrac{1}{2}$.
+
+    \vspace{0.4em}
+
+    \[
+    \pi = \left[ \frac{2}{11} \approx 0.182,\ \frac{7}{22} \approx 0.318,\ \frac{1}{2} = 0.5 \right]
     \]
 
-    \vspace{0.5em}
-
-    \textbf{Interpretación:} A largo plazo, el ingeniero pasa aproximadamente 17\% del tiempo en A, 31\% en B y 52\% en C.
+    \textbf{Interpretación:} a largo plazo el ingeniero pasa $\approx 18\%$ en A, $\approx 32\%$ en B y $50\%$ en C.
 \end{frame}
 
 % --- PROCESOS DE DECISIÓN DE MARKOV ---
@@ -797,16 +881,17 @@
     \]
 
     \textbf{Interpretación:} $y_{ik}$ representa la frecuencia con que el sistema está en estado $i$ y se toma la decisión $k$ a largo plazo.
+\end{frame}
 
-    \vspace{0.5em}
-
+\begin{frame}{Variables de Decisión y Coste Promedio (cont.)}
+    \small
     Se relaciona con la distribución estacionaria:
     \[
     y_{ik} = \pi_i \cdot D_{ik}
     \]
     donde $\pi_i$ es la probabilidad de estar en $i$ y $D_{ik}$ es la probabilidad de tomar decisión $k$ dado que estamos en $i$.
 
-    \vspace{0.5em}
+    \vspace{1em}
 
     La función objetivo (costo promedio por unidad de tiempo) es:
     \[
@@ -829,13 +914,18 @@
     \vspace{0.5em}
 
     \textbf{(3) No negatividad:} $y_{ik} \ge 0$
+\end{frame}
 
-    \vspace{0.5em}
-
-    Una vez resuelto, obtenemos:
+\begin{frame}{Restricciones del Modelo LP: extraer la política}
+    \small
+    Una vez resuelto el LP, recuperamos la distribución estacionaria y la política a partir de las $y_{ik}$:
     \[
     \pi_i = \sum_{k=1}^K y_{ik}, \quad D_{ik} = \frac{y_{ik}}{\pi_i}
     \]
+
+    \vspace{0.5em}
+
+    $\pi_i$ es la fracción de tiempo en el estado $i$, y $D_{ik}$ es la probabilidad de tomar la decisión $k$ estando en $i$ (la política).
 \end{frame}
 
 \begin{frame}{Ejercicio 6: Reemplazo de Maquinaria (MDP)}
@@ -850,9 +940,10 @@
         \item Estado 2: máquina deteriorada
         \item Estado 3: máquina rota
     \end{itemize}
+\end{frame}
 
-    \vspace{0.5em}
-
+\begin{frame}{Ejercicio 6: Reemplazo de Maquinaria - Decisiones}
+    \small
     \textbf{Decisiones posibles en cada período:}
     \begin{enumerate}
         \item No hacer nada ($k=1$)
@@ -860,7 +951,7 @@
         \item Comprar una máquina nueva ($k=3$, aplicable en estados 1, 2 o 3)
     \end{enumerate}
 
-    \vspace{0.5em}
+    \vspace{1em}
 
     \textbf{Objetivo:} Encontrar la política óptima que minimice el costo promedio a largo plazo.
 \end{frame}
@@ -1343,12 +1434,17 @@ print(f"\nCosto minimo: ${objective.value:.2f}/semana")
         \item \textbf{Calle (2 espacios):} Reduce abolladura a 2\%, pero 30\% de multa (\$15)
         \item \textbf{Lote:} Cuesta \$5, pero 0\% de probabilidad de abolladura
     \end{itemize}
+\end{frame}
 
+\begin{frame}{Problema de Estacionamiento - Contexto (cont.)}
+    \small
     \textbf{Si el auto se abolla:}
     \begin{itemize}
         \item \textbf{Reparar:} Cuesta \$50 (incluye remis por 1 día fuera de servicio)
         \item \textbf{Conducir abollado:} Pérdida de valor y orgullo = \$9 por día
     \end{itemize}
+
+    \vspace{1em}
 
     \textbf{Objetivo:} Encontrar la política óptima (dónde estacionar y cuándo reparar) que minimice el costo promedio esperado a largo plazo por día en la Universidad de San Andrés.
 \end{frame}
